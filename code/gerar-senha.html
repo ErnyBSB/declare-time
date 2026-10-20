@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gerar senha — Declaração de disponibilidade</title>
+<style>
+:root{--tinta:#22352C;--papel:#F5F6F2;--verde:#2F5D4A;--verde-suave:#E4EEE8;
+  --dourado:#A8852F;--grafite:#5C6660;--linha:#D6DBD5;--raio:6px}
+body{margin:0;background:var(--papel);color:var(--tinta);
+  font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:640px;margin:0 auto;padding:32px 20px}
+h1{font-family:Georgia,"Times New Roman",serif;font-weight:600;font-size:24px;
+  border-bottom:3px double var(--tinta);padding-bottom:12px}
+.card{background:#fff;border:1px solid var(--linha);border-left:4px solid var(--grafite);
+  border-radius:var(--raio);padding:22px;margin-top:20px}
+label{display:block;font-weight:600;font-size:13px;margin:14px 0 4px}
+input{width:100%;padding:9px 10px;font:inherit;border:1px solid var(--linha);
+  border-radius:var(--raio);box-sizing:border-box}
+input:focus,button:focus-visible{outline:2px solid var(--verde);outline-offset:1px}
+button{margin-top:16px;background:var(--verde);color:#fff;border:0;
+  border-radius:var(--raio);padding:11px 22px;font:inherit;font-weight:600;cursor:pointer}
+button:hover{background:#264b3c}
+pre{background:var(--papel);color:var(--tinta);border:1px solid var(--linha);
+  border-radius:var(--raio);padding:14px;white-space:pre-wrap;word-break:break-all;
+  display:none;font-size:13px}
+p.nota{color:var(--grafite);font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Gerar senha</h1>
+  <div class="card">
+    <p class="nota">O caminho normal é definir a senha no painel de <b>Administração</b>.
+    Esta página serve para quem precisa preparar o mapa <b>SENHAS</b> do catalogo.js à mão.
+    Digite o nome <b>exatamente</b> como está no cadastro e a senha desejada. Nada sai
+    desta página — o código é calculado no seu navegador.</p>
+    <label for="nome">Nome (idêntico ao cadastro)</label>
+    <input id="nome" autocomplete="off">
+    <label for="senha">Senha</label>
+    <input id="senha" type="password" autocomplete="new-password">
+    <button id="gerar">Gerar linha para o catálogo</button>
+    <pre id="saida"></pre>
+  </div>
+</div>
+<script>
+"use strict";
+document.getElementById("gerar").addEventListener("click", async () => {
+  const nome = document.getElementById("nome").value.trim();
+  const senha = document.getElementById("senha").value;
+  const saida = document.getElementById("saida");
+  if (!nome || !senha) {
+    saida.style.display = "block";
+    saida.textContent = "Preencha o nome e a senha.";
+    return;
+  }
+  const buf = await crypto.subtle.digest("SHA-256",
+    new TextEncoder().encode(nome + "|" + senha));
+  const hex = [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("");
+  saida.style.display = "block";
+  saida.textContent = `"${nome.replaceAll('"', '\\"')}": "${hex}",`;
+});
+</script>
+</body>
+</html>

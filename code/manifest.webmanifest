@@ -1,0 +1,29 @@
+{
+  "name": "Declaração de disponibilidade",
+  "short_name": "Disponibilidade",
+  "description": "Cada pessoa declara em que horários e períodos estará disponível no ambiente de trabalho; leitores e administradores veem o conjunto.",
+  "lang": "pt-BR",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F0F2F0",
+  "theme_color": "#1D2720",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
