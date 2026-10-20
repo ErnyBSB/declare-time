@@ -591,8 +591,14 @@ inglês.)
 **Documentos.** Como no projeto de origem: `code/LEIA-ME.txt` argumenta cada
 decisão em prosa e muda a cada alteração de comportamento; este
 `project_design.md` é a referência estruturada e muda quando arquitetura, modelo de
-dados, perfis ou limitações mudam. Ao publicar uma *tag*, acrescenta-se uma linha a
-um histórico de versões, que este documento ganha na v0.1.
+dados, perfis ou limitações mudam. Ao publicar uma *tag*, acrescenta-se uma linha ao
+histórico abaixo.
+
+### 10.3. Histórico de versões
+
+| Versão | Data | O que entrou |
+|---|---|---|
+| v0.1 | out/2026 | Entrada (conexão, selo, oficialização pelo primeiro administrador, identificação com jornada), Administração (unidades, pessoas, papéis `leitor`/`adm`, senhas, conferência de `atualizadoEm`), Ajuda, Sobre, PWA. |
 
 ---
 

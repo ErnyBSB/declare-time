@@ -50,16 +50,16 @@ Section 13 is the roadmap.
 
 ```
 code/                    the app — one copy, always the current version
-  index.html             UI + all app logic + inline CSS, in one file (phase 1+)
+  index.html             UI + all app logic + inline CSS, in one file
   versao.js              the ONE place the app version is written
   catalogo.js            static seed: workday lengths, weekday labels, example
                          folder path; empty units and passwords (public repo)
-  rede.js                network folder access (phase 1, pruned from origin)
-  sw.js                  service worker; cache key "dt-" + versao (phase 1)
-  manifest.webmanifest   PWA metadata (phase 1)
-  gerar-senha.html       standalone tool: sha256("nome|senha") (phase 1)
+  rede.js                network folder access (pruned from origin)
+  sw.js                  service worker; cache key "dt-" + versao
+  manifest.webmanifest   PWA metadata (name shows on the installed icon)
+  gerar-senha.html       standalone tool: sha256("nome|senha")
   echarts.min.js         vendored chart library (phase 4)
-  icons/                 icon-192.png, icon-512.png (phase 1)
+  icons/                 icon-192.png, icon-512.png — required for offline install
   LEIA-ME.txt            the real documentation: what changed and WHY
 project_design.md        structured reference: schemas, roles, decisions, roadmap
 ```

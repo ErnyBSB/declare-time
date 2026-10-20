@@ -1,5 +1,5 @@
-DECLARAÇÃO DE DISPONIBILIDADE (versão 0.0, out/26 — antes do código)
-====================================================================
+DECLARAÇÃO DE DISPONIBILIDADE (versão 0.1, out/26 — PWA em rede)
+================================================================
 
 Este arquivo é a documentação de verdade do programa. Não é uma lista
 de mudanças: é o porquê de cada decisão, escrito para quem vai usar,
@@ -11,9 +11,105 @@ A referência estruturada — esquemas, tabelas, papéis, roteiro — fica no
 project_design.md, na raiz do repositório. Os dois dizem a mesma coisa
 de jeitos diferentes: lá, para consultar; aqui, para entender.
 
-Nesta versão 0.0 ainda não há aplicativo. Há o repositório arrumado, o
-catálogo-semente, o lugar único da versão e as decisões que precisavam
-vir antes da primeira linha de código.
+A versão 0.1 é a primeira com aplicativo: conecta a pasta, oficializa,
+identifica cada pessoa com a sua jornada e mantém o cadastro de
+unidades, pessoas, papéis e senhas. Declarar horários ainda não: isso
+chega na 0.2.
+
+Versão 0.1: entrar, oficializar e cadastrar (novidade da v0.1)
+--------------------------------------------------------------
+A entrada tem as duas etapas herdadas do projeto de origem — conectar a
+pasta da rede, e depois dizer quem se é —, com três diferenças que
+precisam estar explicadas.
+
+Não existe mais um "Administrador" de nome fixo, nem a senha inicial
+"adm". No projeto de origem, a pasta virgem era oficializada por uma
+conta chamada Administrador, com senha "adm" até alguém trocá-la. As
+duas coisas eram iguais em toda instalação e estavam escritas no
+código, que é público: qualquer um que o lesse entraria como
+administrador numa pasta recém-oficializada, antes da troca. Aqui,
+quem oficializa a pasta digita o próprio nome, a própria unidade e uma
+senha, e vira o primeiro administrador. O config.json nasce nesse ato,
+já com uma pessoa de verdade dentro.
+
+Administrador sempre tem senha. Dar o papel a alguém sem senha pede a
+senha na mesma hora, e as duas coisas vão juntas na mesma gravação: não
+existe um instante em que o arquivo tenha um administrador sem senha.
+Pela mesma razão, a senha de um administrador pode ser trocada, mas não
+removida, e o último administrador não pode perder o papel nem sair do
+cadastro — senão ninguém mais entraria na Administração.
+
+A jornada (8 ou 6 horas) é pedida a todos, inclusive a leitores e
+administradores, porque todos declaram. Ela é gravada no arquivo da
+própria pessoa ANTES de a identidade travar: se a pasta recusar a
+escrita, a pessoa vê o motivo ainda na entrada, e não descobre o
+problema na primeira declaração.
+
+Os papéis vêm do cadastro, e só dele. A identidade lembrada neste
+computador guarda o nome e a jornada, e não o papel: quem foi promovido
+a leitor, ou deixou de ser administrador, passa a ver a tela certa no
+próximo "Atualizar dados da rede", sem precisar sair e entrar.
+
+Dois administradores ao mesmo tempo
+-----------------------------------
+Com um administrador só, o config.json tinha um escritor só. Com vários,
+dois podem estar com a Administração aberta ao mesmo tempo, e o
+segundo a salvar apagaria em silêncio o que o primeiro fez — cada um
+grava o cadastro inteiro, do jeito que estava quando a tela abriu.
+
+Por isso, antes de gravar, o programa relê o config.json e compara a
+data de atualização com a que leu ao abrir a tela. Se forem diferentes,
+outra pessoa gravou no meio do caminho: nada é gravado, e a tela pede
+"Atualizar dados da rede" e que a alteração seja refeita. Refazer uma
+alteração é chato; perder a de outra pessoa sem ninguém saber é pior.
+
+A conferência não fecha a porta inteira. Entre a releitura e a escrita
+passam milissegundos, e duas gravações exatamente nesse intervalo ainda
+se sobrepõem. Fechar isso exigiria um servidor que tranque o arquivo,
+que é justamente o que este programa não tem.
+
+A mesma ideia vale para a oficialização: ela só grava se, no momento da
+gravação, continuar não existindo config.json na pasta.
+
+O que a gravação não apaga
+--------------------------
+Toda gravação no arquivo de uma pessoa lê o arquivo inteiro, muda o que
+precisa e regrava o conjunto — inclusive as chaves que esta versão não
+conhece. Uma versão mais nova pode acrescentar algo ao arquivo (as
+chaves "realizados" e "ausencias" já estão reservadas); se alguém abrir
+o arquivo com esta versão, mais antiga, e mudar a jornada, o que a
+versão nova gravou continua lá. O mesmo vale para o config.json.
+
+Remover uma pessoa do cadastro não apaga o arquivo dela: ele continua
+na pasta, desligado do cadastro. Apagar declarações de alguém não é
+coisa que um clique na Administração deva fazer. O painel da v0.3 vai
+mostrar esses arquivos numa seção própria, para que não sumam calados.
+
+Nomes que cairiam no mesmo arquivo
+----------------------------------
+O arquivo de cada pessoa leva o nome dela sem acentos, em minúsculas e
+com hífens: "Ana Beatriz Nunes" grava em ana-beatriz-nunes.json. Dois
+nomes que só diferem em acento ou em maiúsculas cairiam no mesmo
+arquivo, e as declarações de um apagariam as do outro. O cadastro recusa
+o segundo nome e diz com quem ele colide; um sobrenome a mais resolve.
+
+Detalhes que parecem pequenos
+-----------------------------
+A senha nova é digitada numa janela própria, com dois campos mascarados,
+e não na caixa de pergunta do navegador, que mostra em claro o que se
+digita para quem estiver olhando a tela.
+
+Os avisos comuns da tela deixaram de ser verdes. No projeto de origem
+verde era "aprovado"; aqui ele significa "declaração vigente", e um
+"senha atualizada" verde diria uma coisa que não é. Pelo mesmo motivo,
+as etiquetas de papel e de senha na Administração são neutras.
+
+O ícone é novo — um calendário com uma faixa de dias coberta — porque o
+do projeto de origem carregava a identidade de outro programa.
+
+A tela "Meus horários" existe desde já, mostrando a identidade em uso e
+onde fica o arquivo da pessoa, para que a primeira coisa a ver depois
+de entrar não seja uma tela vazia.
 
 O que o programa é
 ------------------
