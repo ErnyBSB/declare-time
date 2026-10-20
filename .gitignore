@@ -1,0 +1,34 @@
+# =========================================================
+# O repositório é PÚBLICO. Nome de pessoa, senha (mesmo em hash) e
+# declaração não entram aqui — ver "O que nunca vai para o repositório",
+# no code/LEIA-ME.txt.
+#
+# Esta lista não é uma sugestão de organização: é a grade que impede um
+# "git add -A" distraído de publicar dado interno.
+# =========================================================
+
+# Configuração central: pessoas, papéis, hashes de senha e o selo da
+# instalação. Mora na pasta da rede, nunca no repositório.
+config.json
+
+# Arquivos de declaração, em qualquer profundidade. Uma pasta
+# declaracoes/ só existe na rede ou numa pasta de teste; nenhuma das
+# duas é versionada.
+declaracoes/
+
+# Pastas de teste que imitam a pasta da rede. Quem for exercitar uma
+# mudança precisa de config.json e declaracoes/<pessoa>.json em algum
+# lugar; que seja em algum destes nomes, que já estão barrados.
+pasta-teste/
+dados/
+teste/
+teste-*/
+
+# Cópia local do catálogo com dados de verdade, se alguém preferir
+# trabalhar assim em vez de cadastrar pelo painel de Administração.
+*.local.js
+
+# Sobras de editor e de sistema
+*~
+.DS_Store
+Thumbs.db
