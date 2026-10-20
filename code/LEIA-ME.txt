@@ -1,0 +1,175 @@
+DECLARAÇÃO DE DISPONIBILIDADE (versão 0.0, out/26 — antes do código)
+====================================================================
+
+Este arquivo é a documentação de verdade do programa. Não é uma lista
+de mudanças: é o porquê de cada decisão, escrito para quem vai usar,
+manter ou retomar o aplicativo daqui a um ano sem ninguém por perto
+para perguntar. Cada mudança de comportamento ganha aqui uma seção
+nova, com a troca que foi feita e a limitação admitida.
+
+A referência estruturada — esquemas, tabelas, papéis, roteiro — fica no
+project_design.md, na raiz do repositório. Os dois dizem a mesma coisa
+de jeitos diferentes: lá, para consultar; aqui, para entender.
+
+Nesta versão 0.0 ainda não há aplicativo. Há o repositório arrumado, o
+catálogo-semente, o lugar único da versão e as decisões que precisavam
+vir antes da primeira linha de código.
+
+O que o programa é
+------------------
+Cada pessoa declara, ela mesma, em que horários e em que períodos
+estará disponível no ambiente de trabalho: "de 01/09 a 31/12, de
+segunda a sexta, das 9h às 15h". Quem responde por uma área vê as
+declarações da sua área; quem administra vê o conjunto, em tabela e em
+gráficos: quem cobre cada hora de cada dia da semana, quantas horas por
+semana cada pessoa declarou e quem ainda não declarou nada.
+
+Ele nasce do Programa de Resultados — COBIB, onde isto era uma seção
+chamada "Horários", dentro de um programa maior de metas e pontos. Aqui
+a seção vira o programa todo, e o resto fica para trás.
+
+O que o programa NÃO é
+----------------------
+Precisa estar dito com todas as letras, porque a confusão é a primeira
+que aparece: isto não é ponto. Ninguém marca entrada nem saída, e o
+programa não confere se o que foi declarado foi cumprido — nem tem como
+conferir. É previsão de disponibilidade.
+
+Pela mesma razão, a declaração não alimenta métrica nenhuma, não passa
+por aprovação e não vira ranking. Um horário declarado que contasse
+para desempenho viraria promessa que o programa não tem como cobrar.
+Daí também o nome: "Declaração de disponibilidade", e não "de horários"
+— o que se declara é quando se espera estar, não quando se esteve.
+
+Por que sem servidor
+--------------------
+O aplicativo roda abrindo o index.html de uma pasta. Os dados ficam em
+arquivos JSON numa pasta de rede compartilhada, lidos e gravados pelo
+próprio navegador (Chrome ou Edge). Não há servidor, banco de dados,
+instalação de pacotes nem nada buscado na internet.
+
+Não é economia de esforço: é que, no serviço público, pedir um servidor
+costuma levar mais tempo do que construir o programa. Uma pasta de rede
+quase todo órgão já tem. O preço está na seção "Limitações", e foi
+aceito de propósito.
+
+Um arquivo, um único escritor
+-----------------------------
+Sem banco de dados, dois navegadores gravando o mesmo arquivo ao mesmo
+tempo apagam o trabalho um do outro em silêncio. A saída herdada do
+projeto de origem é não deixar isso acontecer por construção: cada
+pessoa grava SÓ o próprio arquivo, declaracoes/<nome>.json, e ninguém
+mais grava nele — nem quem administra.
+
+O config.json, com o cadastro, é a única exceção parcial: só
+administradores o gravam, mas pode haver mais de um. Por isso, antes de
+gravar, o programa relê o arquivo e confere se alguém o alterou desde
+que a tela foi aberta. Se alterou, não grava e pede para atualizar
+antes. Duas gravações no mesmo instante ainda podem se sobrepor; é
+raro, e está admitido.
+
+Três papéis, que se somam
+-------------------------
+Pessoa: todo mundo que está no cadastro. Declara os próprios horários,
+e só os próprios.
+
+Leitor: o responsável pela área de trabalho e as pessoas que ele
+indicar. Vê o painel das unidades que lhe forem atribuídas — pode ser
+mais de uma, e pode haver vários leitores por unidade.
+
+Administrador: vê tudo e mantém o cadastro. Pode haver vários.
+
+Os papéis se somam, e não se excluem: a chefe de uma seção também tem
+horário, e declará-lo não deveria exigir uma segunda identidade. Quem
+é leitor ou administrador entra uma vez só e vê as duas coisas.
+
+Uma ressalva honesta: o recorte do leitor por unidade é de tela. Na
+pasta da rede, todos têm leitura em todos os arquivos — é assim que o
+painel consegue montar o conjunto. Quem abrir os arquivos fora do
+programa lê tudo.
+
+As decisões que vieram antes do código
+--------------------------------------
+O formato dos arquivos é um contrato com gente de verdade: depois que
+alguém gravar uma declaração na pasta, nenhuma chave muda de nome. Por
+isso três perguntas foram respondidas antes da primeira linha:
+
+Previsão, e não realização. Declara-se "de setembro a dezembro, de
+segunda a sexta, das 9h às 15h", e não "no dia 14 estive aqui das 9h às
+12h". A segunda forma se aproxima de registro de ponto, que este
+programa não é. Se um dia for pedida, entra no mesmo arquivo com chave
+própria (realizados), já reservada, sem tocar no que existe.
+
+Uma faixa por declaração. Quem trabalha das 9h às 12h e das 14h às 17h
+declara duas vezes, uma para cada turno. Foi escolha entre um
+formulário simples para o caso comum e uma lista de faixas que pesaria
+em todo mundo para servir a alguns. Duas declarações só colidem quando
+período, dia da semana e hora se cruzam ao mesmo tempo. Turno que passa
+da meia-noite é recusado, e a tela diz por quê.
+
+Encerrar, excluir, substituir — e nunca editar. Uma declaração que
+ainda não começou pode ser excluída. Uma que está valendo pode ser
+encerrada, isto é, ganhar data de fim. Uma que já começou não se edita,
+porque editar reescreveria o passado que o painel consulta mês a mês.
+Mudar de horário é substituir: encerrar a atual na véspera e declarar a
+nova, as duas coisas numa gravação só.
+
+O lugar único da versão
+-----------------------
+A versão é escrita num arquivo só, o versao.js, e em nenhum outro
+lugar. A etiqueta da tela, a janela "Sobre" e a chave do cache offline
+derivam dele. No projeto de origem o número já esteve em três lugares,
+e bastava esquecer um para a tela anunciar uma versão enquanto o
+navegador servia outra.
+
+Publicar uma versão é mexer no versao.js e marcar a tag correspondente
+no repositório. A numeração é 0.x enquanto o programa não for usado com
+dados reais; a 1.0 marca o primeiro uso em produção, e a partir dela o
+formato dos arquivos não muda mais de nome. Esta 0.0 é o repositório
+antes do código e não ganha tag.
+
+A data de atualização no versao.js é preenchida à mão. Buscá-la na
+internet contradiria o motivo de o programa existir: funcionar numa
+máquina que só enxerga a pasta da rede.
+
+O que nunca vai para o repositório
+----------------------------------
+O código mora num repositório PÚBLICO. A regra é curta:
+
+  NOME DE PESSOA, SENHA (mesmo em hash), CADASTRO E DECLARAÇÃO NÃO
+  SÃO VERSIONADOS. NUNCA.
+
+As pessoas de verdade ficam no config.json da pasta da rede, gravado
+por um administrador pelo painel. O catalogo.js do repositório é só
+SEMENTE: unidades vazias, nenhuma senha. Ele continua versionado porque
+o index.html o carrega pelo nome; sem ele, um clone novo abriria em
+branco. O arquivo fica; o que sai dele são as pessoas.
+
+O .gitignore é a grade de proteção: barra o config.json, qualquer pasta
+declaracoes/, as pastas de teste (pasta-teste/, dados/, teste*/) e
+arquivos *.local.js. Sem ele, uma pasta de teste com dados reais
+entraria num "git add -A" sem aviso nenhum.
+
+Exemplos, capturas de tela e testes usam um elenco inventado: Helena
+Barros, Ana Beatriz Nunes, Carlos Eduardo Prado, Marina Duarte e
+Roberto Aguiar.
+
+Limitações assumidas desde o início
+-----------------------------------
+- Só funciona no Chrome e no Edge, por causa do acesso à pasta.
+- Não há tempo real: "Atualizar dados da rede" relê os arquivos.
+- Cada pessoa aponta a pasta uma vez em cada computador.
+- Tudo é autodeclarado: nem horário nem jornada são conferidos.
+- O mapa de cobertura não conhece feriados nem ausências, e conta a
+  hora inteira (quem sai às 12h30 conta na hora das 12h).
+- Sem as permissões NTFS recomendadas, a proteção é só contra uso
+  casual.
+- Publicar sem trocar a versão no versao.js continua servindo a
+  anterior, por causa do cache.
+
+O que ainda está em aberto
+--------------------------
+O texto de finalidade exigido pela LGPD — para que o dado serve, quem o
+lê, com que base legal — tem de ser redigido por quem responde pelo
+dado no órgão, e não inventado pelo programa. Até lá, a tela de Ajuda
+trará um aviso de texto pendente. Precisa estar resolvido antes da 1.0.
