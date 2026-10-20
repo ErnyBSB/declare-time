@@ -219,10 +219,10 @@ code/                    o aplicativo: uma cópia só, sempre a versão atual
   icons/                 icon-192.png, icon-512.png
   LEIA-ME.txt            o porquê de cada decisão, em prosa
 project_design.md        este documento
-CLAUDE.md                instruções para agentes de IA (a escrever, ver 13)
+CLAUDE.md                instruções para agentes de IA
 README.md                apresentação curta
 LICENSE                  CC0 1.0
-.gitignore               barra config.json, pastas de teste e *.local.js
+.gitignore               barra config.json, declaracoes/, pastas de teste e *.local.js
 ```
 
 Tudo num `index.html` só, pelo mesmo motivo do projeto de origem: sem build,
@@ -242,7 +242,7 @@ restrição de licença.
 | `gerar-senha.html` | Copiar como está. |
 | `echarts.min.js` | Copiar como está: a linha do tempo é feita em HTML/CSS (12.6) e não pede recompilação. |
 | `index.html` | **Não copiar inteiro.** Trazer por partes: folha de estilo e tokens, rail, tela de entrada (conexão, selo, identificação), `escapar`, `sha256hex`, a tela **Horários** e a aba **Horários** do painel, com seus dois gráficos. É dessa última parte que nasce o aplicativo. |
-| `.gitignore` | Copiar, trocando `unidadeCentral/` pelo nome de pasta de teste deste projeto. |
+| `.gitignore` | Copiar, trocando `unidadeCentral/` por `pasta-teste/` e barrando também qualquer `declaracoes/`. |
 
 ---
 
