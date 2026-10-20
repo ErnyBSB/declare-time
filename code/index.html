@@ -1,0 +1,1607 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Declaração de disponibilidade</title>
+<meta name="description" content="Cada pessoa declara em que horários e períodos estará disponível no ambiente de trabalho; leitores e administradores veem o conjunto.">
+<!-- O manifesto NÃO entra aqui: ele é criado por código, no fim da página,
+     junto com o registro do service worker e sob a mesma condição de
+     protocolo. Sob file:// o Chrome recusa buscá-lo e enche o console. -->
+<meta name="theme-color" content="#1D2720">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<style>
+/* ===================== PALETA =====================
+   Herdada do projeto de origem, com o significado das cores trocado:
+   lá verde era aprovado e dourado, pendente. Aqui não há aprovação, e
+   as duas ficam com significados novos, fixos:
+     verde   = declaração vigente;
+     dourado = divergência entre a faixa declarada e a jornada.
+   Nenhuma das duas serve de enfeite nem de "status" de cadastro —
+   etiqueta de papel ou de senha é neutra (.tag). O rail escuro é
+   superfície, não estado. */
+:root{
+  --tinta:#1B211D; --papel:#F0F2F0; --ficha:#FFFFFF;
+  --linha:#D7DCD8; --linha-suave:#E5E9E6;
+  /* --linha é ESTRUTURA (borda de cartão, de tabela) e some do olho de
+     propósito; --linha-campo é CONTORNO DE CONTROLE (campo, chip), onde
+     a pessoa clica ou digita: 3,59:1 no branco, acima dos 3:1 da WCAG. */
+  --linha-campo:#7E8A83;
+  --grafite:#646B65;
+  --verde:#3D5840; --verde-fundo:#2A442E; --verde-suave:#EDF6EE;
+  --verde-borda:#DBEEDD; --verde-vivo:#51BF68;
+  --dourado:#775814; --dourado-suave:#F8EDD8;
+  --erro:#A03F3C; --erro-suave:#FFD9D4;
+  /* rail de navegação */
+  --rail:#1D2720; --rail-linha:#2E3831; --rail-ativo:#2B3930;
+  --rail-hover:#2B362E; --rail-texto:#E6E9E5; --rail-mudo:#9DA89E;
+  --rail-mudo2:#808981; --rail-ponto:#4A564E;
+  --raio:8px; --raio-p:6px;
+  --serif: Georgia, "Times New Roman", serif;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+*{box-sizing:border-box}
+/* Sem o !important, qualquer regra nossa que declare display vence o
+   display:none que o navegador dá a [hidden]. */
+[hidden]{display:none !important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0; background:var(--papel); color:var(--tinta);
+  font-family:var(--sans); font-size:14px; line-height:1.5;
+  -webkit-font-smoothing:antialiased}
+button{font-family:inherit}
+:focus-visible{outline:2px solid var(--verde); outline-offset:2px}
+.rail :focus-visible{outline-color:var(--verde-vivo)}
+
+/* ===================== ESTRUTURA ===================== */
+.app{display:flex; min-height:100vh; align-items:stretch}
+
+/* ---------- rail de navegação ---------- */
+.rail{flex:0 0 244px; background:var(--rail); color:var(--rail-texto);
+  display:flex; flex-direction:column; position:sticky; top:0; height:100vh}
+.rail-topo{padding:22px 20px 18px; border-bottom:1px solid var(--rail-linha)}
+/* O nome vai por extenso, em duas linhas: o espaço entre "Declaração" e
+   "de" é inseparável no HTML, para a quebra cair sempre antes de
+   "disponibilidade" e nunca deixar o "de" sozinho. */
+.marca{display:block; font-family:var(--serif); font-size:22px; line-height:1.12;
+  color:#F9FBF9}
+.marca-sub{display:flex; align-items:center; gap:8px; margin-top:8px; flex-wrap:wrap}
+.marca-sub .versao{font-size:10.5px; letter-spacing:.04em; color:var(--rail-mudo);
+  border:1px solid #3A463E; border-radius:999px; padding:1px 7px; white-space:nowrap}
+
+/* flex:0 1 auto: a navegação ocupa só a altura dos seus itens, para que
+   "Ajuda" e "Sobre" fiquem logo abaixo do último item. */
+.rail-nav{padding:14px 10px; display:flex; flex-direction:column; gap:2px;
+  flex:0 1 auto; overflow-y:auto}
+.rail-grupo{font-size:10px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--rail-mudo2); padding:6px 10px 8px; margin:0}
+.rail-nav > .rail-grupo:not(:first-child){padding-top:18px}
+.rail-item{display:flex; align-items:center; gap:10px; width:100%;
+  padding:9px 11px; border:0; border-radius:7px; background:none; cursor:pointer;
+  font-size:13.5px; font-weight:500; color:#CED3CC; text-align:left}
+.rail-item:hover{background:var(--rail-hover)}
+.rail-item[aria-current=page]{background:var(--rail-ativo); color:#F9FBF9}
+.rail-item .ponto{width:6px; height:6px; border-radius:50%;
+  background:var(--rail-ponto); flex:none}
+.rail-item[aria-current=page] .ponto{background:var(--verde-vivo)}
+
+/* "Ajuda" e "Sobre" vivem FORA da navegação (ver o comentário no HTML),
+   então ganham uma linha de separação. */
+.rail-extra{display:flex; flex-direction:column; gap:2px;
+  padding:8px 10px; border-top:1px solid var(--rail-linha)}
+.rail-pe{margin-top:auto; padding:14px 16px 16px; border-top:1px solid var(--rail-linha);
+  display:flex; flex-direction:column; gap:10px}
+.pessoa{display:flex; align-items:center; gap:10px}
+.avatar{flex:none; width:30px; height:30px; border-radius:50%;
+  background:var(--rail-ativo); color:var(--rail-texto); font-size:11px;
+  font-weight:600; display:flex; align-items:center; justify-content:center}
+.pessoa-txt{min-width:0}
+.pessoa-txt b{display:block; font-size:13px; color:#F9FBF9;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.pessoa-txt small{display:block; font-size:11.5px; color:var(--rail-mudo)}
+.rail-trocar{background:none; border:0; padding:0; cursor:pointer; text-align:left;
+  font-size:11.5px; color:var(--rail-mudo); text-decoration:underline}
+.rail-trocar:hover{color:var(--rail-texto)}
+.conexao{display:flex; align-items:center; gap:8px; font-size:11.5px; color:var(--rail-mudo)}
+.led{width:8px; height:8px; border-radius:50%; background:var(--erro); flex:none}
+.led.ok{background:var(--verde-vivo)}
+.rail-acao{width:100%; padding:8px 10px; border:1px solid #3A463E; border-radius:var(--raio-p);
+  background:var(--rail-ativo); color:var(--rail-texto); font-size:12.5px;
+  font-weight:600; cursor:pointer}
+.rail-acao:hover{background:#354039}
+
+/* ---------- palco ---------- */
+.palco{flex:1 1 auto; min-width:0; display:flex; flex-direction:column}
+.topo{padding:26px 32px 18px; border-bottom:1px solid var(--linha);
+  display:flex; gap:24px; align-items:flex-start; flex-wrap:wrap;
+  background:var(--ficha)}
+.topo .titulo{flex:1 1 340px; min-width:0}
+.topo h1{font-family:var(--serif); font-weight:400; font-size:27px; margin:0; line-height:1.2}
+.topo .sub{margin:6px 0 0; color:var(--grafite); font-size:13px; max-width:78ch}
+.topo .controles{display:flex; gap:14px; align-items:flex-end; flex-wrap:wrap}
+.corpo{padding:22px 32px 56px; flex:1 1 auto}
+
+/* ---------- cartões e formulário ---------- */
+.cartao{background:var(--ficha); border:1px solid var(--linha);
+  border-radius:var(--raio); padding:20px}
+.cartao + .cartao{margin-top:16px}
+.cartao h2{font-size:14.5px; font-weight:600; margin:0}
+.dica{margin:5px 0 0; color:var(--grafite); font-size:12.5px}
+.rotulo{display:block; font-size:10.5px; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--grafite); font-weight:600; margin:0 0 5px}
+select,input[type=text],input[type=password]{
+  width:100%; padding:9px 11px; font:inherit; font-size:13.5px; color:var(--tinta);
+  background:var(--ficha); border:1px solid var(--linha-campo); border-radius:var(--raio-p)}
+.campo{margin-bottom:14px}
+.campo:last-child{margin-bottom:0}
+.grade2{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+.linha-form{display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap; margin-top:14px}
+.linha-form .campo{margin:0; flex:1 1 200px}
+.marcar{display:flex; gap:8px; align-items:center; margin:12px 0 0; font-size:13px}
+.marcar input{width:auto; margin:0}
+
+.acao{background:var(--verde); color:#fff; border:0; border-radius:var(--raio-p);
+  padding:11px 20px; font:inherit; font-size:13.5px; font-weight:600; cursor:pointer}
+.acao:hover{background:var(--verde-fundo)}
+/* Botão secundário é controle, e o contorno é a única coisa que o desenha:
+   entra na mesma linha firme dos campos. */
+.acao.sec{background:var(--ficha); color:var(--tinta); border:1px solid var(--linha-campo)}
+.acao.sec:hover{background:var(--papel)}
+.acao.mini{padding:7px 13px; font-size:12.5px}
+.acao:disabled{opacity:.45; cursor:not-allowed}
+.acao:disabled:hover{background:var(--verde)}
+.excluir{background:none; border:0; color:var(--erro); cursor:pointer;
+  font-size:12.5px; padding:6px 8px}
+.excluir:hover{text-decoration:underline}
+
+/* chips de jornada */
+.chips{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+.chip{border:1px solid var(--linha-campo); background:var(--ficha); border-radius:var(--raio-p);
+  padding:12px 14px; font:inherit; cursor:pointer; color:var(--grafite);
+  display:flex; align-items:baseline; gap:7px; justify-content:center}
+.chip b{font-family:var(--serif); font-size:19px; font-weight:400; color:var(--tinta)}
+.chip small{font-size:10.5px; letter-spacing:.09em; text-transform:uppercase}
+.chip[aria-pressed=true]{border-color:var(--tinta); background:var(--papel); color:var(--tinta)}
+
+/* ---------- avisos ----------
+   O aviso comum é neutro, e não verde: verde aqui é "declaração
+   vigente". O de erro continua vermelho, que nunca foi cor de dado. */
+.aviso{background:var(--papel); border:1px solid var(--linha);
+  border-radius:var(--raio-p); color:var(--tinta);
+  padding:9px 12px; font-size:12.5px; margin-top:12px; display:none}
+.aviso.erro{background:var(--erro-suave); border-color:#F0C4BE; color:var(--erro)}
+
+/* ---------- tabelas ---------- */
+.rolagem{overflow-x:auto}
+table{width:100%; min-width:640px; border-collapse:collapse; font-size:13px}
+th{text-align:left; font-size:10px; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--grafite); font-weight:600; padding:10px 12px;
+  border-bottom:1px solid var(--linha); white-space:nowrap}
+td{border-bottom:1px solid var(--linha-suave); padding:10px 12px; vertical-align:middle}
+tr:last-child td{border-bottom:0}
+/* O select herda width:100% dos campos; numa coluna estreita isso corta
+   o nome da unidade. Aqui ele mede pelo conteúdo, com um piso. */
+td select{width:auto; min-width:9em; padding:6px 8px; font-size:12.5px}
+td.acoes{white-space:nowrap}
+td.acoes .acao{margin:2px 4px 2px 0}
+.vazio{color:var(--grafite); text-align:center; padding:24px 12px; font-size:13px}
+
+/* ---------- etiquetas neutras (papel, senha, unidade) ---------- */
+.tag{display:inline-block; background:var(--papel); color:var(--grafite);
+  border:1px solid var(--linha); border-radius:999px; padding:1px 8px;
+  font-size:10.5px; font-weight:600; white-space:nowrap; margin:1px 2px 1px 0}
+.tag.forte{background:var(--ficha); color:var(--tinta); border-color:var(--linha-campo)}
+.lista-unidades{list-style:none; margin:14px 0 0; padding:0; display:flex; flex-wrap:wrap; gap:8px}
+.lista-unidades li{display:flex; align-items:center; gap:2px; border:1px solid var(--linha);
+  border-radius:999px; padding:2px 4px 2px 12px; font-size:13px; background:var(--papel)}
+.lista-unidades .excluir{padding:4px 8px}
+
+/* ---------- ficha de identidade (Meus horários) ---------- */
+.ficha{display:grid; grid-template-columns:auto 1fr; gap:7px 18px; margin:14px 0 0; font-size:13.5px}
+.ficha dt{font-weight:600; color:var(--grafite); white-space:nowrap}
+.ficha dd{margin:0; overflow-wrap:anywhere}
+code{font-family:ui-monospace,Consolas,monospace; font-size:12.5px}
+
+/* ---------- entrada (pasta + identidade) ---------- */
+.entrada{max-width:540px; margin:52px auto 0}
+.entrada h1{font-family:var(--serif); font-weight:400; font-size:27px; margin:0 0 6px}
+.entrada .sub{margin:0 0 22px; color:var(--grafite); font-size:13px}
+.etapa{display:flex; gap:12px; align-items:flex-start}
+.etapa > div{flex:1 1 auto; min-width:0}
+.etapa .selo{flex:none; width:22px; height:22px; border-radius:50%; font-size:12px;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--papel); color:var(--grafite); border:1px solid var(--linha)}
+.etapa .selo.ok{background:var(--rail); color:#F9FBF9; border-color:var(--rail)}
+.caminho{font-family:ui-monospace,Consolas,monospace; font-size:11.5px; color:var(--grafite);
+  overflow-wrap:anywhere}
+
+/* ---------- janelas ---------- */
+dialog{border:0; border-radius:var(--raio); padding:24px; width:min(480px,92vw);
+  color:var(--tinta); font-family:var(--sans); font-size:14px; line-height:1.5;
+  box-shadow:0 16px 40px rgba(27,33,29,.3)}
+dialog::backdrop{background:rgba(27,33,29,.45)}
+dialog h2{font-family:var(--serif); font-weight:400; font-size:21px; margin:0 0 4px}
+.janela-rodape{display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap;
+  gap:10px; margin-top:20px; padding-top:16px; border-top:1px solid var(--linha)}
+.janela-rodape .esquerda{margin-right:auto}
+.marcas{display:flex; flex-direction:column; gap:6px; margin:14px 0 0;
+  max-height:260px; overflow-y:auto}
+.sobre-corpo{margin:16px 0 0; font-size:13.5px}
+.sobre-corpo p{margin:0 0 9px}
+.sobre-corpo p:last-child{margin-bottom:0}
+.sobre-corpo a{color:var(--verde); overflow-wrap:anywhere}
+
+/* ---------- ajuda ----------
+   Medida de leitura limitada: esta é a única tela feita para ser LIDA, e
+   não preenchida. */
+.ajuda{max-width:80ch}
+.ajuda h3{font-size:13.5px; font-weight:600; margin:18px 0 6px}
+.ajuda p, .ajuda ul, .ajuda ol{margin:0 0 10px; font-size:13.5px}
+.ajuda ul, .ajuda ol{padding-left:20px}
+.ajuda li{margin-bottom:5px}
+.ajuda .pendente{border:1px dashed var(--linha-campo); border-radius:var(--raio-p);
+  padding:11px 13px; margin:12px 0 0; color:var(--grafite)}
+
+/* ===================== TELAS ESTREITAS =====================
+   O rail vira uma barra no topo, que rola na horizontal. */
+@media(max-width:900px){
+  .app{flex-direction:column}
+  .rail{flex:none; width:100%; height:auto; position:static}
+  .rail-topo{padding:14px 16px 12px}
+  .marca{font-size:20px}
+  .rail-nav{flex-direction:row; overflow-x:auto; gap:6px; padding:10px 12px; flex:none}
+  .rail-grupo{display:none}
+  .rail-item{width:auto; white-space:nowrap; padding:8px 12px}
+  .rail-extra{flex-direction:row; gap:6px; border-top:0; padding:0 12px 8px}
+  .rail-pe{flex-direction:row; align-items:center; flex-wrap:wrap; gap:12px; padding:12px 16px}
+  .rail-pe .conexao{margin-left:auto}
+  .rail-acao{width:auto}
+  .topo,.corpo{padding-left:20px; padding-right:20px}
+}
+@media(max-width:560px){
+  .topo{padding:18px 16px 14px}
+  .corpo{padding:16px 16px 44px}
+  .grade2{grid-template-columns:1fr}
+  .topo h1,.entrada h1{font-size:23px}
+  .entrada{margin-top:24px}
+}
+@media (prefers-reduced-motion: reduce){*{transition:none !important}}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+<!-- ============================ RAIL ============================
+     Cada assunto é uma tela, e o rail diz onde se está. "Meu trabalho"
+     é de todos, porque todos declaram; "Gestão" só aparece para quem
+     tem papel de gestão. O painel de leitores e administradores chega
+     na v0.3. -->
+<nav class="rail">
+  <div class="rail-topo">
+    <span class="marca">Declaração&nbsp;de disponibilidade</span>
+    <div class="marca-sub">
+      <!-- Preenchida a partir de APP.rotulo (versao.js). Vazia no HTML de
+           propósito: uma cópia escrita aqui seria um segundo lugar a
+           lembrar de atualizar. -->
+      <span class="versao" id="versaoApp"></span>
+    </div>
+  </div>
+
+  <div class="rail-nav" id="railNav" hidden>
+    <p class="rail-grupo">Meu trabalho</p>
+    <button type="button" class="rail-item" data-vista="hor" id="navHor">
+      <span class="ponto"></span>Meus horários</button>
+
+    <p class="rail-grupo" id="grupoGestao">Gestão</p>
+    <button type="button" class="rail-item" data-vista="adm" id="navAdm">
+      <span class="ponto"></span>Administração</button>
+  </div>
+
+  <!-- "Ajuda" e "Sobre" ficam FORA do #railNav de propósito. O nav some
+       enquanto ninguém se identificou, e é justamente antes de entrar que
+       se pergunta o que é este programa e como conectar a pasta. -->
+  <div class="rail-extra">
+    <button type="button" class="rail-item" id="btnAjuda" data-vista="ajuda">
+      <span class="ponto"></span>Ajuda</button>
+    <button type="button" class="rail-item" id="btnSobre">
+      <span class="ponto"></span>Sobre o programa</button>
+  </div>
+
+  <div class="rail-pe">
+    <div class="pessoa" id="railPessoa" hidden>
+      <span class="avatar" id="railIniciais" aria-hidden="true"></span>
+      <span class="pessoa-txt">
+        <b id="idAtual">Ninguém identificado</b>
+        <small id="txtIdentResumo"></small>
+      </span>
+    </div>
+    <button type="button" class="rail-trocar" id="btnTrocar" hidden>trocar identidade</button>
+    <div class="conexao">
+      <span class="led" id="led"></span>
+      <span id="txtConexao">Pasta não conectada</span>
+    </div>
+    <button type="button" class="rail-acao" id="btnAtualizar" hidden>Atualizar dados da rede</button>
+  </div>
+</nav>
+
+<main class="palco">
+
+<!-- ====================== ENTRADA (pasta + identidade) ====================== -->
+<section class="vista" id="vEntrada">
+  <div class="corpo">
+    <div class="entrada">
+      <h1>Quem é você?</h1>
+      <p class="sub">Duas etapas, uma vez só por computador. Depois disso a tela abre direto
+        nos seus horários.</p>
+
+      <div class="cartao">
+        <div class="etapa">
+          <span class="selo" id="seloPasta">1</span>
+          <div>
+            <h2>Pasta da rede</h2>
+            <p class="dica">Conecte a pasta compartilhada. Só pastas oficializadas por um
+              administrador são aceitas; a escolha fica memorizada neste computador.</p>
+            <p class="caminho" id="txtCaminho"></p>
+            <button type="button" class="acao sec mini" id="btnPasta">Conectar pasta</button>
+            <div class="aviso" id="avisoPasta" role="alert"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cartao" id="cardIdent" hidden>
+        <div class="etapa">
+          <span class="selo" id="seloIdent">2</span>
+          <div>
+            <h2 id="tituloIdent">Identificação</h2>
+            <div id="linhaPessoa">
+              <!-- Pasta oficial (ou divergente): escolhe-se um nome do cadastro. -->
+              <div id="blocoEscolha">
+                <p class="dica" style="margin-bottom:14px">Os papéis e a unidade vêm do
+                  cadastro da pasta — não se escolhem aqui.</p>
+                <div class="campo">
+                  <label class="rotulo" for="selPessoa">Seu nome</label>
+                  <select id="selPessoa"></select>
+                </div>
+                <div class="campo" id="cSenha" hidden>
+                  <label class="rotulo" for="inpSenha">Senha</label>
+                  <input type="password" id="inpSenha" autocomplete="current-password">
+                </div>
+              </div>
+              <!-- Pasta sem config.json: quem oficializa vira o primeiro
+                   administrador. Não há nome fixo de administrador nem
+                   senha inicial conhecida — ver LEIA-ME. -->
+              <div id="blocoOficializar" hidden>
+                <p class="dica" style="margin-bottom:14px">Esta pasta ainda não tem cadastro.
+                  Quem a oficializa passa a administrar o cadastro.</p>
+                <div class="campo">
+                  <label class="rotulo" for="inpOfNome">Seu nome completo</label>
+                  <input type="text" id="inpOfNome" autocomplete="name">
+                </div>
+                <div class="campo">
+                  <label class="rotulo" for="inpOfUnidade">Sua unidade</label>
+                  <input type="text" id="inpOfUnidade" autocomplete="off">
+                </div>
+                <div class="grade2 campo">
+                  <div>
+                    <label class="rotulo" for="inpOfSenha">Senha</label>
+                    <input type="password" id="inpOfSenha" autocomplete="new-password">
+                  </div>
+                  <div>
+                    <label class="rotulo" for="inpOfSenha2">Repita a senha</label>
+                    <input type="password" id="inpOfSenha2" autocomplete="new-password">
+                  </div>
+                </div>
+              </div>
+              <div class="campo" id="cCarga">
+                <span class="rotulo" id="rotCarga">Jornada diária</span>
+                <div class="chips" id="chipsCarga" role="group" aria-labelledby="rotCarga"></div>
+                <p class="dica" id="hintCarga"></p>
+              </div>
+              <button type="button" class="acao" id="btnIniciar" style="width:100%">Confirmar identidade</button>
+            </div>
+            <div id="resumoIdent" hidden>
+              <p class="dica" style="margin:0 0 12px">Identidade confirmada e travada para esta sessão.</p>
+              <button type="button" class="acao sec mini" id="btnTrocarEntrada">Trocar identidade</button>
+            </div>
+            <div class="aviso" id="avisoIdent" role="alert"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== MEUS HORÁRIOS ======================
+     Na v0.1 a tela só mostra a identidade em uso e onde o arquivo da
+     pessoa fica. O formulário de declaração chega na v0.2. -->
+<section class="vista" id="vHor" hidden>
+  <div class="topo">
+    <div class="titulo">
+      <h1>Meus horários</h1>
+      <p class="sub">Aqui você vai declarar em que horários e períodos estará disponível.
+        É previsão de disponibilidade, não registro de ponto.</p>
+    </div>
+  </div>
+  <div class="corpo">
+    <div class="cartao">
+      <h2>Sua identificação</h2>
+      <dl class="ficha" id="fichaEu"></dl>
+    </div>
+    <div class="cartao">
+      <h2>Declarações</h2>
+      <p class="dica">O formulário de declaração chega na versão 0.2. Por enquanto, esta
+        versão serve para conectar a pasta, montar o cadastro e confirmar que cada pessoa
+        consegue entrar e gravar a própria jornada.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== ADMINISTRAÇÃO ====================== -->
+<section class="vista" id="vAdm" hidden>
+  <div class="topo">
+    <div class="titulo">
+      <h1>Administração</h1>
+      <p class="sub">Alterações aqui são gravadas no <code>config.json</code> da pasta da rede
+        e valem para todos ao atualizarem os dados. Se outro administrador tiver gravado
+        depois que esta tela leu o cadastro, a gravação é recusada e nada se perde.</p>
+    </div>
+  </div>
+
+  <div class="corpo">
+    <div class="cartao">
+      <h2>Pasta oficial</h2>
+      <p class="dica" id="infoInstalacao">—</p>
+    </div>
+
+    <div class="cartao">
+      <h2>Unidades</h2>
+      <p class="dica">Uma unidade só pode ser removida quando ninguém estiver nela e nenhum
+        leitor a tiver na lista.</p>
+      <ul class="lista-unidades" id="listaUnidades"></ul>
+      <div class="linha-form">
+        <div class="campo">
+          <label class="rotulo" for="inpNovaUnidade">Nova unidade</label>
+          <input type="text" id="inpNovaUnidade" autocomplete="off">
+        </div>
+        <button type="button" class="acao sec" id="btnNovaUnidade">Acrescentar</button>
+      </div>
+      <div class="aviso" id="avisoUnidades" role="status"></div>
+    </div>
+
+    <div class="cartao">
+      <h2>Pessoas e papéis</h2>
+      <p class="dica">Toda pessoa cadastrada declara os próprios horários. <b>Leitor</b> vê o
+        painel das unidades da sua lista; <b>administrador</b> vê tudo e mantém este
+        cadastro. Os papéis se somam. Remover uma pessoa não apaga o arquivo dela na pasta;
+        para corrigir um nome, remova e cadastre de novo.</p>
+      <div class="linha-form">
+        <div class="campo">
+          <label class="rotulo" for="inpNovaPessoa">Nome completo</label>
+          <input type="text" id="inpNovaPessoa" autocomplete="off">
+        </div>
+        <div class="campo" style="flex:0 1 200px">
+          <label class="rotulo" for="selNovaPessoaUnidade">Unidade</label>
+          <select id="selNovaPessoaUnidade"></select>
+        </div>
+        <button type="button" class="acao sec" id="btnNovaPessoa">Cadastrar</button>
+      </div>
+      <label class="marcar">
+        <input type="checkbox" id="chkExigirSenha">
+        Exigir senha de todas as pessoas (bloqueia quem não tiver senha definida)
+      </label>
+      <div class="rolagem" style="margin-top:14px">
+        <table>
+          <thead><tr><th>Pessoa</th><th>Unidade</th><th>Papéis</th><th>Senha</th>
+            <th>Ações</th></tr></thead>
+          <tbody id="tbodyPessoas"></tbody>
+        </table>
+      </div>
+      <div class="aviso" id="avisoAdm" role="status"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================== AJUDA ======================
+     Tela, e não página solta: quem clica aqui está travado AGORA, e
+     numa máquina sem internet um link externo não abre. -->
+<section class="vista" id="vAjuda" hidden>
+  <div class="topo">
+    <div class="titulo">
+      <h1>Ajuda</h1>
+      <p class="sub">O que é o programa, quem faz o quê e como entrar.
+        Esta tela funciona sem internet, como o resto do aplicativo.</p>
+    </div>
+    <div class="controles">
+      <button type="button" class="acao sec mini" id="btnVoltarAjuda">← Voltar</button>
+    </div>
+  </div>
+
+  <div class="corpo">
+    <div class="ajuda">
+      <div class="cartao">
+        <h2>O que é a Declaração de disponibilidade</h2>
+        <div style="margin-top:12px">
+          <p>Cada pessoa declara, ela mesma, em que horários e em que períodos estará
+            disponível no trabalho — por exemplo, “de 01/09 a 31/12, de segunda a sexta, das
+            9h às 15h”. Quem responde por uma área vê as declarações da área; a
+            administração vê o conjunto.</p>
+          <p><b>Não é registro de ponto.</b> Ninguém marca entrada nem saída, e o programa não
+            confere se o horário declarado foi cumprido. Também não há metas, pontos nem
+            aprovação.</p>
+        </div>
+      </div>
+
+      <div class="cartao">
+        <h2>Como entrar</h2>
+        <div style="margin-top:12px">
+          <ol>
+            <li><b>Conecte a pasta da rede</b> indicada pela administração. O navegador
+              pergunta se pode ler e gravar nela: as duas permissões são necessárias.</li>
+            <li><b>Escolha o seu nome</b> na lista, digite a senha se houver e marque a sua
+              <b>jornada diária</b> (8 ou 6 horas).</li>
+            <li>Pronto: nas próximas vezes, neste computador, a tela abre direto.</li>
+          </ol>
+          <p>Se o seu nome não está na lista, peça a um administrador para cadastrá-lo.</p>
+        </div>
+      </div>
+
+      <div class="cartao">
+        <h2>Quem faz o quê</h2>
+        <div style="margin-top:12px">
+          <ul>
+            <li><b>Pessoa</b> — todo mundo que está no cadastro. Declara só os próprios
+              horários, e só ela grava o próprio arquivo.</li>
+            <li><b>Leitor</b> — o responsável pela área de trabalho e quem ele indicar. Vê as
+              declarações das unidades que lhe forem atribuídas.</li>
+            <li><b>Administrador</b> — vê tudo e mantém o cadastro de unidades, pessoas,
+              papéis e senhas. Não altera a declaração de ninguém.</li>
+          </ul>
+          <p>Os papéis se somam: quem é leitor ou administrador também declara os próprios
+            horários, com a mesma identidade.</p>
+        </div>
+      </div>
+
+      <div class="cartao">
+        <h2>Quando o programa recusa</h2>
+        <div style="margin-top:12px">
+          <ul>
+            <li><b>“Pasta somente para leitura”</b> — a sua conta não tem permissão de gravar
+              na pasta. Fale com quem cuida da rede.</li>
+            <li><b>“Pasta diferente da oficial”</b> — este computador já usou outra pasta.
+              Confira o caminho; se a troca for intencional, um administrador adota a nova.</li>
+            <li><b>“config.json ilegível”</b> — o cadastro da pasta está danificado. Ninguém
+              entra até ele ser corrigido ou restaurado, para não gravar um cadastro vazio por
+              cima do verdadeiro.</li>
+            <li><b>“Arquivo ilegível”</b> — o seu arquivo de declarações está danificado, e
+              gravar por cima apagaria o que há nele. Leve o nome do arquivo a um
+              administrador.</li>
+            <li><b>“Outro administrador alterou o cadastro”</b> — use “Atualizar dados da
+              rede” e refaça a alteração.</li>
+            <li>O programa funciona apenas no <b>Chrome</b> e no <b>Edge</b>.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="cartao">
+        <h2>Seus dados</h2>
+        <div style="margin-top:12px">
+          <p>O horário em que você declara estar no trabalho é dado pessoal. Ele fica num
+            arquivo só seu, na pasta da rede, e é lido pelos leitores da sua unidade e pela
+            administração.</p>
+          <!-- Texto que o programa NÃO pode inventar: finalidade e base legal
+               são redigidas por quem responde pelo dado no órgão
+               (project_design.md, 12.7). O marcador fica visível de
+               propósito até lá. -->
+          <p class="pendente"><b>Texto pendente.</b> A finalidade do tratamento e a base
+            legal serão informadas aqui pela área responsável pelos dados do órgão.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+</div>
+
+<!-- ====================== JANELAS ====================== -->
+<dialog id="dlgSobre" aria-labelledby="sobreTitulo">
+  <h2 id="sobreTitulo">Declaração de disponibilidade</h2>
+  <p class="dica" id="sobreVersao" style="margin:0"></p>
+  <div class="sobre-corpo">
+    <p>Cada pessoa declara em que horários e períodos estará disponível no ambiente de
+      trabalho. Previsão de disponibilidade, não registro de ponto.</p>
+    <p>Licença livre: Creative Commons CC0 1.0 (domínio público).</p>
+    <p>Derivado do Programa de Resultados — COBIB.</p>
+    <p id="sobreAtualizado"></p>
+    <p id="sobreCatalogo"></p>
+    <p>Disponível no GitHub:<br><a id="sobreLink" target="_blank" rel="noopener"></a></p>
+  </div>
+  <div class="janela-rodape">
+    <button type="button" class="acao" id="btnSobreOK" autofocus>Fechar</button>
+  </div>
+</dialog>
+
+<!-- Senha nova: janela própria, e não prompt(). O prompt do navegador
+     mostra o que se digita em claro, ao lado de quem estiver olhando. -->
+<dialog id="dlgSenha" aria-labelledby="senhaTitulo">
+  <form id="formSenha" method="dialog">
+    <h2 id="senhaTitulo">Definir senha</h2>
+    <p class="dica" style="margin:0">Para <b id="senhaPara"></b>. Pelo menos 4 caracteres.</p>
+    <p class="dica" id="senhaMotivo" hidden></p>
+    <div class="campo" style="margin-top:14px">
+      <label class="rotulo" for="inpSenha1">Nova senha</label>
+      <input type="password" id="inpSenha1" autocomplete="new-password">
+    </div>
+    <div class="campo">
+      <label class="rotulo" for="inpSenha2">Repita a senha</label>
+      <input type="password" id="inpSenha2" autocomplete="new-password">
+    </div>
+    <div class="aviso erro" id="avisoSenha" role="alert"></div>
+    <div class="janela-rodape">
+      <button type="button" class="acao sec" id="btnSenhaCancelar">Cancelar</button>
+      <button type="submit" class="acao">Salvar senha</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="dlgLeitor" aria-labelledby="leitorTitulo">
+  <h2 id="leitorTitulo">Papel de leitor</h2>
+  <p class="dica" style="margin:0"><b id="leitorPara"></b> verá o painel das unidades
+    marcadas. Marque pelo menos uma.</p>
+  <div class="marcas" id="leitorUnidades"></div>
+  <div class="aviso erro" id="avisoLeitor" role="alert"></div>
+  <div class="janela-rodape">
+    <button type="button" class="excluir esquerda" id="btnLeitorRetirar">Retirar o papel de leitor</button>
+    <button type="button" class="acao sec" id="btnLeitorCancelar">Cancelar</button>
+    <button type="button" class="acao" id="btnLeitorSalvar">Salvar</button>
+  </div>
+</dialog>
+
+<!-- Antes de tudo: o número da versão que a etiqueta do rail, a janela
+     "Sobre" e o cache do service worker compartilham. -->
+<script src="versao.js"></script>
+<script src="catalogo.js"></script>
+<script src="rede.js"></script>
+
+<script>
+"use strict";
+/* =============================== ESTADO =============================== */
+/* Prefixo "dt." e não "ra.": os dois aplicativos podem ser servidos da
+   mesma origem e dividir o mesmo localStorage. Nunca renomeie estas
+   chaves; crie outra com sufixo de versão. */
+const CHAVE_ID = "dt.identificacao.v1";
+const CHAVE_INST = "dt.instalacao.v1";
+let ident = null;          // { nome, carga } — os papéis vêm sempre do CFG
+let dirRaiz = null;
+let cargaSel = null;       // 8 ou 6, marcada na identificação
+let situacaoPasta = null;  // "oficial" | "nao-oficializada" | "divergente" | "ilegivel"
+/* Motivo, quando o config.json existe mas não pôde ser lido. Fica fora
+   do CFG de propósito: o CFG é o cadastro EM VIGOR, e neste caso não há
+   cadastro em vigor nenhum. */
+let configIlegivel = null;
+/* Cadastro em vigor: começa pela semente do catalogo.js e é substituído
+   pelo config.json da pasta ao conectar. O atualizadoEm é o que a
+   gravação confere para não apagar a mudança de outro administrador. */
+const semente = () => ({
+  unidades: [...UNIDADES],
+  pessoas: {},
+  senhas: { ...(typeof SENHAS !== "undefined" ? SENHAS : {}) },
+  exigirSenha: typeof EXIGIR_SENHA !== "undefined" && EXIGIR_SENHA === true,
+  instalacao: null,
+  atualizadoEm: null
+});
+let CFG = semente();
+
+const $ = (id) => document.getElementById(id);
+const fmtData = (iso) => iso.split("-").reverse().join("/");
+const porNome = (a, b) => a.localeCompare(b, "pt-BR");
+
+/* --------------------------- PAPÉIS ---------------------------
+   Os papéis moram dentro de CFG.pessoas[nome] e se somam: toda pessoa
+   do cadastro declara; "leitor" (lista de unidades) e "adm" (true) são
+   permissões a mais. Nenhum papel é guardado na identidade — ela só
+   tem o nome —, então "Atualizar dados da rede" já traz o papel novo
+   de quem foi promovido ou rebaixado. */
+const cadastro = (nome) => (nome && Object.hasOwn(CFG.pessoas, nome)) ? CFG.pessoas[nome] : null;
+const eu = () => ident && cadastro(ident.nome);
+const ehAdmNome = (nome) => cadastro(nome)?.adm === true;
+const leitorDe = (nome) => {
+  const l = cadastro(nome)?.leitor;
+  return Array.isArray(l) ? l.filter(u => CFG.unidades.includes(u)) : [];
+};
+const ehPessoa = () => Boolean(eu());
+const ehLeitor = () => Boolean(ident) && leitorDe(ident.nome).length > 0;
+const ehAdm    = () => Boolean(ident) && ehAdmNome(ident.nome);
+const ehMeu    = (d) => Boolean(ident) && d.pessoa === ident.nome;
+/* O recorte do painel (v0.3): tudo para o administrador; a lista para o
+   leitor; nada para quem só declara. É só de tela — na pasta, todos
+   leem todos os arquivos (ver LEIA-ME). */
+const unidadesVisiveis = () =>
+  ehAdm() ? [...CFG.unidades] : ehLeitor() ? leitorDe(ident.nome) : [];
+const administradores = (cfg = CFG) =>
+  Object.keys(cfg.pessoas).filter(n => cfg.pessoas[n] && cfg.pessoas[n].adm === true);
+const hashDe = (nome) => (Object.hasOwn(CFG.senhas, nome) && CFG.senhas[nome]) || null;
+
+/* Todo texto que vem de fora (nomes, unidades) passa por aqui antes de
+   entrar em innerHTML. A sessão do administrador grava o cadastro de
+   todos: um nome lido como marcação executaria ali. */
+function escapar(s) {
+  return String(s ?? "").replace(/[&<>"']/g, (ch) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
+}
+/* "permanente" existe para os avisos de diagnóstico: sumir sozinho em
+   seis segundos serve ao "salvo", e atrapalha quem está tentando
+   entender por que algo foi recusado. */
+function avisar(el, msg, erro = false, permanente = false) {
+  el.textContent = msg;
+  el.className = "aviso" + (erro ? " erro" : "");
+  el.style.display = "block";
+  clearTimeout(el._t);
+  if (!permanente)
+    el._t = setTimeout(() => { el.style.display = "none"; }, 6000);
+}
+const calar = (el) => { clearTimeout(el._t); el.style.display = "none"; };
+async function sha256hex(txt) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(txt));
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("");
+}
+/* localStorage pode lançar (dados do site bloqueados, janela anônima
+   restrita). Perder a memória da identidade é aceitável; derrubar a
+   tela de entrada por causa dela, não. */
+const lembrar = {
+  ler(k) { try { return localStorage.getItem(k); } catch { return null; } },
+  gravar(k, v) { try { localStorage.setItem(k, v); } catch {} },
+  apagar(k) { try { localStorage.removeItem(k); } catch {} }
+};
+
+/* ========================= NAVEGAÇÃO POR TELAS =========================
+   Quem pode ver o quê vem do PAPEL, nunca da tela: o rail apenas esconde
+   o que não é da alçada da pessoa, e podeVer() barra qualquer outro
+   caminho até a tela. */
+const VISTAS = { entrada: "vEntrada", hor: "vHor", adm: "vAdm", ajuda: "vAjuda" };
+let vistaAtual = "entrada";
+/* De onde se entrou na ajuda, para o "Voltar" devolver ao lugar. */
+let vistaAnterior = "entrada";
+
+function podeVer(v) {
+  if (v === "entrada" || v === "ajuda") return true;
+  if (v === "hor") return ehPessoa();
+  if (v === "adm") return ehAdm();
+  return false;
+}
+function irPara(v) {
+  if (!VISTAS[v]) return;
+  if (v !== "entrada" && v !== "ajuda" && !(dirRaiz && ident)) v = "entrada";
+  if (!podeVer(v)) v = ident ? "hor" : "entrada";
+  if (v === "ajuda" && vistaAtual !== "ajuda") vistaAnterior = vistaAtual;
+  vistaAtual = v;
+  for (const [nome, id] of Object.entries(VISTAS)) $(id).hidden = nome !== v;
+  for (const b of railItens())
+    b.setAttribute("aria-current", b.dataset.vista === v ? "page" : "false");
+  window.scrollTo(0, 0);
+}
+const railItens = () => [...document.querySelectorAll(".rail-item[data-vista]")];
+$("railNav").addEventListener("click", (e) => {
+  const b = e.target.closest(".rail-item");
+  if (b) irPara(b.dataset.vista);
+});
+
+function ajustarRail() {
+  $("railNav").hidden = !ident;
+  $("navHor").hidden = !ehPessoa();
+  $("grupoGestao").hidden = !ehAdm();
+  $("navAdm").hidden = !ehAdm();
+}
+
+const ROTULO_PAPEL = { leitor: "leitor", adm: "administrador" };
+function resumoPapeis(nome) {
+  const p = [];
+  if (leitorDe(nome).length) p.push(ROTULO_PAPEL.leitor);
+  if (ehAdmNome(nome)) p.push(ROTULO_PAPEL.adm);
+  return p;
+}
+const iniciais = (nome) => nome.trim().split(/\s+/)
+  .filter(p => p.length > 2).slice(0, 2).map(p => p[0].toUpperCase()).join("") ||
+  nome.slice(0, 2).toUpperCase();
+
+/* A tela de entrada some assim que pasta e identidade estão resolvidas,
+   e volta quando alguma das duas se desfaz. */
+function ajustarConfig() {
+  const pronto = Boolean(dirRaiz && ident);
+  $("seloPasta").textContent = dirRaiz ? "✓" : "1";
+  $("seloPasta").classList.toggle("ok", Boolean(dirRaiz));
+  $("seloIdent").textContent = ident ? "✓" : "2";
+  $("seloIdent").classList.toggle("ok", Boolean(ident));
+  $("railPessoa").hidden = !ident;
+  $("btnTrocar").hidden = !ident;
+  $("idAtual").textContent = ident ? ident.nome : "Ninguém identificado";
+  $("txtIdentResumo").textContent = ident
+    ? [eu()?.unidade, ident.carga ? ident.carga + "h/dia" : null, ...resumoPapeis(ident.nome)]
+        .filter(Boolean).join(" · ")
+    : "";
+  $("railIniciais").textContent = ident ? iniciais(ident.nome) : "";
+  ajustarRail();
+  /* Quem está lendo a ajuda fica onde está: a reconexão silenciosa da
+     pasta acontece sozinha ao abrir e arrancaria a pessoa da leitura. */
+  if (vistaAtual === "ajuda") return;
+  if (!pronto) irPara("entrada");
+  else if (vistaAtual === "entrada" || !podeVer(vistaAtual)) irPara("hor");
+}
+
+/* ============================ PASTA DA REDE ============================ */
+function estadoConexao(ok, txt) {
+  $("led").className = "led" + (ok ? " ok" : "");
+  $("txtConexao").textContent = txt;
+  $("btnAtualizar").hidden = !ok;
+  $("btnPasta").textContent = ok ? "Trocar pasta" : "Conectar pasta";
+  ajustarConfig();
+}
+async function conectarSilencioso() {
+  if (!("showDirectoryPicker" in window))
+    return avisar($("avisoPasta"),
+      "Este navegador não oferece acesso a pastas. Use Chrome ou Edge.", true, true);
+  const salvo = await obterHandleRaiz();
+  if (salvo && await garantirPermissao(salvo, "readwrite", false)) {
+    dirRaiz = salvo;
+    estadoConexao(true, `Conectado a “${salvo.name}”`);
+    await aposConectar();
+  } else if (salvo) {
+    estadoConexao(false, `Pasta “${salvo.name}” memorizada — clique para reconectar`);
+    $("btnPasta").textContent = "Reconectar pasta";
+  }
+}
+$("btnPasta").addEventListener("click", async () => {
+  if (!("showDirectoryPicker" in window))
+    return avisar($("avisoPasta"),
+      "Este navegador não oferece acesso a pastas. Use Chrome ou Edge.", true, true);
+  try {
+    let handle = null;
+    const salvo = await obterHandleRaiz();
+    if (salvo && $("btnPasta").textContent === "Reconectar pasta" &&
+        await garantirPermissao(salvo, "readwrite")) {
+      handle = salvo;
+    } else {
+      handle = await showDirectoryPicker({ id: "pastaDeclaracao", mode: "readwrite" });
+      /* O mode:"readwrite" é PEDIDO, não garantia. Com a escrita barrada
+         — direitos NTFS, política do navegador —, o handle pode voltar só
+         com leitura e sem prompt nenhum. Anunciar "Conectado" aí seria
+         prometer o que não vai acontecer: a quebra só apareceria na
+         primeira gravação, longe da causa. */
+      if (!(await garantirPermissao(handle, "readwrite"))) {
+        estadoConexao(false, `Pasta “${handle.name}” aberta somente para leitura`);
+        return avisar($("avisoPasta"),
+          `A pasta “${handle.name}” abriu, mas o navegador NÃO concedeu permissão de escrita. ` +
+          "Nenhuma declaração poderia ser gravada, então a conexão não foi concluída. " +
+          "Confira os direitos da sua conta nessa pasta da rede e, no navegador, a permissão de " +
+          "edição de arquivos para este site.", true, true);
+      }
+      await salvarHandleRaiz(handle);
+    }
+    calar($("avisoPasta"));
+    dirRaiz = handle;
+    estadoConexao(true, `Conectado a “${handle.name}”`);
+    await aposConectar();
+  } catch (e) {
+    if (e && e.name !== "AbortError")
+      avisar($("avisoPasta"), "Não foi possível acessar a pasta: " + e.message, true, true);
+  }
+});
+$("btnAtualizar").addEventListener("click", () => aposConectar());
+
+async function carregarConfig() {
+  configIlegivel = null;
+  const r = await lerConfig(dirRaiz);
+  if (r.estado === "ok") {
+    /* O arquivo inteiro vira o CFG, inclusive chaves que esta versão não
+       conhece: a próxima gravação as devolve intactas. Só se garantem
+       os tipos do que esta versão usa. */
+    const d = r.dados;
+    CFG = {
+      ...d,
+      senhas: (d.senhas && typeof d.senhas === "object") ? d.senhas : {},
+      exigirSenha: d.exigirSenha === true,
+      instalacao: d.instalacao || null,
+      atualizadoEm: d.atualizadoEm || null
+    };
+  } else if (r.estado === "ilegivel") {
+    /* Guardar o motivo é o que impede a tela de anunciar pasta virgem —
+       e a oficialização de gravar um cadastro novo por cima. */
+    configIlegivel = r.motivo || "conteúdo inválido";
+    CFG = semente();
+  } else {
+    CFG = semente();   // sem config: pasta virgem
+  }
+}
+
+async function aposConectar() {
+  try { await carregarConfig(); }
+  catch (e) {
+    configIlegivel = (e && e.message) || "falha ao ler";
+    CFG = semente();
+  }
+  const idLocal = lembrar.ler(CHAVE_INST);
+  /* O arquivo ilegível vem ANTES de tudo: sem esta primeira pergunta, a
+     falta de CFG.instalacao — que aqui só quer dizer "não deu para ler" —
+     seria lida como pasta nunca oficializada. */
+  if (configIlegivel) situacaoPasta = "ilegivel";
+  else if (CFG.instalacao && CFG.instalacao.id) {
+    if (idLocal && idLocal !== CFG.instalacao.id) situacaoPasta = "divergente";
+    else {
+      situacaoPasta = "oficial";
+      lembrar.gravar(CHAVE_INST, CFG.instalacao.id);
+    }
+  } else situacaoPasta = "nao-oficializada";
+
+  calar($("avisoIdent"));
+  montarPessoas();
+  $("cardIdent").hidden = false;
+  if (situacaoPasta === "ilegivel")
+    avisar($("avisoIdent"),
+      "O config.json desta pasta EXISTE, mas não pôde ser lido (" + configIlegivel + "). " +
+      "Isto NÃO é uma pasta nova: ninguém entra, administradores inclusive, até o arquivo ser " +
+      "corrigido ou restaurado de uma cópia. Depois, use “Atualizar dados da rede”.", true, true);
+  if (situacaoPasta === "divergente")
+    avisar($("avisoIdent"),
+      "Esta pasta é DIFERENTE da pasta oficial usada antes neste computador. Confira o caminho; " +
+      "se a mudança for intencional, só um administrador desta pasta pode adotá-la.", true, true);
+
+  if (situacaoPasta === "oficial") {
+    if (!ident) await restaurarIdentidade();
+    else if (!cadastro(ident.nome)) {
+      limparIdentidade();
+      avisar($("avisoIdent"),
+        "O seu nome não está mais no cadastro desta pasta. Fale com um administrador.", true, true);
+    } else {
+      renderHor();
+      if (ehAdm()) renderAdm();
+      ajustarConfig();
+    }
+  } else if (ident) {
+    // identidade anterior não vale numa pasta não validada
+    limparIdentidade();
+  }
+}
+
+/* ============================ IDENTIFICAÇÃO ============================ */
+/* A lista sai do cadastro, agrupada por unidade. Quem está numa unidade
+   que saiu da lista de unidades ainda aparece, num grupo à parte: some
+   da tela não é o mesmo que sair do cadastro. */
+function montarPessoas() {
+  const oficializar = situacaoPasta === "nao-oficializada";
+  const escolher = situacaoPasta === "oficial" || situacaoPasta === "divergente";
+  $("blocoOficializar").hidden = !oficializar;
+  $("blocoEscolha").hidden = !escolher;
+  $("cCarga").hidden = !(oficializar || escolher);
+  $("btnIniciar").hidden = !(oficializar || escolher);
+  $("tituloIdent").textContent = oficializar ? "Oficializar a pasta" : "Identificação";
+  $("btnIniciar").textContent = oficializar ? "Oficializar a pasta e entrar" : "Confirmar identidade";
+
+  const grupos = new Map(CFG.unidades.map(u => [u, []]));
+  const semUnidade = [];
+  for (const nome of Object.keys(CFG.pessoas).sort(porNome)) {
+    const u = cadastro(nome)?.unidade;
+    (grupos.has(u) ? grupos.get(u) : semUnidade).push(nome);
+  }
+  let html = "";
+  for (const [u, nomes] of grupos) {
+    if (!nomes.length) continue;
+    html += `<optgroup label="${escapar(u)}">` +
+      nomes.map(n => `<option value="${escapar(n)}">${escapar(n)}</option>`).join("") +
+      "</optgroup>";
+  }
+  if (semUnidade.length)
+    html += `<optgroup label="Sem unidade cadastrada">` +
+      semUnidade.map(n => `<option value="${escapar(n)}">${escapar(n)}</option>`).join("") +
+      "</optgroup>";
+  $("selPessoa").innerHTML = html;
+  aoTrocarPessoa();
+}
+
+/* ---------------------------- JORNADA ----------------------------
+   Obrigatória para todos, porque todos declaram. Ela é carimbada em
+   cada declaração (v0.2) e é com ela que a faixa declarada é comparada. */
+function montarChipsCarga() {
+  $("chipsCarga").innerHTML = JORNADAS.map(h =>
+    `<button type="button" class="chip" data-h="${h}" aria-pressed="false">` +
+    `<b>${h}</b><small>horas por dia</small></button>`).join("");
+}
+function marcarCarga(h) {
+  cargaSel = h;
+  for (const c of $("chipsCarga").querySelectorAll(".chip"))
+    c.setAttribute("aria-pressed", String(+c.dataset.h === h));
+}
+$("chipsCarga").addEventListener("click", (e) => {
+  const c = e.target.closest(".chip");
+  if (c) { marcarCarga(+c.dataset.h); calar($("avisoIdent")); }
+});
+
+/* Um "change" tardio (rede lenta) não pode sobrescrever a jornada de uma
+   pessoa escolhida depois: cada chamada carimba um bilhete e só a mais
+   recente escreve na tela. */
+let bilheteCarga = 0;
+async function aoTrocarPessoa() {
+  marcarCarga(null);
+  if (situacaoPasta === "nao-oficializada") {
+    $("hintCarga").textContent = "Marque a sua jornada diária.";
+    return;
+  }
+  const nome = $("selPessoa").value;
+  $("cSenha").hidden = !(nome && (hashDe(nome) || ehAdmNome(nome)));
+  $("inpSenha").value = "";
+  if (!nome) { $("hintCarga").textContent = ""; return; }
+  const meu = ++bilheteCarga;
+  $("hintCarga").textContent = "Verificando a jornada já registrada…";
+  let salva = null;
+  if (dirRaiz) { try { salva = await lerCargaHoraria(dirRaiz, nome); } catch {} }
+  if (meu !== bilheteCarga) return;   // a pessoa já mudou: descarta
+  if (salva) marcarCarga(salva);
+  $("hintCarga").textContent = salva
+    ? `Marcada como ${salva} horas da última vez. Só altere se a sua jornada tiver mudado.`
+    : "Ainda não registrada — marque a sua jornada diária para continuar.";
+}
+$("selPessoa").addEventListener("change", aoTrocarPessoa);
+
+/* -------------------- ESCRITA DO ARQUIVO DA PESSOA --------------------
+   Ponto único de escrita: lê o arquivo atual com leitura estrita, monta
+   o estado com TODAS as chaves que estão nele, aplica a mudança e
+   regrava o conjunto. Não chame gravarArquivoPessoa direto.
+
+   O estado parte do arquivo inteiro (...atual), e não de uma lista de
+   chaves conhecidas: assim uma chave nova — de uma versão futura, ou
+   esquecida na montagem — não é apagada pela gravação seguinte. Só se
+   garantem as que esta versão usa. */
+async function atualizarArquivoPessoa(nome, mudar) {
+  const atual = await lerArquivoParaGravar(dirRaiz, nome);
+  const estado = {
+    ...(atual || {}),
+    pessoa: nome,
+    unidade: cadastro(nome)?.unidade ?? atual?.unidade ?? null,
+    cargaHoraria: atual?.cargaHoraria ?? null,
+    declaracoes: (atual && atual.declaracoes) || []
+  };
+  mudar(estado);
+  await gravarArquivoPessoa(dirRaiz, estado);
+  return estado;
+}
+/* A recusa por arquivo ilegível já explica tudo e não é falha de
+   gravação — mostrar "não foi possível gravar" na frente dela mentiria
+   sobre o que aconteceu. */
+const msgErro = (e, prefixo) => e.arquivoIlegivel ? e.message : prefixo + e.message;
+
+async function senhaConfere(nome, senha) {
+  const hash = hashDe(nome);
+  return Boolean(hash) && (await sha256hex(nome + "|" + senha)) === hash;
+}
+
+$("btnIniciar").addEventListener("click", async () => {
+  calar($("avisoIdent"));
+  if (situacaoPasta === "ilegivel")
+    return avisar($("avisoIdent"),
+      "O config.json existe e não pôde ser lido (" + configIlegivel + "). " +
+      "Corrija o arquivo antes de entrar.", true, true);
+  if (situacaoPasta === "nao-oficializada") return oficializarEEntrar();
+
+  const nome = $("selPessoa").value;
+  if (!nome) return avisar($("avisoIdent"),
+    "Ninguém cadastrado nesta pasta ainda — peça a um administrador.", true);
+  /* Quem tem o papel adm SEMPRE tem senha, com ou sem exigirSenha: sem
+     ela, qualquer um que escolhesse o nome entraria com escrita no
+     cadastro de todos. Um adm sem hash é cadastro inconsistente, e a
+     recusa diz como sair dele. */
+  if (ehAdmNome(nome) && !hashDe(nome))
+    return avisar($("avisoIdent"),
+      "Este administrador está sem senha no cadastro. Peça a outro administrador para defini-la.",
+      true, true);
+  if (hashDe(nome)) {
+    const senha = $("inpSenha").value;
+    if (!senha) return avisar($("avisoIdent"), "Informe a senha.", true);
+    if (!(await senhaConfere(nome, senha))) {
+      $("inpSenha").value = "";
+      return avisar($("avisoIdent"), "Senha incorreta.", true);
+    }
+  } else if (CFG.exigirSenha) {
+    return avisar($("avisoIdent"),
+      "Senha obrigatória, mas ainda não definida para você. Peça a um administrador.", true, true);
+  }
+  $("inpSenha").value = "";
+  if (!cargaSel)
+    return avisar($("avisoIdent"), "Marque a sua jornada diária para continuar.", true);
+  if (situacaoPasta === "divergente") {
+    if (!ehAdmNome(nome))
+      return avisar($("avisoIdent"),
+        "Esta pasta é diferente da oficial usada neste computador. Só um administrador pode adotá-la.",
+        true, true);
+    if (!confirm("Adotar ESTA pasta como a oficial neste computador, substituindo a anterior?"))
+      return;
+    lembrar.gravar(CHAVE_INST, CFG.instalacao.id);
+    situacaoPasta = "oficial";
+  }
+  await gravarJornadaEEntrar(nome, cargaSel);
+});
+
+/* Grava antes de travar a identidade: se a rede recusar a escrita, a
+   pessoa continua na entrada e vê o motivo, em vez de seguir com uma
+   jornada que só existe nesta aba. */
+async function gravarJornadaEEntrar(nome, carga) {
+  try {
+    await atualizarArquivoPessoa(nome, (e) => { e.cargaHoraria = carga; });
+  } catch (e) {
+    return avisar($("avisoIdent"),
+      msgErro(e, "Não foi possível gravar a jornada na pasta da rede: "), true, true);
+  }
+  identificar(nome, carga);
+}
+
+/* Oficializar é criar o config.json, e quem o cria vira o primeiro
+   administrador. Não há nome fixo de administrador nem senha inicial
+   conhecida: as duas coisas seriam iguais em toda instalação, e
+   qualquer um que lesse este código entraria como administrador numa
+   pasta recém-oficializada. */
+async function oficializarEEntrar() {
+  const nome = $("inpOfNome").value.trim().replace(/\s+/g, " ");
+  const unidade = $("inpOfUnidade").value.trim().replace(/\s+/g, " ");
+  const s1 = $("inpOfSenha").value, s2 = $("inpOfSenha2").value;
+  const recusar = (msg) => avisar($("avisoIdent"), msg, true, true);
+  if (!nome || !slug(nome)) return recusar("Informe o seu nome completo.");
+  if (!unidade) return recusar("Informe a sua unidade.");
+  if (s1.length < 4) return recusar("Use uma senha com pelo menos 4 caracteres.");
+  if (s1 !== s2) return recusar("As senhas não conferem.");
+  if (!cargaSel) return recusar("Marque a sua jornada diária para continuar.");
+  if (!confirm("Oficializar a pasta conectada como a pasta deste programa?\n" +
+      "Você passará a administrar o cadastro, e todas as pessoas passarão a entrar por ela.\n\n" +
+      "Isto GRAVA o config.json na pasta.")) return;
+  const novo = {
+    unidades: [unidade],
+    pessoas: { [nome]: { unidade, adm: true } },
+    senhas: { [nome]: await sha256hex(nome + "|" + s1) },
+    exigirSenha: false,
+    instalacao: { id: crypto.randomUUID(), por: nome, em: new Date().toISOString() }
+  };
+  try {
+    /* esperado = null: a gravação recusa se, entre a leitura e agora,
+       alguém tiver criado um config.json nesta pasta. */
+    CFG = await gravarConfig(dirRaiz, novo, null);
+  } catch (e) {
+    return recusar(e.configAlterado ? e.message
+      : "Não foi possível oficializar (sem escrita na pasta?): " + e.message);
+  }
+  for (const id of ["inpOfSenha", "inpOfSenha2"]) $(id).value = "";
+  lembrar.gravar(CHAVE_INST, CFG.instalacao.id);
+  situacaoPasta = "oficial";
+  configIlegivel = null;
+  const carga = cargaSel;
+  montarPessoas();
+  $("selPessoa").value = nome;
+  await gravarJornadaEEntrar(nome, carga);
+}
+
+function travarIdentidade(travar) {
+  $("linhaPessoa").hidden = travar;
+  $("resumoIdent").hidden = !travar;
+}
+function identificar(nome, carga) {
+  ident = { nome, carga };
+  cargaSel = carga;
+  lembrar.gravar(CHAVE_ID, JSON.stringify(ident));
+  travarIdentidade(true);
+  renderHor();
+  if (ehAdm()) renderAdm();
+  ajustarConfig();
+}
+/* A identidade memorizada só vale se a pessoa ainda estiver no cadastro.
+   O travamento vale como "lembrar-me" neste navegador: não se pede a
+   senha de novo a cada abertura. */
+async function restaurarIdentidade() {
+  let salvo = null;
+  try { salvo = JSON.parse(lembrar.ler(CHAVE_ID)); } catch {}
+  if (!salvo || !cadastro(salvo.nome)) { lembrar.apagar(CHAVE_ID); return; }
+  /* O arquivo da rede manda: se a pessoa mudou a jornada em outra
+     máquina, é aquele valor que vale, não o guardado aqui. */
+  let carga = null;
+  try { carga = await lerCargaHoraria(dirRaiz, salvo.nome); } catch {}
+  carga = carga || (JORNADAS.includes(salvo.carga) ? salvo.carga : null);
+  $("selPessoa").value = salvo.nome;
+  if (!carga) { lembrar.apagar(CHAVE_ID); return aoTrocarPessoa(); }
+  identificar(salvo.nome, carga);
+}
+function limparIdentidade() {
+  ident = null;
+  lembrar.apagar(CHAVE_ID);
+  travarIdentidade(false);
+  ajustarConfig();
+  aoTrocarPessoa();
+}
+function pedirTroca() {
+  if (confirm("Trocar de identidade?")) limparIdentidade();
+}
+$("btnTrocar").addEventListener("click", pedirTroca);
+$("btnTrocarEntrada").addEventListener("click", pedirTroca);
+$("inpSenha").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") $("btnIniciar").click();
+});
+
+/* ============================ MEUS HORÁRIOS ============================ */
+function renderHor() {
+  if (!ident) { $("fichaEu").innerHTML = ""; return; }
+  const p = eu() || {};
+  const papeis = ["pessoa (declara os próprios horários)"];
+  const lei = leitorDe(ident.nome);
+  if (lei.length) papeis.push("leitor de " + lei.join(", "));
+  if (ehAdmNome(ident.nome)) papeis.push("administrador");
+  const linhas = [
+    ["Nome", ident.nome],
+    ["Unidade", p.unidade || "—"],
+    ["Jornada", ident.carga ? ident.carga + " horas por dia" : "—"],
+    ["Papéis", papeis.join("; ")],
+    ["Seu arquivo", "declaracoes/" + arquivoDe(ident.nome)]
+  ];
+  $("fichaEu").innerHTML = linhas.map(([k, v]) =>
+    `<dt>${escapar(k)}</dt><dd>${k === "Seu arquivo" ? `<code>${escapar(v)}</code>` : escapar(v)}</dd>`
+  ).join("");
+}
+
+/* ============================ ADMINISTRAÇÃO ============================
+   Toda alteração segue o mesmo caminho: copia o CFG, aplica a mudança
+   na CÓPIA, grava conferindo o atualizadoEm e só então troca o CFG em
+   vigor. Assim uma recusa — de validação ou de outro administrador ter
+   gravado antes — não deixa a tela mostrando um cadastro que não existe
+   no arquivo. */
+let pessoasAdm = [];   // nomes na ordem da tabela; os botões levam o índice
+
+function renderAdm() {
+  if (!ehAdm()) return;
+  const inst = CFG.instalacao;
+  $("infoInstalacao").textContent = inst
+    ? `Oficializada por ${inst.por} em ${fmtData(String(inst.em).slice(0, 10))} · identificador ` +
+      `${String(inst.id).slice(0, 8)}… As pessoas só conseguem entrar em pastas com este selo.`
+    : "Pasta ainda não oficializada.";
+
+  $("listaUnidades").innerHTML = CFG.unidades.length
+    ? CFG.unidades.map((u, i) =>
+        `<li>${escapar(u)}<button type="button" class="excluir" data-rmunidade="${i}"
+           aria-label="Remover a unidade ${escapar(u)}">remover</button></li>`).join("")
+    : `<li>Nenhuma unidade cadastrada</li>`;
+  $("selNovaPessoaUnidade").innerHTML = CFG.unidades
+    .map(u => `<option value="${escapar(u)}">${escapar(u)}</option>`).join("");
+  $("chkExigirSenha").checked = CFG.exigirSenha === true;
+
+  pessoasAdm = Object.keys(CFG.pessoas).sort(porNome);
+  const opcoesUnidade = (atual) => {
+    const lista = CFG.unidades.includes(atual) || !atual ? CFG.unidades : [atual, ...CFG.unidades];
+    return lista.map(u =>
+      `<option value="${escapar(u)}"${u === atual ? " selected" : ""}>${escapar(u)}</option>`).join("");
+  };
+  $("tbodyPessoas").innerHTML = pessoasAdm.length ? pessoasAdm.map((nome, i) => {
+    const p = cadastro(nome) || {};
+    const lei = leitorDe(nome);
+    const adm = ehAdmNome(nome);
+    const tem = Boolean(hashDe(nome));
+    const papeis = [
+      lei.length ? `<span class="tag forte">leitor: ${escapar(lei.join(", "))}</span>` : "",
+      adm ? `<span class="tag forte">administrador</span>` : ""
+    ].join("") || `<span class="tag">só declara</span>`;
+    return `<tr>
+      <td>${escapar(nome)}${ident && nome === ident.nome ? ' <span class="tag">você</span>' : ""}</td>
+      <td><select data-unidade="${i}" aria-label="Unidade de ${escapar(nome)}">${opcoesUnidade(p.unidade)}</select></td>
+      <td>${papeis}</td>
+      <td><span class="tag">${tem ? "definida" : "sem senha"}</span></td>
+      <td class="acoes">
+        <button type="button" class="acao sec mini" data-acao="leitor" data-i="${i}">Leitor…</button>
+        <button type="button" class="acao sec mini" data-acao="adm" data-i="${i}">${adm ? "Retirar adm" : "Tornar adm"}</button>
+        <button type="button" class="acao sec mini" data-acao="senha" data-i="${i}">${tem ? "Alterar" : "Definir"} senha</button>
+        ${tem && !adm ? `<button type="button" class="excluir" data-acao="rmsenha" data-i="${i}">Remover senha</button>` : ""}
+        <button type="button" class="excluir" data-acao="remover" data-i="${i}">Remover pessoa</button>
+      </td></tr>`;
+  }).join("") : `<tr><td colspan="5" class="vazio">Ninguém cadastrado ainda.</td></tr>`;
+}
+
+/* mudar(copia) altera a cópia e devolve uma string quando recusa. */
+async function salvarCFG(mudar, msgOk, aviso = $("avisoAdm")) {
+  if (!dirRaiz) return avisar(aviso, "Conecte a pasta da rede primeiro.", true);
+  const copia = structuredClone(CFG);
+  const recusa = mudar(copia);
+  if (typeof recusa === "string") return avisar(aviso, recusa, true, true);
+  try {
+    CFG = await gravarConfig(dirRaiz, copia, CFG.atualizadoEm);
+  } catch (e) {
+    return avisar(aviso, e.configAlterado ? e.message
+      : "Não foi possível gravar o config.json: " + e.message, true, true);
+  }
+  avisar(aviso, msgOk);
+  montarPessoas();
+  /* Quem removeu a si mesmo do cadastro sai; quem retirou o próprio
+     papel de administrador perde a tela de Administração na hora. */
+  if (ident && !cadastro(ident.nome)) return limparIdentidade();
+  renderHor();
+  renderAdm();
+  ajustarConfig();
+}
+
+/* ----------------------------- unidades ----------------------------- */
+$("btnNovaUnidade").addEventListener("click", async () => {
+  const u = $("inpNovaUnidade").value.trim().replace(/\s+/g, " ");
+  await salvarCFG((c) => {
+    if (!u) return "Digite o nome da unidade.";
+    const igual = c.unidades.find(x => x.toLocaleLowerCase("pt-BR") === u.toLocaleLowerCase("pt-BR"));
+    if (igual) return `A unidade “${igual}” já está cadastrada.`;
+    c.unidades.push(u);
+  }, `Unidade ${u} cadastrada.`, $("avisoUnidades"));
+  if (CFG.unidades.includes(u)) $("inpNovaUnidade").value = "";
+});
+$("inpNovaUnidade").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") $("btnNovaUnidade").click();
+});
+$("listaUnidades").addEventListener("click", async (e) => {
+  const b = e.target.closest("[data-rmunidade]");
+  if (!b) return;
+  const u = CFG.unidades[+b.dataset.rmunidade];
+  if (u === undefined || !confirm(`Remover a unidade ${u}?`)) return;
+  await salvarCFG((c) => {
+    const nela = Object.keys(c.pessoas).filter(n => c.pessoas[n]?.unidade === u);
+    if (nela.length)
+      return `A unidade ${u} ainda tem ${nela.length} pessoa(s): ${nela.join(", ")}. ` +
+        "Mude a unidade delas antes de remover.";
+    const leitores = Object.keys(c.pessoas)
+      .filter(n => Array.isArray(c.pessoas[n]?.leitor) && c.pessoas[n].leitor.includes(u));
+    if (leitores.length)
+      return `A unidade ${u} está na lista de leitura de: ${leitores.join(", ")}. ` +
+        "Tire-a da lista desses leitores antes de remover.";
+    c.unidades = c.unidades.filter(x => x !== u);
+  }, `Unidade ${u} removida.`, $("avisoUnidades"));
+});
+
+/* ----------------------------- pessoas ----------------------------- */
+$("btnNovaPessoa").addEventListener("click", async () => {
+  const nome = $("inpNovaPessoa").value.trim().replace(/\s+/g, " ");
+  const unidade = $("selNovaPessoaUnidade").value;
+  await salvarCFG((c) => {
+    if (!c.unidades.length) return "Cadastre uma unidade antes de cadastrar pessoas.";
+    if (!nome || !slug(nome)) return "Digite o nome completo da pessoa.";
+    if (!c.unidades.includes(unidade)) return "Escolha a unidade da pessoa.";
+    /* O arquivo de cada pessoa sai do slug do nome. Dois nomes com o
+       mesmo slug (homônimos, ou nomes que só diferem em acento) cairiam
+       no mesmo arquivo, e um apagaria as declarações do outro. */
+    const conflito = Object.keys(c.pessoas).find(n => slug(n) === slug(nome));
+    if (conflito)
+      return conflito === nome ? `${nome} já está no cadastro.`
+        : `“${nome}” usaria o mesmo arquivo que “${conflito}” (declaracoes/${arquivoDe(nome)}). ` +
+          "Diferencie o nome, por exemplo com um sobrenome a mais.";
+    c.pessoas[nome] = { unidade };
+  }, `${nome} entrou no cadastro, na unidade ${unidade}.`);
+  if (cadastro(nome)) $("inpNovaPessoa").value = "";
+});
+$("inpNovaPessoa").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") $("btnNovaPessoa").click();
+});
+$("chkExigirSenha").addEventListener("change", async (e) => {
+  const v = e.target.checked;
+  await salvarCFG((c) => { c.exigirSenha = v; },
+    `Exigência de senha ${v ? "ativada" : "desativada"}.`);
+  $("chkExigirSenha").checked = CFG.exigirSenha === true;
+});
+$("tbodyPessoas").addEventListener("change", async (e) => {
+  const sel = e.target.closest("select[data-unidade]");
+  if (!sel) return;
+  const nome = pessoasAdm[+sel.dataset.unidade];
+  const u = sel.value;
+  await salvarCFG((c) => {
+    if (!c.pessoas[nome]) return `${nome} não está mais no cadastro.`;
+    c.pessoas[nome].unidade = u;
+  }, `${nome} passou para ${u}. As declarações antigas continuam com a unidade em que foram feitas.`);
+  renderAdm();
+});
+$("tbodyPessoas").addEventListener("click", async (e) => {
+  const b = e.target.closest("[data-acao]");
+  if (!b) return;
+  const nome = pessoasAdm[+b.dataset.i];
+  if (!nome || !cadastro(nome)) return;
+  const acao = b.dataset.acao;
+
+  if (acao === "leitor") {
+    const r = await pedirLeitor(nome);
+    if (!r) return;
+    await salvarCFG((c) => {
+      if (!c.pessoas[nome]) return `${nome} não está mais no cadastro.`;
+      if (r.retirar) delete c.pessoas[nome].leitor;
+      else c.pessoas[nome].leitor = r.unidades;
+    }, r.retirar ? `Papel de leitor retirado de ${nome}.`
+                 : `Papel de leitor de ${nome}: ${r.unidades.join(", ")}.`);
+  }
+
+  if (acao === "adm") {
+    if (ehAdmNome(nome)) {
+      if (administradores().length <= 1)
+        return avisar($("avisoAdm"),
+          `${nome} é a única pessoa com o papel de administrador. Dê o papel a outra pessoa antes, ` +
+          "senão ninguém mais conseguiria entrar na Administração.", true, true);
+      if (!confirm(`Retirar o papel de administrador de ${nome}?`)) return;
+      await salvarCFG((c) => {
+        if (administradores(c).length <= 1) return "Não é possível retirar o último administrador.";
+        delete c.pessoas[nome].adm;
+      }, `Papel de administrador retirado de ${nome}.`);
+    } else {
+      if (!confirm(`Dar o papel de administrador a ${nome}? Essa pessoa poderá alterar o cadastro de todos.`)) return;
+      /* Administrador sempre tem senha: atribuir o papel a quem não tem
+         pede a senha no mesmo ato, e as duas coisas vão na mesma
+         gravação — nunca existe um adm sem senha no arquivo. */
+      let hash = hashDe(nome);
+      if (!hash) {
+        const s = await pedirSenha(nome, "Administradores sempre têm senha. Defina a de " + nome + ".");
+        if (s === null) return;
+        hash = await sha256hex(nome + "|" + s);
+      }
+      await salvarCFG((c) => {
+        if (!c.pessoas[nome]) return `${nome} não está mais no cadastro.`;
+        c.pessoas[nome].adm = true;
+        c.senhas[nome] = hash;
+      }, `${nome} agora tem o papel de administrador.`);
+    }
+  }
+
+  if (acao === "senha") {
+    const s = await pedirSenha(nome);
+    if (s === null) return;
+    const hash = await sha256hex(nome + "|" + s);
+    await salvarCFG((c) => { c.senhas[nome] = hash; }, `Senha de ${nome} atualizada.`);
+  }
+
+  if (acao === "rmsenha") {
+    if (ehAdmNome(nome))
+      return avisar($("avisoAdm"), "Administradores sempre têm senha; ela pode ser alterada, não removida.", true);
+    if (!confirm(`Remover a senha de ${nome}?`)) return;
+    await salvarCFG((c) => { delete c.senhas[nome]; }, `Senha de ${nome} removida.`);
+  }
+
+  if (acao === "remover") {
+    if (ehAdmNome(nome) && administradores().length <= 1)
+      return avisar($("avisoAdm"),
+        `${nome} é a única pessoa com o papel de administrador e não pode sair do cadastro.`, true, true);
+    const proprio = ident && nome === ident.nome;
+    if (!confirm(`Remover ${nome} do cadastro?\n\nO arquivo declaracoes/${arquivoDe(nome)} NÃO é ` +
+        "apagado: ele continua na pasta, desligado do cadastro." +
+        (proprio ? "\n\nVocê está removendo a si mesmo e sairá do programa." : ""))) return;
+    await salvarCFG((c) => {
+      if (c.pessoas[nome]?.adm === true && administradores(c).length <= 1)
+        return "Não é possível remover o último administrador.";
+      delete c.pessoas[nome];
+      delete c.senhas[nome];
+    }, `${nome} saiu do cadastro.`);
+  }
+});
+
+/* ------------------------- janela de senha ------------------------- */
+function pedirSenha(nome, motivo = "") {
+  return new Promise((ok) => {
+    const dlg = $("dlgSenha");
+    $("senhaPara").textContent = nome;
+    $("senhaMotivo").textContent = motivo;
+    $("senhaMotivo").hidden = !motivo;
+    $("inpSenha1").value = ""; $("inpSenha2").value = "";
+    calar($("avisoSenha"));
+    dlg._resolver = ok;
+    dlg.showModal();
+  });
+}
+$("formSenha").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const s1 = $("inpSenha1").value, s2 = $("inpSenha2").value;
+  if (s1.length < 4) return avisar($("avisoSenha"), "Use pelo menos 4 caracteres.", true, true);
+  if (s1 !== s2) return avisar($("avisoSenha"), "As senhas não conferem.", true, true);
+  const dlg = $("dlgSenha"), ok = dlg._resolver;
+  dlg._resolver = null;
+  dlg.close();
+  $("inpSenha1").value = ""; $("inpSenha2").value = "";
+  if (ok) ok(s1);
+});
+$("btnSenhaCancelar").addEventListener("click", () => $("dlgSenha").close());
+/* Fechar por Esc ou por "Cancelar" responde null a quem pediu. */
+$("dlgSenha").addEventListener("close", () => {
+  const dlg = $("dlgSenha"), ok = dlg._resolver;
+  dlg._resolver = null;
+  $("inpSenha1").value = ""; $("inpSenha2").value = "";
+  if (ok) ok(null);
+});
+
+/* ------------------------- janela de leitor ------------------------- */
+function pedirLeitor(nome) {
+  return new Promise((ok) => {
+    const dlg = $("dlgLeitor");
+    const atuais = leitorDe(nome);
+    $("leitorPara").textContent = nome;
+    $("leitorUnidades").innerHTML = CFG.unidades.length
+      ? CFG.unidades.map((u, i) =>
+          `<label class="marcar" style="margin:0"><input type="checkbox" data-u="${i}"` +
+          `${atuais.includes(u) ? " checked" : ""}> ${escapar(u)}</label>`).join("")
+      : `<p class="dica">Nenhuma unidade cadastrada.</p>`;
+    $("btnLeitorRetirar").hidden = !atuais.length;
+    calar($("avisoLeitor"));
+    dlg._resolver = ok;
+    dlg.showModal();
+  });
+}
+function responderLeitor(valor) {
+  const dlg = $("dlgLeitor"), ok = dlg._resolver;
+  dlg._resolver = null;
+  dlg.close();
+  if (ok) ok(valor);
+}
+$("btnLeitorSalvar").addEventListener("click", () => {
+  const unidades = [...$("leitorUnidades").querySelectorAll("input:checked")]
+    .map(c => CFG.unidades[+c.dataset.u]).filter(Boolean);
+  /* Leitor sem unidade não vê nada e pareceria um papel que não funciona.
+     Para tirar o papel, há o botão próprio. */
+  if (!unidades.length)
+    return avisar($("avisoLeitor"),
+      "Marque pelo menos uma unidade — ou use “Retirar o papel de leitor”.", true, true);
+  responderLeitor({ unidades });
+});
+$("btnLeitorRetirar").addEventListener("click", () => responderLeitor({ retirar: true }));
+$("btnLeitorCancelar").addEventListener("click", () => $("dlgLeitor").close());
+$("dlgLeitor").addEventListener("close", () => {
+  const dlg = $("dlgLeitor"), ok = dlg._resolver;
+  dlg._resolver = null;
+  if (ok) ok(null);
+});
+
+/* ========================== SOBRE O PROGRAMA ==========================
+   A versão é escrita em UM lugar (versao.js) e lida em três: a etiqueta
+   do rail, esta janela e a chave do cache do service worker. Tudo entra
+   por textContent e pela propriedade href — nada de innerHTML. */
+function montarSobre() {
+  $("versaoApp").textContent = APP.rotulo;
+  $("sobreVersao").textContent = "Versão " + APP.versao;
+  $("sobreAtualizado").textContent = "Última atualização: " + APP.atualizado;
+  /* typeof, e não acesso direto: um catalogo.js sem a constante não pode
+     derrubar a janela. Sem selo, a linha some. */
+  const temSelo = typeof CATALOGO_ATUALIZADO !== "undefined" && CATALOGO_ATUALIZADO;
+  $("sobreCatalogo").hidden = !temSelo;
+  if (temSelo) $("sobreCatalogo").textContent = "Catálogo: " + CATALOGO_ATUALIZADO;
+  $("sobreLink").href = APP.repositorio;
+  $("sobreLink").textContent = APP.repositorio;
+}
+/* ================================ AJUDA ================================ */
+$("btnAjuda").addEventListener("click", () => irPara("ajuda"));
+$("btnVoltarAjuda").addEventListener("click", () => irPara(vistaAnterior));
+$("btnSobre").addEventListener("click", () => $("dlgSobre").showModal());
+$("btnSobreOK").addEventListener("click", () => $("dlgSobre").close());
+/* Devolve o foco a quem abriu: sem isto, quem navega por teclado volta
+   ao começo da página e perde o lugar no rail. */
+$("dlgSobre").addEventListener("close", () => $("btnSobre").focus());
+
+/* --------------------------- INICIALIZAÇÃO --------------------------- */
+montarSobre();
+montarChipsCarga();
+for (const b of railItens()) b.setAttribute("aria-current", "false");
+$("txtCaminho").textContent =
+  (typeof PASTA_REDE !== "undefined" && PASTA_REDE) || "definida pela administração";
+ajustarConfig();   // começa na entrada, com o rail vazio
+/* O .catch() não é zelo excessivo: abrir o IndexedDB e consultar a
+   permissão do handle podem lançar quando o navegador está com os dados
+   do site bloqueados. Sem captura, a tela ficaria em "Pasta não
+   conectada" — idêntica à de quem ainda não conectou. Não conseguir
+   VERIFICAR é diferente de não ter o que verificar. */
+conectarSilencioso().catch((e) => {
+  estadoConexao(false, "Não foi possível verificar a pasta memorizada");
+  avisar($("avisoPasta"),
+    "Não foi possível verificar se havia uma pasta memorizada neste computador (" +
+    ((e && e.message) || "motivo desconhecido") + "). " +
+    "Isso costuma vir de o navegador estar com os dados deste site bloqueados. " +
+    "Ainda é possível conectar a pasta à mão, em “Conectar pasta”.", true, true);
+});
+
+/* Manifesto e service worker só existem sob HTTP(S). Em file://, o
+   Chrome trata cada arquivo como origem única e recusa buscar o
+   manifesto; o <link> fixo no <head> rendia erros vermelhos no console
+   que faziam quem abre o F12 concluir que o programa estava quebrado. */
+if (location.protocol.startsWith("http")) {
+  const lnkManifesto = document.createElement("link");
+  lnkManifesto.rel = "manifest";
+  lnkManifesto.href = "manifest.webmanifest";
+  document.head.appendChild(lnkManifesto);
+  if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
+}
+</script>
+
+</body>
+</html>
