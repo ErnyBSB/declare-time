@@ -1,4 +1,4 @@
-DECLARAÇÃO DE DISPONIBILIDADE (versão 0.6, out/26 — PWA em rede)
+DECLARAÇÃO DE DISPONIBILIDADE (versão 0.7, out/26 — PWA em rede)
 ================================================================
 
 Este arquivo é a documentação de verdade do programa. Não é uma lista
@@ -14,6 +14,30 @@ de jeitos diferentes: lá, para consultar; aqui, para entender.
 As seções vêm da mais nova para a mais antiga. Uma seção antiga não é
 apagada quando a decisão muda: a nova diz o que mudou e por quê, e a
 antiga fica como registro do que valia antes.
+
+O aviso de privacidade (novidade da v0.7)
+-----------------------------------------
+Desde o começo, a Ajuda trazia um aviso de "texto pendente" no lugar da
+finalidade e da base legal do tratamento dos dados, porque esse texto
+não é o programa quem escreve. Na 0.7 ele chegou: o "Aviso de
+Privacidade e Proteção de Dados (LGPD)", na Ajuda, com propósito, base
+legal, acesso aos dados, tempo de guarda e direitos.
+
+Dois dos cinco itens foram ajustados antes de entrar, e vale dizer por
+quê. O rascunho recebido falava em solicitações e em aprovação de
+demandas, que este programa não tem, e dizia que os dados ficavam
+visíveis "apenas" para o autor e a chefia. Não é verdade, e um aviso de
+privacidade não pode prometer mais sigilo do que entrega: no programa,
+leem as declarações o próprio autor, os leitores da unidade e os
+administradores; e na pasta de rede, com as permissões recomendadas,
+todas as pessoas que usam o programa têm leitura nos arquivos. Os dois
+itens passaram a dizer exatamente isso. Os demais — base legal, tempo
+de guarda e direitos — são texto jurídico e entraram como vieram.
+
+Esses dois itens descrevem o programa, e por isso há um teste que os
+confere. Se um dia o programa mudar quem lê o quê — por exemplo,
+restringindo a leitura da pasta —, o aviso tem de mudar na mesma
+versão.
 
 Os testes no navegador
 ----------------------
@@ -733,8 +757,6 @@ Limitações assumidas desde o início
 
 O que ainda está em aberto
 --------------------------
-O texto de finalidade exigido pela LGPD — para que o dado serve, quem o
-lê, com que base legal — tem de ser redigido por quem responde pelo
-dado no órgão, e não inventado pelo programa (issue #17). Até lá, a
-tela de Ajuda traz um aviso de texto pendente. Precisa estar resolvido
-antes da 1.0, junto com a prova de uso numa unidade real.
+O aviso de privacidade está na Ajuda desde a 0.7. O que falta para a
+1.0 é a prova de uso numa unidade real, numa pasta real, com as
+permissões conferidas pela TI (issue #20).
