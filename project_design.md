@@ -77,8 +77,8 @@ Os cinco do projeto de origem, sem alteração de ordem:
    campos novos são tratados pela ausência, nunca por migração.
 4. **Legível para quem não é técnico.** Interface, comentários e documentação em
    **pt-BR**; a tela explica a recusa em vez de falhar em silêncio.
-5. **Acessível e com pouca dependência.** Elemento nativo primeiro; o ECharts é a
-   única biblioteca e vem embarcado, nunca buscado.
+5. **Acessível e com pouca dependência.** Elemento nativo primeiro. Desde a v0.4,
+   **nenhuma biblioteca**: os gráficos são HTML e CSS (12.6).
 
 ---
 
@@ -100,15 +100,13 @@ erros.
 | `lerConfig` com três estados: `ausente` / `ilegivel` / `ok` (v1.9) | Oficializar por cima de um `config.json` quebrado gravava a semente vazia sobre o cadastro real. |
 | **Selo de instalação** (§9): `oficial` / `nao-oficializada` / `divergente` | O handle não se transfere entre máquinas; o selo garante que cada pessoa aponte para a pasta certa. |
 | Senha como `sha256(nome + "|" + senha)`, com `exigirSenha` (§10.1) | Barreira contra uso casual, documentada honestamente como tal. |
-| `escapar()` em todo texto vindo de fora, inclusive nas dicas do ECharts (§10.2) | As sessões de administrador e de leitor exibem texto de outras pessoas, e a de administrador tem escrita ampla; uma observação lida como marcação executaria ali. |
+| `escapar()` em todo texto vindo de fora, inclusive nas dicas dos gráficos (§10.2) | As sessões de administrador e de leitor exibem texto de outras pessoas, e a de administrador tem escrita ampla; uma observação lida como marcação executaria ali. |
 | `[hidden]{display:none !important}` (§10.4) | Uma regra de `display` na folha vence o `hidden` do navegador. |
 | `versao.js` como **único** lugar da versão (§3.6) | Etiqueta, janela "Sobre" e chave do cache derivam dele; versão escrita em dois lugares diverge. |
 | `sw.js` *cache-first* com `importScripts("./versao.js")`, e catálogo **rede-first** com prazo (v1.10) | Uso offline sem congelar em silêncio o dado editável. |
 | Manifesto e service worker só sob `http(s)` (v1.6) | Sob `file://` o Chrome nega o manifesto e enche o console. |
 | `garantirPermissao()` de **escrita** ao conectar (v1.11) | `mode: "readwrite"` é pedido, não garantia: o navegador pode devolver a pasta só para leitura. |
 | Data de atualização **manual** no `versao.js` | Buscá-la na rede contradiz o uso offline. |
-| ECharts embarcado, compilação própria só-canvas (§3.4) | Barra e mapa de calor já são o que se precisa; a linha do tempo é feita em HTML/CSS (12.6). |
-| Desenho adiado de gráfico em contêiner oculto (§8) | O ECharts mede altura zero no que não está visível. |
 | Ordem **alfabética** por padrão; "ordenar por volume" é opção (§8) | Ordenar por horas transforma o painel num *ranking* que o dado não sustenta. |
 | Repositório público, sem dado interno (§10.5) e `.gitignore` como grade | Mesmo motivo, e o repositório novo também é público (CC0). |
 | Elenco inventado nos exemplos e capturas | Helena Barros, Ana Beatriz Nunes, Carlos Eduardo Prado, Marina Duarte, Roberto Aguiar. |
@@ -151,7 +149,7 @@ Navegador (Chrome/Edge) leitor, adm ─┘      (caminho definido em PASTA_REDE)
                                               │
  Cada navegador:                              ├─ config.json        (só adms gravam)
  • roda index.html + versao.js + catalogo.js  └─ declaracoes/
-   + rede.js + echarts.min.js                     ├─ ana-beatriz-nunes.json
+   + rede.js                                      ├─ ana-beatriz-nunes.json
  • lê/grava JSON via File System Access API       ├─ carlos-eduardo-prado.json
  • guarda o handle da pasta no IndexedDB          └─ ...  (cada um, só o dono grava)
  • guarda identidade e preferências de tela
@@ -215,7 +213,6 @@ code/                    o aplicativo: uma cópia só, sempre a versão atual
   sw.js                  service worker; chave do cache a partir do versao.js
   manifest.webmanifest   metadados do PWA
   gerar-senha.html       ferramenta avulsa: sha256("nome|senha")
-  echarts.min.js         biblioteca de gráficos (embarcada)
   icons/                 icon-192.png, icon-512.png
   LEIA-ME.txt            o porquê de cada decisão, em prosa
 project_design.md        este documento
@@ -240,7 +237,7 @@ restrição de licença.
 | `sw.js` | Copiar; trocar o prefixo do cache para `dt-` e restringir a limpeza do `activate` a esse prefixo (ver 3.2). |
 | `versao.js` | Copiar a forma; recomeçar o número (ver 10.2). |
 | `gerar-senha.html` | Copiar como está. |
-| `echarts.min.js` | Copiar como está: a linha do tempo é feita em HTML/CSS (12.6) e não pede recompilação. |
+| `echarts.min.js` | **Não copiar** (decidido na v0.4, ver 12.6): os gráficos são HTML e CSS. |
 | `index.html` | **Não copiar inteiro.** Trazer por partes: folha de estilo e tokens, rail, tela de entrada (conexão, selo, identificação), `escapar`, `sha256hex`, a tela **Horários** e a aba **Horários** do painel, com seus dois gráficos. É dessa última parte que nasce o aplicativo. |
 | `.gitignore` | Copiar, trocando `unidadeCentral/` por `pasta-teste/` e barrando também qualquer `declaracoes/`. |
 
@@ -533,7 +530,14 @@ caso.
 3. **Linha do tempo das declarações**: uma faixa por pessoa no eixo das datas,
    mostrando os períodos declarados, os buracos e as sobreposições entre
    declarações sucessivas. É o único gráfico **novo**, e o que responde à parte
-   "períodos" do escopo. Desenhado em HTML/CSS puro, sem ECharts (12.6).
+   "períodos" do escopo. A janela é o mês escolhido ou, numa data, três meses para
+   cada lado; declarações que valem ao mesmo tempo ficam em raias, uma sob a outra.
+
+Os três são **HTML e CSS** (12.6), saem do mesmo recorte da tabela e têm dica no
+ponteiro e no foco do teclado, preenchida por `textContent`. A cobertura usa uma
+rampa de um só verde (conferida: monótona, degraus visíveis, o tom claro a 2,1:1 do
+branco), com o zero em cinza e o número escrito; as barras são de tinta neutra e só a
+divergência sai em dourado. As horas por semana só aparecem no recorte por data.
 
 **A nota embaixo de cada gráfico diz o que ele não é**: horário declarado não é
 horário cumprido, e o mapa de cobertura não desconta ausências nem feriados.
@@ -617,6 +621,7 @@ histórico abaixo.
 | v0.1 | out/2026 | Entrada (conexão, selo, oficialização pelo primeiro administrador, identificação com jornada), Administração (unidades, pessoas, papéis `leitor`/`adm`, senhas, conferência de `atualizadoEm`), Ajuda, Sobre, PWA. |
 | v0.2 | out/2026 | Meus horários: formulário com total ao vivo, recusas de 7.2, colisão conferida contra o arquivo relido, encerrar/substituir/excluir, divergência por dia, grade da semana. |
 | v0.3 | out/2026 | Painel para leitores (recorte pelas suas unidades) e administradores: data ou mês, unidade, pessoa; indicadores; "sem declaração" pelo cadastro; tabela; CSV; arquivos sem cadastro ou ilegíveis. |
+| v0.4 | out/2026 | Gráficos do painel em HTML/CSS, sem biblioteca: cobertura por hora e dia (pessoas distintas, zero = descoberta), horas por semana por pessoa com jornada × 5, linha do tempo com raias. |
 
 ---
 
@@ -722,7 +727,7 @@ que o painel consulta por mês.
 **`ausencias`** (nome reservado, ver 5.2), com o mapa de cobertura passando a
 descontá-las, como lá.
 
-### 12.6. Como desenhar a linha do tempo — **Decidido: HTML/CSS puro**
+### 12.6. Como desenhar os gráficos — **Decidido: HTML/CSS puro, sem ECharts**
 
 O `echarts.min.js` herdado é uma compilação só-canvas com barra e mapa de calor, sem
 a série `custom` que um Gantt pediria. Opções consideradas:
@@ -734,9 +739,14 @@ a série `custom` que um Gantt pediria. Opções consideradas:
   funciona com a compilação atual, mas a dica e a acessibilidade ficam piores.
 - **(c) recompilar o ECharts** com `custom`: aumenta o arquivo e o cache offline.
 
-**Decisão: (a).** O `echarts.min.js` é copiado do projeto de origem sem
-recompilação (4.1) e continua servindo só ao mapa de cobertura e às horas por
-semana.
+**Decisão: (a).** E, revisto ao começar a v0.4 (21/10/2026), a mesma decisão vale para
+os outros dois gráficos: o `echarts.min.js` do projeto de origem **não é copiado**.
+Motivos: é uma compilação própria de 533 KB, minificada, sem cabeçalho de licença
+(o ECharts é Apache-2.0) nem registro da versão; e o que este programa desenha — um
+mapa de calor, que é uma tabela, e barras horizontais — não justifica o arquivo no
+cache offline. Em HTML, o conteúdo é texto de verdade: lê em leitor de tela, imprime
+e funciona sem rede. Saem junto as regras herdadas que só existiam por causa do
+ECharts (desenho adiado em contêiner oculto, compilação só-canvas).
 
 ### 12.7. Texto de finalidade (LGPD) — **Pendente**
 
@@ -765,7 +775,7 @@ que se declara é **disponibilidade** prevista, e não horário cumprido (seçã
 | **1. Entrada** | `rede.js` podado, `sw.js`, manifesto, ícones; telas de Entrada, Sobre e Ajuda; conexão, selo, identificação com jornada; Administração (cadastro, papéis `leitor`/`adm`, senhas, conferência de `atualizadoEm`). | v0.1 |
 | **2. Declarar** | Tela *Meus horários*: formulário, total ao vivo, recusas de 7.2, colisão, encerrar/excluir/substituir, grade semanal. `atualizarArquivoPessoa`. | v0.2 |
 | **3. Painel** | Filtros, indicadores, tabela, CSV, "arquivos sem cadastro"; recorte por `unidadesVisiveis()` para o leitor. | v0.3 |
-| **4. Gráficos** | Mapa de cobertura, horas por semana, linha do tempo em HTML/CSS (12.6). Desenho adiado. | v0.4 |
+| **4. Gráficos** | Mapa de cobertura, horas por semana, linha do tempo, todos em HTML/CSS (12.6). | v0.4 |
 | **5. Prova de uso** | Teste com uma unidade real, numa pasta real, com permissões NTFS aplicadas. Ajustes. | v0.5… |
 | **6. Produção** | Esquema congelado, LEIA-ME completo, Ajuda com o texto de 12.7. | **v1.0** |
 
