@@ -215,6 +215,7 @@ code/                    o aplicativo: uma cópia só, sempre a versão atual
   gerar-senha.html       ferramenta avulsa: sha256("nome|senha")
   icons/                 icon-192.png, icon-512.png
   LEIA-ME.txt            o porquê de cada decisão, em prosa
+testes/                  testes ponta a ponta no navegador (node testes/rodar.mjs)
 project_design.md        este documento
 CLAUDE.md                instruções para agentes de IA
 README.md                apresentação curta
@@ -615,10 +616,20 @@ rel="manifest">` ficam condicionados a `location.protocol.startsWith("http")`.
 **Servir pela intranet exige HTTPS**: sob `http://` que não seja `localhost`, a
 `showDirectoryPicker` não existe.
 
-**Verificação.** Não há testes nem executor. Uma mudança se confere abrindo o
-`index.html` no Chrome contra uma pasta local de teste com `declaracoes/`, em
-várias abas, alternando entre pessoa, leitor e administrador, e com dois administradores gravando o cadastro. JS avulso se confere com
-`node --check`. Ao mexer em arquivo cacheado, use recarregamento forçado.
+**Verificação.** Há testes ponta a ponta em `testes/`, rodados com
+`node testes/rodar.mjs` (ou só algumas suítes: `node testes/rodar.mjs 02 05`). Eles
+sobem um servidor HTTP mínimo para `code/` e um Chrome sem tela, simulam a pasta da
+rede com o OPFS do navegador — o `rede.js` de verdade lê e grava arquivos de verdade —
+e falham também com qualquer erro no console da página. Só usam módulos do Node 22
+(nenhum pacote npm): o Node é ferramenta de quem mantém o programa, nunca dependência
+do aplicativo. `CHROME=` indica o navegador; `FOTOS=<pasta>` guarda capturas de tela
+para conferir o layout a olho.
+
+Os testes não substituem a conferência à mão: abrir o `index.html` no Chrome contra
+uma pasta local de teste com `declaracoes/` (a `pasta-teste/`, já no `.gitignore`), em
+várias abas, alternando entre pessoa, leitor e administrador, e com dois
+administradores gravando o cadastro. JS avulso se confere com `node --check`. Ao
+mexer em arquivo cacheado, use recarregamento forçado.
 
 ### 10.2. Versões
 
