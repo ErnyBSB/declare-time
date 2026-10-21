@@ -500,13 +500,26 @@ referência** (padrão: hoje), e entram as declarações vigentes nela. Um filtr
 **mês** alternativo considera as declarações que encostam no mês em qualquer dia,
 como as ausências do projeto de origem.
 
+**Fixado na v0.3.** As declarações são atribuídas ao **dono do arquivo** (o nome do
+cadastro cujo `slug` dá o nome do arquivo), nunca ao campo `pessoa` gravado dentro
+dele. Declaração com forma inválida fica fora das contas, sem derrubar a tela, e
+continua no arquivo. A tabela entra pela unidade **carimbada**; o cadastro, pela
+unidade **atual**.
+
 ### 8.1. Indicadores
 
 - **Pessoas cadastradas** (do `config.json`, nas unidades visíveis);
 - **Com declaração vigente** na data de referência;
 - **Sem declaração**: calculado a partir do cadastro e clicável, para listar quem
   falta;
-- **Horas por semana declaradas**, no total e em média por pessoa com declaração.
+- **Horas por semana declaradas**, no total e em média por pessoa com declaração —
+  só no recorte por data: no recorte por mês, as declarações sucessivas de quem
+  substituiu o horário se somariam.
+
+"Sem declaração" não conta quem tem arquivo **ilegível** (listado à parte, com a
+marca) nem quem tem declaração no período carimbada com outra unidade (mudou de
+unidade e não redeclarou); o indicador "com declaração" diz quantos estão nesse
+caso.
 
 ### 8.2. Gráficos
 
@@ -529,7 +542,8 @@ horário cumprido, e o mapa de cobertura não desconta ausências nem feriados.
 
 CSV com uma linha por declaração, colunas na ordem do esquema 5.1, com `dias` por
 extenso ("Seg Ter Qua"). Separador `;` e BOM UTF-8, para o Excel em pt-BR abrir sem
-assistente.
+assistente. Célula que comece com `=`, `+`, `-` ou `@` ganha um apóstrofo na frente,
+para o Excel não a executar como fórmula.
 
 ---
 
@@ -602,6 +616,7 @@ histórico abaixo.
 |---|---|---|
 | v0.1 | out/2026 | Entrada (conexão, selo, oficialização pelo primeiro administrador, identificação com jornada), Administração (unidades, pessoas, papéis `leitor`/`adm`, senhas, conferência de `atualizadoEm`), Ajuda, Sobre, PWA. |
 | v0.2 | out/2026 | Meus horários: formulário com total ao vivo, recusas de 7.2, colisão conferida contra o arquivo relido, encerrar/substituir/excluir, divergência por dia, grade da semana. |
+| v0.3 | out/2026 | Painel para leitores (recorte pelas suas unidades) e administradores: data ou mês, unidade, pessoa; indicadores; "sem declaração" pelo cadastro; tabela; CSV; arquivos sem cadastro ou ilegíveis. |
 
 ---
 

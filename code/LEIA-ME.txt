@@ -1,4 +1,4 @@
-DECLARAÇÃO DE DISPONIBILIDADE (versão 0.2, out/26 — PWA em rede)
+DECLARAÇÃO DE DISPONIBILIDADE (versão 0.3, out/26 — PWA em rede)
 ================================================================
 
 Este arquivo é a documentação de verdade do programa. Não é uma lista
@@ -11,10 +11,91 @@ A referência estruturada — esquemas, tabelas, papéis, roteiro — fica no
 project_design.md, na raiz do repositório. Os dois dizem a mesma coisa
 de jeitos diferentes: lá, para consultar; aqui, para entender.
 
-A versão 0.2 é a primeira em que se declara: a tela "Meus horários"
-recebe as declarações de cada pessoa, com as recusas, o encerramento,
-a substituição e a grade da semana. O painel de leitores e
-administradores chega na 0.3.
+A versão 0.3 traz o Painel: leitores veem as declarações das unidades
+que acompanham, e administradores veem o conjunto, com indicadores,
+tabela e exportação em CSV. Os gráficos chegam na 0.4.
+
+O Painel (novidade da v0.3)
+---------------------------
+É uma tela só, para leitores e administradores. A diferença entre os
+dois é o recorte: o administrador vê todas as unidades; o leitor, só as
+da lista dele, e o filtro de unidade só oferece essas. Quem só declara
+não vê o Painel.
+
+A pergunta que o painel responde é "em quando?", porque toda declaração
+vale num intervalo. O padrão é HOJE: entram as declarações vigentes na
+data escolhida. A alternativa é um MÊS inteiro: entram as que valem em
+qualquer dia dele.
+
+Quatro números abrem a tela:
+
+- pessoas cadastradas, pela unidade ATUAL no cadastro;
+- com declaração no recorte;
+- sem declaração — e um clique mostra quem;
+- horas por semana declaradas, no total e em média.
+
+As horas por semana só aparecem numa data, e não num mês. No mês, a
+declaração antiga e a nova de quem substituiu o horário valem as duas,
+em dias diferentes, e somá-las daria a essa pessoa uma semana com o
+dobro das horas.
+
+Sem declaração se conta pelo cadastro
+-------------------------------------
+"Sem declaração" sai da lista de pessoas cadastradas, e não das
+declarações. Uma lista feita só de quem declarou pareceria completa
+justamente onde falta gente.
+
+Dois casos não entram como "sem declaração", de propósito:
+
+- quem tem o arquivo ILEGÍVEL aparece na lista com essa marca. Não ter
+  declarado e ter um arquivo danificado são problemas diferentes, com
+  soluções diferentes;
+- quem mudou de unidade e ainda não redeclarou tem declaração — só que
+  com a unidade antiga no carimbo. Essa pessoa conta como "com
+  declaração", e o indicador avisa quantas estão nesse caso, porque a
+  declaração dela não aparece na tabela da unidade nova.
+
+De quem é cada declaração
+-------------------------
+A tabela entra pela unidade CARIMBADA na declaração, e não pela unidade
+atual da pessoa: o histórico de quem mudou de unidade fica com a
+unidade em que foi feito, como a jornada.
+
+E cada declaração é atribuída ao DONO DO ARQUIVO, e não ao nome escrito
+dentro dela. O dono de declaracoes/ana-beatriz-nunes.json é quem, no
+cadastro, tem esse arquivo. O arquivo é JSON comum, e um nome trocado à
+mão lá dentro não pode fazer uma declaração aparecer como de outra
+pessoa.
+
+Declaração com forma inesperada — editada à mão, ou gravada por uma
+versão futura — fica fora das contas e da tela, em vez de derrubar o
+painel inteiro. Ela continua no arquivo. Na tela "Meus horários", a
+própria pessoa é avisada de quantas foram ignoradas.
+
+Arquivos que pedem atenção
+--------------------------
+Só para administradores, no fim do painel: arquivos da pasta
+declaracoes/ que não pertencem a ninguém do cadastro (de quem foi
+removido, ou de um nome corrigido) e arquivos que não puderam ser
+lidos. O programa não apaga nem corrige nenhum deles — mostra, para que
+não sumam calados.
+
+O CSV
+-----
+Uma linha por declaração da tabela, com as colunas na ordem do esquema
+e os dias por extenso ("Seg Ter Qua"). Separador ";" e marca de UTF-8
+no começo do arquivo, para o Excel em português abrir com acentos e
+colunas certos, sem assistente de importação.
+
+A observação é texto livre, e o Excel trata como fórmula qualquer
+célula que comece com "=", "+", "-" ou "@". Uma observação escrita
+"=HIPERLINK(...)" viraria um link clicável na planilha de quem baixou.
+Por isso essas células ganham um apóstrofo na frente: o Excel mostra o
+texto como texto.
+
+O painel relê a pasta a cada vez que se entra nele, e no "Atualizar
+dados da rede": as declarações são de outras pessoas e mudam sem que
+esta tela saiba.
 
 Meus horários: declarar (novidade da v0.2)
 ------------------------------------------
