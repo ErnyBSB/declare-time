@@ -154,6 +154,11 @@ folder picker and permission prompt: the network folder is the browser's OPFS, s
 the real `rede.js` reads and writes real files. `FOTOS=/some/dir` saves
 screenshots for a visual check; look at them after any layout change.
 
+**The file contract is frozen for v1.0** (`project_design.md` 5.6, checked by
+`testes/06-contrato.mjs`): only add keys, never rename, retype or reuse one, never
+migrate files, and a `formato` > 1 file is never written over. A new key means
+updating the 5.6 table and that suite in the same PR.
+
 **When behavior changes, change the tests in the same PR.** Add checks to the suite
 of the area you touched, or a new `NN-name.mjs` suite exporting `nome`, `opcoes`
 (`downloads`, `foco`) and a default `async function (t)`. Test data uses the
