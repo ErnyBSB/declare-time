@@ -720,6 +720,7 @@ nome. Só se marca a *tag* com tudo isto feito:
 | v0.3 | out/2026 | Painel para leitores (recorte pelas suas unidades) e administradores: data ou mês, unidade, pessoa; indicadores; "sem declaração" pelo cadastro; tabela; CSV; arquivos sem cadastro ou ilegíveis. |
 | v0.4 | out/2026 | Gráficos do painel em HTML/CSS, sem biblioteca: cobertura por hora e dia (pessoas distintas, zero = descoberta), horas por semana por pessoa com jornada × 5, linha do tempo com raias. |
 | v0.5 | out/2026 | Sem jornada (12.9) e sem o dourado; "Sobre" sem o crédito ao projeto de origem; ausências (férias, licença, recesso, outro) em Meus horários e no painel, descontadas da cobertura na data (#13). |
+| v0.6 | out/2026 | Preparação da 1.0: contrato dos arquivos congelado (5.6) e conferido por `testes/06-contrato.mjs`; recusa de gravar por cima de formato mais novo; testes no navegador no repositório; guia de instalação, permissões, cópia de segurança e publicação na LEIA-ME; lista de publicação da 1.0 (10.3). |
 
 ---
 

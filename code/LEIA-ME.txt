@@ -1,4 +1,4 @@
-DECLARAÇÃO DE DISPONIBILIDADE (versão 0.5, out/26 — PWA em rede)
+DECLARAÇÃO DE DISPONIBILIDADE (versão 0.6, out/26 — PWA em rede)
 ================================================================
 
 Este arquivo é a documentação de verdade do programa. Não é uma lista
