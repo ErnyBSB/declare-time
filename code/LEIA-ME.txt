@@ -1,4 +1,4 @@
-DECLARAÇÃO DE DISPONIBILIDADE (versão 0.1, out/26 — PWA em rede)
+DECLARAÇÃO DE DISPONIBILIDADE (versão 0.2, out/26 — PWA em rede)
 ================================================================
 
 Este arquivo é a documentação de verdade do programa. Não é uma lista
@@ -11,10 +11,109 @@ A referência estruturada — esquemas, tabelas, papéis, roteiro — fica no
 project_design.md, na raiz do repositório. Os dois dizem a mesma coisa
 de jeitos diferentes: lá, para consultar; aqui, para entender.
 
-A versão 0.1 é a primeira com aplicativo: conecta a pasta, oficializa,
-identifica cada pessoa com a sua jornada e mantém o cadastro de
-unidades, pessoas, papéis e senhas. Declarar horários ainda não: isso
-chega na 0.2.
+A versão 0.2 é a primeira em que se declara: a tela "Meus horários"
+recebe as declarações de cada pessoa, com as recusas, o encerramento,
+a substituição e a grade da semana. O painel de leitores e
+administradores chega na 0.3.
+
+Meus horários: declarar (novidade da v0.2)
+------------------------------------------
+Uma declaração é um período, os dias da semana e uma faixa de horas:
+"de 01/09 a 31/12, de segunda a sexta, das 9h às 15h". O último dia
+pode ficar em branco, e aí ela vale até nova declaração — horário de
+trabalho costuma ser assim, e obrigar uma data inventada faria a pessoa
+escolher 31/12 e o horário sumir em janeiro.
+
+O total aparece enquanto se digita ("6h por dia · 30h por semana"),
+porque somar as próprias horas para conferir se acertou não é trabalho
+de quem preenche.
+
+A jornada e a unidade vão gravadas DENTRO de cada declaração, como
+retrato do momento. Sem isso, um horário de março seria conferido pela
+jornada de outubro, e uma mudança de jornada faria declarações antigas
+passarem a divergir sozinhas.
+
+O que a tela recusa, e por quê
+------------------------------
+Cada recusa tem a sua frase, e nenhuma é silenciosa:
+
+- faixa que termina antes de começar: a tela explica que jornada que
+  passa da meia-noite se declara como dois horários. Aceitar 22h às 6h
+  daria um total negativo sem ninguém perceber;
+- nenhum dia da semana marcado;
+- último dia anterior ao primeiro;
+- dias marcados que não caem dentro do período — de sábado a domingo,
+  marcando só segunda, não haveria dia nenhum em que a declaração
+  valesse;
+- colisão com outra declaração da mesma pessoa, citando qual e em que
+  dias.
+
+Duas declarações só colidem quando as TRÊS coisas se cruzam: o período,
+o dia da semana e a hora — e o dia em comum precisa de fato ocorrer no
+trecho em que os dois períodos se sobrepõem. Barrar só por período
+tornaria "uma faixa por declaração" inútil: a manhã e a tarde do mesmo
+semestre colidiriam. Faixas que se encostam (9h–15h e 15h–17h) não
+colidem.
+
+A colisão é conferida contra o arquivo RELIDO na hora de gravar, e não
+contra a lista que a tela mostrou. Duas abas abertas da mesma pessoa
+não conseguem, assim, gravar duas declarações que se cruzam.
+
+Encerrar, substituir, excluir — e nunca editar
+----------------------------------------------
+Uma declaração que já começou não se edita. O painel consulta o passado
+mês a mês, e editar reescreveria o que ele já mostrou. O que se faz com
+cada uma depende de quando ela vale:
+
+- VIGENTE pode ser encerrada: ganha um último dia, que vai de hoje em
+  diante e só antecipa o fim que ela já tinha. Encerrar ontem seria
+  reescrever ontem.
+- VIGENTE pode ser substituída: é o caminho para trocar de horário. O
+  formulário abre com o horário atual, a pessoa muda o que mudou, e uma
+  só gravação encerra a atual na véspera e cria a nova. A nova começa
+  hoje ou depois — o que já valeu fica como valeu.
+- FUTURA, que ainda não começou, pode ser excluída: nada do que o
+  painel mostrou se perde.
+- ENCERRADA fica como está.
+
+Pode-se declarar um período que começou no passado: quem passa a usar
+o programa em outubro tem um horário que vale desde setembro. A tela
+avisa, antes de gravar, que uma declaração assim só poderá ser
+encerrada, e não excluída — um erro de digitação ali não tem borracha.
+
+A situação (vigente, futura, encerrada) nunca é gravada: é calculada
+contra o dia de hoje sempre que a tela abre. Uma declaração vigente
+ontem pode amanhecer encerrada sem que ninguém toque no arquivo.
+
+Quando a faixa não fecha com a jornada
+--------------------------------------
+Alguém com jornada de 8h que declara das 8h às 14h está declarando 6h.
+Pode estar certo — jornada reduzida naquele período — ou pode ter errado
+a digitação, e o programa não tem como distinguir uma coisa da outra.
+Então ele mostra, em dourado, e não corrige nada.
+
+A comparação é com o DIA, e não com cada declaração. A jornada partida
+(9h–12h e 14h–17h) são duas declarações que, sozinhas, diferem da
+jornada, e juntas fecham as 8h; marcar as duas em dourado ensinaria a
+ignorar o dourado. Uma declaração só sai marcada quando, em algum dia
+seu, a soma de tudo o que vale junto com ela não bate com a jornada.
+
+A semana de hoje
+----------------
+Abaixo das declarações, uma grade em HTML — horas nas linhas, dias nas
+colunas — mostra o que está valendo hoje. Não é gráfico: é para a pessoa
+conferir num relance se a semana ficou como ela pensa. Sábado e domingo
+só aparecem se alguma declaração os usar. A hora conta inteira, como no
+mapa de cobertura que virá no painel: quem sai às 12h30 aparece na hora
+das 12h. O total de cada dia sai em dourado quando difere da jornada.
+
+Se o arquivo da pessoa estiver ilegível, a tela diz isso ao abrir e
+desliga o botão de declarar, em vez de deixar a pessoa preencher tudo e
+descobrir na hora de gravar.
+
+As janelas de senha e de encerramento usam as mensagens do programa, e
+não os balões do navegador: o balão some ao primeiro clique e não diz o
+que fazer.
 
 Versão 0.1: entrar, oficializar e cadastrar (novidade da v0.1)
 --------------------------------------------------------------
