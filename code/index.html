@@ -205,6 +205,67 @@ td.acoes .acao{margin:2px 4px 2px 0}
 td .sub{display:block; color:var(--grafite); font-size:11.5px; margin-top:2px; overflow-wrap:anywhere}
 td.num{text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap}
 
+/* ---------- gráficos do painel ----------
+   Em HTML e CSS, sem biblioteca: o conteúdo é texto de verdade (lê em
+   leitor de tela, imprime, funciona sem rede) e não há 500 KB de código
+   alheio no cache. Cores:
+     - cobertura: rampa de um só verde, do claro ao escuro, conferida no
+       validador (monótona, degraus visíveis, o claro a 2,1:1 do branco);
+       o zero fica no cinza do papel, com o número em negrito;
+     - barras: tinta neutra; dourado SÓ para divergência com a jornada;
+     - linha do tempo: verde para vigente, cinza para o resto.
+   Texto nunca leva a cor do dado; dentro da célula, tinta ou branco pelo
+   contraste do fundo (todos acima de 4,5:1). */
+.grafico{margin-top:16px}
+.grafico .nota-grafico{margin:10px 0 0; font-size:11.5px; color:var(--grafite)}
+.legenda{display:flex; flex-wrap:wrap; gap:6px 16px; align-items:center; margin:10px 0 0;
+  font-size:12px; color:var(--grafite)}
+.legenda .chave{display:inline-block; width:14px; height:10px; border-radius:2px;
+  vertical-align:-1px; margin-right:5px}
+.legenda .chave.traco{width:2px; height:14px; border-radius:0; background:var(--tinta); vertical-align:-3px}
+table.hm{min-width:440px; border-collapse:separate; border-spacing:2px; table-layout:fixed; font-size:12px}
+table.hm th{padding:4px 2px; text-align:center}
+table.hm th.h, table.hm td.h{width:48px; text-align:right; color:var(--grafite); padding-right:6px;
+  border:0; font-variant-numeric:tabular-nums}
+table.hm td.c{text-align:center; padding:6px 2px; border:0; border-radius:3px;
+  font-variant-numeric:tabular-nums; cursor:default}
+table.hm td.c:hover{outline:2px solid var(--tinta); outline-offset:-2px}
+/* Degraus da cobertura, usados nas células e nas chaves da legenda. */
+.n0{background:var(--papel); font-weight:700}
+.n1{background:#84C190; color:var(--tinta)}
+.n2{background:#55A065; color:var(--tinta)}
+.n3{background:#2E7A40; color:#fff}
+.n4{background:#1B4D26; color:#fff}
+.barras{display:grid; grid-template-columns:minmax(110px,190px) minmax(0,1fr) 64px;
+  gap:4px 12px; align-items:center; font-size:12.5px; margin-top:12px}
+.barras .nome{overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.trilho{position:relative; height:22px}
+.trilho .b{position:absolute; left:0; top:5px; height:12px; background:#5C6A60;
+  border-radius:0 4px 4px 0; min-width:2px}
+.trilho .b.diverge{background:var(--dourado)}
+.trilho .ref{position:absolute; top:1px; bottom:1px; width:2px; margin-left:-1px; background:var(--tinta)}
+.trilho:focus-visible, .lt-bloco:focus-visible{outline:2px solid var(--verde); outline-offset:2px}
+.barras .v{text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap}
+.lt{margin-top:12px; font-size:12px}
+.lt-linha{display:grid; grid-template-columns:minmax(110px,190px) minmax(0,1fr); gap:12px;
+  align-items:center; padding:3px 0; border-bottom:1px solid var(--linha-suave)}
+.lt-linha:last-child{border-bottom:0}
+.lt-linha .nome{overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.lt-faixa{position:relative}
+.lt-mes{position:absolute; top:0; bottom:0; width:1px; background:var(--linha-suave)}
+.lt-ref{position:absolute; top:-3px; bottom:-3px; width:2px; margin-left:-1px; background:var(--tinta)}
+.lt-bloco{position:absolute; height:10px; border-radius:4px; background:#7E8A83}
+.lt-bloco.vigente{background:#55A065}
+.lt-bloco.segue{border-top-right-radius:0; border-bottom-right-radius:0}
+.lt-bloco.antes{border-top-left-radius:0; border-bottom-left-radius:0}
+.lt-eixo{position:relative; height:16px; color:var(--grafite); font-size:11px}
+.lt-eixo > span{position:absolute; top:0; transform:translateX(-50%); white-space:nowrap}
+#dicaGrafico{position:fixed; z-index:50; pointer-events:none; max-width:320px;
+  background:var(--ficha); color:var(--tinta); border:1px solid var(--linha);
+  border-radius:var(--raio-p); box-shadow:0 8px 22px rgba(27,33,29,.18);
+  padding:8px 10px; font-size:12px; line-height:1.45}
+#dicaGrafico b{display:block; font-size:13px}
+
 /* ---------- etiquetas neutras (papel, senha, unidade) ---------- */
 .tag{display:inline-block; background:var(--papel); color:var(--grafite);
   border:1px solid var(--linha); border-radius:999px; padding:1px 8px;
@@ -329,6 +390,10 @@ dialog h2{font-family:var(--serif); font-weight:400; font-size:21px; margin:0 0 
   .kpis{grid-template-columns:1fr 1fr}
 }
 @media(max-width:560px){
+  .barras{grid-template-columns:90px minmax(0,1fr) 52px}
+  .lt-linha{grid-template-columns:90px minmax(0,1fr)}
+  /* Seis meses em ~150px não cabem: um rótulo sim, outro não, sem o ano. */
+  .lt-eixo > span.impar, .lt-eixo .ano{display:none}
   .topo{padding:18px 16px 14px}
   .corpo{padding:16px 16px 44px}
   .grade2{grid-template-columns:1fr}
@@ -612,6 +677,46 @@ dialog h2{font-family:var(--serif); font-weight:400; font-size:21px; margin:0 0 
     <p class="nota-painel">Horário declarado não é horário cumprido: o programa não confere
       nada, e estes números não medem desempenho. A ordem é alfabética de propósito.</p>
 
+    <!-- Os três gráficos saem do MESMO recorte da tabela abaixo. Servem
+         para achar onde olhar; o número exato está na tabela e no CSV. -->
+    <figure class="cartao grafico" id="figCobertura" style="margin-left:0;margin-right:0">
+      <h2>Cobertura por hora e dia da semana</h2>
+      <p class="dica" id="subCobertura">Quantas pessoas declararam estar disponíveis em cada hora.
+        Zero é hora descoberta.</p>
+      <div class="legenda" id="legCobertura"></div>
+      <div class="rolagem" style="margin-top:10px" id="gCobertura"></div>
+      <p class="nota-grafico">Conta pessoas, e não declarações; a hora conta inteira (quem sai às
+        12h30 conta na hora das 12h). Não desconta ausências nem feriados.</p>
+    </figure>
+
+    <figure class="cartao grafico" id="figHoras" style="margin-left:0;margin-right:0">
+      <div class="cartao-topo">
+        <h2>Horas por semana, por pessoa</h2>
+        <button type="button" class="ligacao direita" id="btnOrdem">ordenar por volume</button>
+      </div>
+      <div class="legenda">
+        <span><span class="chave" style="background:#5C6A60"></span>horas declaradas</span>
+        <span><span class="chave traco"></span>jornada × 5</span>
+        <span><span class="chave" style="background:var(--dourado)"></span>difere da jornada × 5</span>
+      </div>
+      <div id="gHoras"></div>
+      <p class="nota-grafico">Ordenar por volume não é ranking: o programa não sabe se as horas
+        declaradas foram cumpridas.</p>
+    </figure>
+
+    <figure class="cartao grafico" id="figLinha" style="margin-left:0;margin-right:0">
+      <h2>Linha do tempo das declarações</h2>
+      <p class="dica" id="subLinha"></p>
+      <div class="legenda">
+        <span><span class="chave" style="background:#55A065"></span>vigente na data</span>
+        <span><span class="chave" style="background:#7E8A83"></span>outras</span>
+        <span><span class="chave traco"></span>data de referência</span>
+      </div>
+      <div class="lt" id="gLinha"></div>
+      <p class="nota-grafico">Uma faixa por pessoa; declarações que valem ao mesmo tempo (manhã e
+        tarde, por exemplo) ficam uma sob a outra. Borda reta = continua além da janela.</p>
+    </figure>
+
     <div class="cartao">
       <div class="cartao-topo">
         <h2>Declarações <span class="dica" id="contDecl" style="font-weight:400"></span></h2>
@@ -794,6 +899,11 @@ dialog h2{font-family:var(--serif); font-weight:400; font-size:21px; margin:0 0 
             <li>A tabela mostra cada declaração com a unidade em que foi feita. Quem mudou de
               unidade e ainda não redeclarou aparece pela unidade antiga.</li>
             <li><b>Baixar CSV</b> gera a tabela do recorte para abrir no Excel.</li>
+            <li><b>Gráficos:</b> a cobertura conta quantas pessoas estão disponíveis em cada
+              hora de cada dia (zero é hora descoberta); as barras mostram as horas por
+              semana de cada pessoa, com um traço na jornada × 5; a linha do tempo mostra os
+              períodos de cada declaração. Passe o ponteiro, ou chegue pelo teclado, para ver
+              os detalhes.</li>
           </ul>
           <p>O painel lê a pasta ao abrir. Para ver o que outras pessoas declararam depois,
             use “Atualizar dados da rede”.</p>
@@ -857,6 +967,9 @@ dialog h2{font-family:var(--serif); font-weight:400; font-size:21px; margin:0 0 
 
 </main>
 </div>
+
+<!-- Dica dos gráficos: um elemento só, preenchido por textContent. -->
+<div id="dicaGrafico" role="tooltip" hidden></div>
 
 <!-- ====================== JANELAS ====================== -->
 <dialog id="dlgSobre" aria-labelledby="sobreTitulo">
@@ -2118,6 +2231,7 @@ function renderPainel() {
   }).join("") : `<tr><td colspan="9" class="vazio">Nenhuma declaração neste recorte.</td></tr>`;
 
   renderArquivosPainel();
+  renderGraficos(r);
 }
 
 function renderArquivosPainel() {
@@ -2146,6 +2260,196 @@ $("kpis").addEventListener("click", (e) => {
   $("cartaoFaltam").hidden = !$("cartaoFaltam").hidden;
   e.target.setAttribute("aria-expanded", String(!$("cartaoFaltam").hidden));
 });
+
+/* ============================== GRÁFICOS ==============================
+   Os três saem do recorte que a tabela usa (recortePainel), e nada é
+   recalculado por outro caminho: se gráfico e tabela divergirem, é
+   defeito. */
+const DIA_MS = 86400000;
+const diasEntre = (a, b) => Math.round((Date.parse(b + "T00:00:00Z") - Date.parse(a + "T00:00:00Z")) / DIA_MS);
+const mesCurto = (iso) => new Date(iso + "T12:00:00Z")
+  .toLocaleDateString("pt-BR", { month: "short", year: "2-digit", timeZone: "UTC" }).replace(". de ", "/").replace(" de ", "/");
+let ordemHoras = "alfa";
+
+function renderGraficos(r) {
+  renderCobertura(r);
+  renderHorasPessoa(r);
+  renderLinhaTempo(r);
+}
+
+/* Cobertura: cada célula conta PESSOAS distintas — duas declarações da
+   mesma pessoa na mesma hora (antes e depois de uma substituição, num
+   mês) contam uma vez. */
+function renderCobertura(r) {
+  const ds = r.decls;
+  if (!ds.length) {
+    $("gCobertura").innerHTML = `<p class="dica">Nenhuma declaração neste recorte.</p>`;
+    $("legCobertura").innerHTML = "";
+    return;
+  }
+  $("subCobertura").textContent = (r.modo === "mes"
+    ? "Quantas pessoas declararam estar disponíveis em cada hora em algum momento do mês."
+    : "Quantas pessoas declararam estar disponíveis em cada hora, na data de referência.") +
+    " Zero é hora descoberta.";
+  const usados = new Set(ds.flatMap(d => d.dias));
+  const cols = ORDEM_DIAS.filter(d => (d >= 1 && d <= 5) || usados.has(d));
+  const h0 = Math.floor(Math.min(...ds.map(d => minutos(d.inicio))) / 60);
+  const h1 = Math.ceil(Math.max(...ds.map(d => minutos(d.fim))) / 60);
+  const quem = (dia, h) => [...new Set(ds.filter(d => d.dias.includes(dia) &&
+    minutos(d.inicio) < (h + 1) * 60 && h * 60 < minutos(d.fim)).map(d => d.pessoa))].sort(porNome);
+  const grade = [];
+  for (let h = h0; h < h1; h++) grade.push(cols.map(dia => quem(dia, h)));
+  const max = Math.max(1, ...grade.flat().map(l => l.length));
+  /* Quatro degraus. Com até 4 pessoas, um degrau por pessoa; acima disso,
+     faixas iguais do máximo. A legenda diz qual faixa é cada cor. */
+  const degrau = (n) => n === 0 ? 0 : (max <= 4 ? n : Math.min(4, Math.ceil(n / max * 4)));
+  const faixas = max <= 4
+    ? Array.from({ length: max }, (_, i) => [i + 1, i + 1])
+    : [1, 2, 3, 4].map(k => [Math.floor((k - 1) * max / 4) + 1, Math.floor(k * max / 4)]);
+  $("legCobertura").innerHTML = `<span><span class="chave n0" style="border:1px solid var(--linha)"></span>0 — descoberta</span>` +
+    faixas.map(([a, b], i) => `<span><span class="chave n${max <= 4 ? a : i + 1}"></span>${a === b ? a : a + "–" + b} ${b === 1 ? "pessoa" : "pessoas"}</span>`).join("");
+  let html = `<table class="hm"><thead><tr><th class="h"><span class="rotulo" style="margin:0">Hora</span></th>` +
+    cols.map(d => `<th scope="col">${escapar(DIAS_SEMANA[d])}</th>`).join("") + `</tr></thead><tbody>`;
+  grade.forEach((linha, i) => {
+    const h = h0 + i;
+    html += `<tr><td class="h">${String(h).padStart(2, "0")}h</td>` + linha.map((pessoas, j) => {
+      const n = pessoas.length;
+      const dica = `${DIAS_SEMANA[cols[j]]}, ${h}h: ${n === 0 ? "ninguém — hora descoberta" :
+        n + (n === 1 ? " pessoa" : " pessoas") + " — " + pessoas.join(", ")}`;
+      return `<td class="c n${degrau(n)}" data-dica="${escapar(dica)}">${n}</td>`;
+    }).join("") + `</tr>`;
+  });
+  $("gCobertura").innerHTML = html + `</tbody></table>`;
+}
+
+/* Horas por semana, por pessoa: só numa data. Num mês, a declaração
+   antiga e a nova de quem substituiu o horário se somariam. */
+function renderHorasPessoa(r) {
+  $("btnOrdem").hidden = r.modo === "mes";
+  if (r.modo === "mes") {
+    $("gHoras").innerHTML = `<p class="dica" style="margin-top:12px">Escolha o recorte “Numa data”:
+      num mês, declarações sucessivas da mesma pessoa se somariam.</p>`;
+    return;
+  }
+  const porPessoa = new Map();
+  for (const d of r.decls) {
+    const p = porPessoa.get(d.pessoa) || { min: 0, carga: d.carga || null };
+    p.min += minutosDia(d) * d.dias.length;
+    porPessoa.set(d.pessoa, p);
+  }
+  const linhas = [...porPessoa.entries()].map(([nome, p]) => ({ nome, ...p }));
+  if (!linhas.length) {
+    $("gHoras").innerHTML = `<p class="dica" style="margin-top:12px">Nenhuma declaração neste recorte.</p>`;
+    return;
+  }
+  linhas.sort(ordemHoras === "volume" ? (a, b) => b.min - a.min || porNome(a.nome, b.nome)
+                                       : (a, b) => porNome(a.nome, b.nome));
+  const escala = Math.max(...linhas.map(l => Math.max(l.min, (l.carga || 0) * 5 * 60)));
+  const pct = (m) => (m / escala * 100).toFixed(2) + "%";
+  $("gHoras").innerHTML = `<div class="barras">` + linhas.map(l => {
+    const ref = l.carga ? l.carga * 5 * 60 : null;
+    const diverge = ref !== null && l.min !== ref;
+    const dica = `${l.nome}: ${fmtHoras(l.min)} por semana` +
+      (ref !== null ? ` · jornada × 5 = ${fmtHoras(ref)}${diverge ? " (difere)" : ""}` : "");
+    return `<span class="nome" title="${escapar(l.nome)}">${escapar(l.nome)}</span>
+      <div class="trilho" tabindex="0" data-dica="${escapar(dica)}" aria-label="${escapar(dica)}">
+        <div class="b${diverge ? " diverge" : ""}" style="width:${pct(l.min)}"></div>
+        ${ref !== null ? `<div class="ref" style="left:${pct(ref)}"></div>` : ""}
+      </div>
+      <span class="v">${fmtHoras(l.min)}</span>`;
+  }).join("") + `</div>`;
+}
+$("btnOrdem").addEventListener("click", () => {
+  ordemHoras = ordemHoras === "alfa" ? "volume" : "alfa";
+  $("btnOrdem").textContent = ordemHoras === "alfa" ? "ordenar por volume" : "ordenar por nome";
+  renderPainel();
+});
+
+/* Linha do tempo: uma faixa por pessoa no eixo das datas, com os
+   períodos declarados, os buracos e as sobreposições. A janela é o mês
+   escolhido ou, numa data, três meses para cada lado. Entram TODAS as
+   declarações que tocam a janela, e não só as vigentes: é para isso
+   que ela existe. */
+function renderLinhaTempo(r) {
+  const jan = r.modo === "mes" ? r.janela
+    : { de: somaDias(r.ref, -91), ate: somaDias(r.ref, 91) };
+  const total = diasEntre(jan.de, jan.ate) + 1;
+  const pos = (iso) => (diasEntre(jan.de, iso) / total * 100);
+  const unidades = unidadesDoRecorte(), pessoaSel = $("selPessoaVer").value;
+  const marco = r.modo === "mes" ? hoje() : r.ref;
+  $("subLinha").textContent = `De ${fmtData(jan.de)} a ${fmtData(jan.ate)}. ` +
+    "Mostra todas as declarações que tocam essa janela, vigentes ou não.";
+  const porPessoa = new Map();
+  for (const [dono, lista] of r.doDono)
+    for (const d of lista)
+      if (unidades.includes(d.unidade) && (pessoaSel === "*" || dono === pessoaSel) && periodosCruzam(d, jan))
+        (porPessoa.get(dono) || porPessoa.set(dono, []).get(dono)).push(d);
+  if (!porPessoa.size) {
+    $("gLinha").innerHTML = `<p class="dica">Nenhuma declaração nesta janela.</p>`;
+    return;
+  }
+  // Marcas de mês no eixo e nas faixas.
+  const meses = [];
+  for (let m = jan.de.slice(0, 7) + "-01"; m <= jan.ate; m = somaDias(ultimoDiaDoMes(m.slice(0, 7)), 1))
+    if (m >= jan.de) meses.push(m);
+  const linhasMes = meses.map(m => `<span class="lt-mes" style="left:${pos(m)}%"></span>`).join("");
+  const ref = marco >= jan.de && marco <= jan.ate ? `<span class="lt-ref" style="left:${pos(marco) + 0.5 / total * 100}%"></span>` : "";
+  let html = `<div class="lt-linha" style="border:0"><span></span><div class="lt-eixo">` +
+    meses.map((m, i) => {
+      const [mes, ano] = mesCurto(m).split("/");
+      return `<span${i % 2 ? ' class="impar"' : ""} style="left:${pos(m)}%">${escapar(mes)}<span class="ano">/${escapar(ano)}</span></span>`;
+    }).join("") + `</div></div>`;
+  for (const nome of [...porPessoa.keys()].sort(porNome)) {
+    const ds = porPessoa.get(nome).sort((a, b) => a.de.localeCompare(b.de) || a.inicio.localeCompare(b.inicio));
+    /* Raias: declarações que valem ao mesmo tempo vão uma sob a outra, em
+       vez de se esconderem. */
+    const fimRaia = [];
+    const blocos = ds.map(d => {
+      let raia = fimRaia.findIndex(f => f < d.de);
+      if (raia < 0) { raia = fimRaia.length; fimRaia.push(""); }
+      fimRaia[raia] = fimOuSempre(d);
+      const ini = d.de < jan.de ? jan.de : d.de;
+      const fim = fimOuSempre(d) > jan.ate ? jan.ate : fimOuSempre(d);
+      const st = situacao(d, marco);
+      const dica = `${nome} · ${periodoTxt(d)} · ${rotDias(d.dias)} · ${d.inicio}–${d.fim} · ${ROTULO_SIT[st]}`;
+      return `<span class="lt-bloco${st === "vigente" ? " vigente" : ""}${d.de < jan.de ? " antes" : ""}${fimOuSempre(d) > jan.ate ? " segue" : ""}"
+        tabindex="0" data-dica="${escapar(dica)}" aria-label="${escapar(dica)}"
+        style="top:${raia * 14 + 4}px; left:${pos(ini)}%; width:max(4px, ${((diasEntre(ini, fim) + 1) / total * 100).toFixed(3)}%)"></span>`;
+    });
+    const resumo = `${nome}: ` + ds.map(d => `${periodoTxt(d)}, ${rotDias(d.dias)}, ${d.inicio}–${d.fim}`).join("; ");
+    html += `<div class="lt-linha"><span class="nome" title="${escapar(nome)}">${escapar(nome)}</span>
+      <div class="lt-faixa" role="group" aria-label="${escapar(resumo)}" style="height:${fimRaia.length * 14 + 4}px">
+        ${linhasMes}${ref}${blocos.join("")}</div></div>`;
+  }
+  $("gLinha").innerHTML = html;
+}
+
+/* Dica: segue o ponteiro, e aparece também no foco pelo teclado. Ela
+   ENRIQUECE, não guarda: todo número está na tabela e no CSV. */
+function mostrarDica(el, x, y) {
+  const d = $("dicaGrafico");
+  const [titulo, ...resto] = el.dataset.dica.split(" · ");
+  d.replaceChildren();
+  const b = document.createElement("b");
+  b.textContent = titulo;
+  d.append(b, document.createTextNode(resto.join(" · ")));
+  d.hidden = false;
+  const r = d.getBoundingClientRect();
+  d.style.left = Math.min(x + 14, innerWidth - r.width - 8) + "px";
+  d.style.top = (y + 16 + r.height > innerHeight ? y - r.height - 10 : y + 16) + "px";
+}
+$("vPainel").addEventListener("pointermove", (e) => {
+  const el = e.target.closest("[data-dica]");
+  if (el) mostrarDica(el, e.clientX, e.clientY); else $("dicaGrafico").hidden = true;
+});
+$("vPainel").addEventListener("pointerleave", () => { $("dicaGrafico").hidden = true; });
+$("vPainel").addEventListener("focusin", (e) => {
+  const el = e.target.closest("[data-dica]");
+  if (!el) return;
+  const r = el.getBoundingClientRect();
+  mostrarDica(el, r.left, r.bottom);
+});
+$("vPainel").addEventListener("focusout", () => { $("dicaGrafico").hidden = true; });
 
 /* ------------------------------- CSV -------------------------------
    Uma linha por declaração, colunas na ordem do esquema (5.1), dias por
