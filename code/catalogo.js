@@ -63,8 +63,11 @@ const SENHAS = {
   // "Nome Da Pessoa": "cole-aqui-o-hash-gerado",
 };
 
-/* Caminho da pasta da rede exibido como orientação na conexão (o
+/* Caminho da pasta de DADOS exibido como orientação na conexão (o
    navegador não permite abrir o caminho automaticamente; cada pessoa o
-   seleciona uma vez e a escolha fica memorizada). É um EXEMPLO: troque
-   pelo caminho real na cópia publicada para a sua organização. */
-const PASTA_REDE = "\\\\SERVIDOR\\Compartilhamento\\declare-time";
+   seleciona uma vez e a escolha fica memorizada). Na rede, a pasta
+   administrativa tem duas subpastas: code\ (este programa) e
+   Compartilhamento\ (os dados) — ver project_design.md, 4.2. Este
+   caminho é o de Compartilhamento\, nunca o de code\.
+   É um EXEMPLO: troque pelo caminho real na cópia publicada em code\. */
+const PASTA_REDE = "\\\\SERVIDOR\\PastaAdministrativa\\Compartilhamento";

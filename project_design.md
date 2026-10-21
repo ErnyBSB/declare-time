@@ -144,14 +144,15 @@ Arquivos estáticos e toda a lógica no navegador, como no projeto de origem.
 
 ```
 Navegador (Chrome/Edge) da pessoa A ─┐
-Navegador (Chrome/Edge) da pessoa B ─┼─ ▶  Pasta de rede compartilhada
-Navegador (Chrome/Edge) leitor, adm ─┘      (caminho definido em PASTA_REDE)
+Navegador (Chrome/Edge) da pessoa B ─┼─ ▶  …\Compartilhamento\  (dados, ver 4.2)
+Navegador (Chrome/Edge) leitor, adm ─┘      (caminho exibido em PASTA_REDE)
                                               │
  Cada navegador:                              ├─ config.json        (só adms gravam)
- • roda index.html + versao.js + catalogo.js  └─ declaracoes/
-   + rede.js                                      ├─ ana-beatriz-nunes.json
- • lê/grava JSON via File System Access API       ├─ carlos-eduardo-prado.json
- • guarda o handle da pasta no IndexedDB          └─ ...  (cada um, só o dono grava)
+ • abre …\code\index.html (o programa,        └─ declaracoes\
+   ver 4.2) com versao.js, catalogo.js            ├─ ana-beatriz-nunes.json
+   e rede.js                                      ├─ carlos-eduardo-prado.json
+ • lê/grava JSON via File System Access API       └─ ...  (cada um, só o dono grava)
+ • guarda o handle da pasta no IndexedDB
  • guarda identidade e preferências de tela
    no localStorage
 ```
@@ -241,6 +242,50 @@ restrição de licença.
 | `echarts.min.js` | **Não copiar** (decidido na v0.4, ver 12.6): os gráficos são HTML e CSS. |
 | `index.html` | **Não copiar inteiro.** Trazer por partes: folha de estilo e tokens, rail, tela de entrada (conexão, selo, identificação), `escapar`, `sha256hex`, a tela **Horários** e a aba **Horários** do painel, com seus dois gráficos. É dessa última parte que nasce o aplicativo. |
 | `.gitignore` | Copiar, trocando `unidadeCentral/` por `pasta-teste/` e barrando também qualquer `declaracoes/`. |
+
+### 4.2. Estrutura na rede (implantação)
+
+O repositório acima é onde o programa é **feito**. Na organização, ele é **usado** a
+partir de uma pasta de rede administrativa, compartilhada e com permissões NTFS, com
+duas subpastas lado a lado:
+
+```
+\\SERVIDOR\<pasta administrativa>\     pasta de rede administrativa (NTFS)
+  code\                                o PROGRAMA: cópia da pasta code/ de uma tag
+    index.html                         o que as pessoas abrem (duplo clique)
+    versao.js, catalogo.js, rede.js,
+    sw.js, manifest.webmanifest,
+    gerar-senha.html, icons\, LEIA-ME.txt
+  Compartilhamento\                    os DADOS vivos: a pasta que cada pessoa conecta
+    config.json                        cadastro, papéis, senhas, selo (só adms gravam)
+    declaracoes\                       um arquivo por pessoa (só o dono grava)
+      ana-beatriz-nunes.json           declarações e ausências da Ana
+      carlos-eduardo-prado.json
+      ...
+```
+
+- **`code\` é o programa, e só o programa.** Recebe a pasta `code/` de uma *tag*
+  publicada (10.2), com o `catalogo.js` da organização (o `PASTA_REDE` real). As
+  pessoas abrem `code\index.html`; ninguém conecta esta pasta na tela de entrada.
+- **`Compartilhamento\` são os dados, e só os dados.** É a pasta escolhida em
+  "Conectar pasta", oficializada pelo primeiro administrador (6.1) e apontada em
+  `PASTA_REDE`. O programa não depende do nome: o que vale é o selo do `config.json`.
+- **Uma não encosta na outra.** Publicar uma versão nova é substituir `code\` (com o
+  cuidado de conservar o `catalogo.js` da organização); `Compartilhamento\` fica
+  intocado. A cópia de segurança é a de `Compartilhamento\` inteira.
+
+**Permissões NTFS, por pasta** (ponto de partida; conferir com a TI na prova de uso,
+issue #20, como descreve a LEIA-ME):
+
+| Pasta | Todos que usam o programa | Administradores do programa | Quem publica versões |
+|---|---|---|---|
+| `<pasta administrativa>\` | ler e listar | ler e listar | ler e listar |
+| `code\` | ler e executar | ler e executar | modificar |
+| `Compartilhamento\` | ler e listar | **modificar** (gravam o `config.json` e o `.crswap` temporário do Chrome) | ler e listar |
+| `Compartilhamento\declaracoes\` | ler, listar e **criar arquivos** (só esta pasta); *Criador proprietário*: **modificar** (só arquivos) | ler e listar | ler e listar |
+
+Ninguém além de quem publica grava em `code\`: uma cópia do programa alterada por
+uma pessoa comum serviria a todos um `index.html` que ninguém revisou.
 
 ---
 
@@ -391,7 +436,7 @@ const DIAS_SEMANA  = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 const UNIDADES     = [];                             // semente vazia (repo público)
 const SENHAS       = {};
 const EXIGIR_SENHA = false;
-const PASTA_REDE   = '\\\\SERVIDOR\\Compartilhamento\\declare-time';  // exemplo
+const PASTA_REDE   = '\\\\SERVIDOR\\PastaAdministrativa\\Compartilhamento';  // exemplo (4.2)
 ```
 
 ### 5.5. Compatibilidade para trás
