@@ -1,6 +1,6 @@
 # Declaração de disponibilidade
 ## Relatório de Projeto
-### Versão 0 (pré-código) · Aplicação Web Progressiva (PWA) *client-side*
+### Aplicação Web Progressiva (PWA) *client-side* · versão atual em `code/versao.js`
 
 > Documento de referência para começar e evoluir o sistema.
 > Destinado a desenvolvedores humanos e a modelos de IA.
@@ -12,11 +12,11 @@
 > Quando este documento diz "o projeto de origem", é àquele repositório que se
 > refere, e as seções citadas (§2.2, §7.5…) são as do `Projeto_Design.md` dele.
 >
-> Ainda não há código. As seções 1 a 11 descrevem o sistema; a seção 12 registra
-> as decisões que estavam em aberto e como foram resolvidas em 20/10/2026. Todas as
-> que tocam esquema gravado estão tomadas, e só uma permanece pendente (12.7, o
-> texto de finalidade da LGPD), que não cabe ao programa redigir. O documento acompanha o `code/`: quando o código existir, o texto passa a
-> descrever a versão em uso, e as anteriores se recuperam pelas *tags*.
+> As seções 1 a 11 descrevem o sistema na versão em uso (ver o histórico em 10.4); a
+> seção 12 registra as decisões de projeto, com as alternativas descartadas; a 13, o
+> roteiro até a 1.0. Todas as decisões estão tomadas; o que falta para a 1.0 está na
+> lista de 10.3. O documento acompanha o `code/`: descreve sempre a versão atual, e as
+> anteriores se recuperam pelas *tags*.
 
 ---
 
@@ -684,7 +684,7 @@ vazia; o `.gitignore` é a grade que barra um `git add -A` distraído.
 **Dado pessoal.** O horário em que alguém está no trabalho é dado pessoal no
 sentido da LGPD. A finalidade (organizar a cobertura do serviço), quem lê
 (leitores, nas suas unidades, e administradores) e o fato de ser **autodeclarado** devem estar escritos na tela de
-Ajuda. Ver 12.7.
+Ajuda — o "Aviso de Privacidade e Proteção de Dados (LGPD)", desde a v0.7 (12.7).
 
 ---
 
@@ -750,8 +750,8 @@ nome. Só se marca a *tag* com tudo isto feito:
 - [x] LEIA-ME completo, com instalação, permissões, cópia de segurança e publicação.
 - [ ] **Prova de uso** (fase 5): uma unidade real, numa pasta real, com as permissões
       NTFS da LEIA-ME aplicadas e conferidas pela TI; ajustes do que aparecer.
-- [ ] **Texto de finalidade da LGPD** na Ajuda, redigido pela área responsável
-      (12.7, issue #17), e o teste de 01 atualizado.
+- [x] **Texto de finalidade da LGPD** na Ajuda (12.7, issue #17), e o teste de 01
+      atualizado (v0.7).
 - [ ] `node testes/rodar.mjs` passando, e conferência à mão em várias abas.
 - [ ] `versao.js` em `1.0` (`versao`, `rotulo`, `atualizado`) e `git tag -a v1.0` no
       `main`, com a linha da v1.0 no histórico abaixo.
@@ -766,6 +766,7 @@ nome. Só se marca a *tag* com tudo isto feito:
 | v0.4 | out/2026 | Gráficos do painel em HTML/CSS, sem biblioteca: cobertura por hora e dia (pessoas distintas, zero = descoberta), horas por semana por pessoa com jornada × 5, linha do tempo com raias. |
 | v0.5 | out/2026 | Sem jornada (12.9) e sem o dourado; "Sobre" sem o crédito ao projeto de origem; ausências (férias, licença, recesso, outro) em Meus horários e no painel, descontadas da cobertura na data (#13). |
 | v0.6 | out/2026 | Preparação da 1.0: contrato dos arquivos congelado (5.6) e conferido por `testes/06-contrato.mjs`; recusa de gravar por cima de formato mais novo; testes no navegador no repositório; guia de instalação, permissões, cópia de segurança e publicação na LEIA-ME; lista de publicação da 1.0 (10.3). |
+| v0.7 | out/2026 | Aviso de Privacidade e Proteção de Dados (LGPD) na Ajuda, no lugar do marcador de texto pendente (12.7, #17). |
 
 ---
 
@@ -795,9 +796,9 @@ nome. Só se marca a *tag* com tudo isto feito:
 
 Registro das decisões que este documento deixou em aberto na versão pré-código.
 As que tocam esquema gravado (12.1, 12.2, 12.4) foram tomadas em **20/10/2026**,
-antes do código, e as demais seguiram a recomendação de cada item. Fica pendente
-só **12.7**, que depende de quem responde pelo dado no órgão. A 12.3 foi revista
-no mesmo dia, ao se definirem os três papéis. Cada item guarda as
+antes do código, e as demais seguiram a recomendação de cada item. A 12.3 foi revista
+no mesmo dia, ao se definirem os três papéis; a 12.5 e a 12.9, na v0.5; a 12.7 foi
+fechada na v0.7, com o aviso de privacidade na Ajuda. Cada item guarda as
 alternativas descartadas, para que a decisão não seja refeita sem o argumento.
 
 ### 12.1. Previsão ou realização? — **Decidido: previsão recorrente**
@@ -894,12 +895,25 @@ cache offline. Em HTML, o conteúdo é texto de verdade: lê em leitor de tela, 
 e funciona sem rede. Saem junto as regras herdadas que só existiam por causa do
 ECharts (desenho adiado em contêiner oculto, compilação só-canvas).
 
-### 12.7. Texto de finalidade (LGPD) — **Pendente**
+### 12.7. Texto de finalidade (LGPD) — **Decidido: aviso na Ajuda** (21/10/2026, #17)
 
-Quem redige a finalidade e a base legal exibidas na Ajuda: a gestão ou o
-encarregado de dados do órgão? O programa não deve inventar esse texto. Até lá, a
-Ajuda traz um marcador explícito de texto pendente. Precisa de resposta antes da
-v1.0 (seção 13).
+O programa não inventa este texto. Até a v0.6, a Ajuda mostrava um marcador de texto
+pendente. Na v0.7 entra o **"Aviso de Privacidade e Proteção de Dados (LGPD)"**, no
+cartão da Ajuda que antes se chamava "Seus dados", com cinco itens:
+
+- **Base Legal**, **Tempo de Guarda** e **Seus Direitos**: texto jurídico, aplicado
+  como foi fornecido pelo responsável pelo projeto. Não se reescreve.
+- **Propósito** e **Acesso aos Dados**: o rascunho recebido falava em "solicitações",
+  "aprovação das demandas" e acesso "apenas" do autor e da chefia, o que não descreve
+  este programa. Foram trocados, com a concordância do responsável, por frases que só
+  dizem o que o programa garante: os dados servem para organizar a cobertura, não há
+  aprovação nem medição de desempenho, e quem lê são o próprio autor, os leitores da
+  unidade e os administradores — com leitura de todos na pasta de rede (4.2, seção 9).
+
+Estes dois itens são **descrição do programa**, e por isso têm teste
+(`testes/01-entrada.mjs`): se um dia o programa mudar quem lê o quê, o texto muda na
+mesma PR. O aviso não nomeia o controlador nem o canal do encarregado (DPO); se a
+organização quiser incluí-los, entram como texto novo, aprovado da mesma forma.
 
 ### 12.8. Nome do produto — **Decidido: "Declaração de disponibilidade"**
 
@@ -937,7 +951,7 @@ declaração ou ausência.
 | **3. Painel** | Filtros, indicadores, tabela, CSV, "arquivos sem cadastro"; recorte por `unidadesVisiveis()` para o leitor. | v0.3 |
 | **4. Gráficos** | Mapa de cobertura, horas por semana, linha do tempo, todos em HTML/CSS (12.6). | v0.4 |
 | **5. Prova de uso** | Teste com uma unidade real, numa pasta real, com permissões NTFS aplicadas. Ajustes — o primeiro lote (#13: jornada, crédito, ausências) saiu na v0.5. | v0.5… |
-| **6. Produção** | Esquema congelado, LEIA-ME completo, Ajuda com o texto de 12.7. Preparada em out/2026 (contrato 5.6, teste 06, guia de instalação na LEIA-ME); a *tag* espera a lista de 10.3. | **v1.0** |
+| **6. Produção** | Esquema congelado, LEIA-ME completo, Ajuda com o texto de 12.7. Preparada em out/2026 (contrato 5.6, teste 06, guia de instalação na LEIA-ME; aviso LGPD na v0.7); a *tag* espera a prova de uso (10.3, #20). | **v1.0** |
 
 Depois da 1.0, nesta ordem de custo/benefício: relatório impresso (o mecanismo da
 v1.13 de origem) e tabela de feriados opcional. (Ausências, antes nesta lista,
