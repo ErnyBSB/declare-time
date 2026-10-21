@@ -15,6 +15,28 @@ As seções vêm da mais nova para a mais antiga. Uma seção antiga não é
 apagada quando a decisão muda: a nova diz o que mudou e por quê, e a
 antiga fica como registro do que valia antes.
 
+Os testes no navegador
+----------------------
+Logo depois da 0.5, o repositório ganhou uma pasta testes/ com testes
+que abrem o programa num Chrome sem tela e o usam como uma pessoa
+usaria: oficializam uma pasta, cadastram gente, declaram, substituem,
+registram férias, conferem o painel. Rodam com "node testes/rodar.mjs".
+
+O que eles NÃO trocam é o principal: a pasta da rede é simulada com um
+recurso do próprio Chrome (o OPFS) que tem a mesma forma de acesso da
+pasta de verdade. O rede.js que roda nos testes é o mesmo que roda na
+rede, gravando e lendo arquivos de verdade. Só o seletor de pasta e o
+pedido de permissão, que precisariam de alguém clicando, são trocados.
+
+Um teste também falha se aparecer qualquer erro no console da página,
+mesmo que a tela pareça certa: erro calado é defeito esperando a hora.
+
+Os testes usam só o Node — nenhum pacote de npm — e o Node é ferramenta
+de quem mantém o programa, não parte dele: o aplicativo continua
+abrindo com um duplo clique, sem instalar nada. E os testes não
+dispensam a conferência à mão, em várias abas, com pessoas e papéis
+diferentes; eles garantem que o que já funcionava continua funcionando.
+
 Versão 0.5: sem jornada, com ausências (novidade da v0.5)
 ---------------------------------------------------------
 Três correções pedidas por quem usou a 0.4 (issue #13).

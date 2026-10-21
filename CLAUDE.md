@@ -60,6 +60,10 @@ code/                    the app — one copy, always the current version
   gerar-senha.html       standalone tool: sha256("nome|senha")
   icons/                 icon-192.png, icon-512.png — required for offline install
   LEIA-ME.txt            the real documentation: what changed and WHY
+testes/                  end-to-end browser tests (dev tooling, not part of the app)
+  rodar.mjs              runner: node testes/rodar.mjs [prefixes…]
+  navegador.mjs          harness: static server, headless Chrome over CDP, OPFS folder
+  NN-*.mjs               one suite per version (01-entrada … 05-ausencias)
 project_design.md        structured reference: schemas, roles, decisions, roadmap
 ```
 
@@ -141,16 +145,31 @@ gold token was removed in v0.5 along with the jornada (decision 12.9). Keep
 
 ## Verifying changes
 
-There are no tests and no runner. To check a change, open `code/index.html` in
-Chrome against a local test folder (named `pasta-teste/`, already in `.gitignore`)
-holding `config.json` and `declaracoes/`, in several tabs, switching between pessoa,
-leitor and adm, and with two admins editing the registry. Syntax-check standalone
-JS with `node --check`. When touching `sw.js` or cached assets, use a hard reload —
-a stale version in `versao.js` will serve the previous cache and hide your change.
+**Run the browser tests before every PR:** `node testes/rodar.mjs` (all suites) or
+`node testes/rodar.mjs 03` (by prefix). They need Node 22+ and Chrome or Edge
+(`CHROME=/path` if it is not found), use only Node built-ins — never add npm
+packages — and fail on any console error in the page. They serve `code/` on a
+local port, drive headless Chrome over the DevTools Protocol, and replace only the
+folder picker and permission prompt: the network folder is the browser's OPFS, so
+the real `rede.js` reads and writes real files. `FOTOS=/some/dir` saves
+screenshots for a visual check; look at them after any layout change.
+
+**When behavior changes, change the tests in the same PR.** Add checks to the suite
+of the area you touched, or a new `NN-name.mjs` suite exporting `nome`, `opcoes`
+(`downloads`, `foco`) and a default `async function (t)`. Test data uses the
+invented cast only.
+
+The tests do not replace a manual pass: open `code/index.html` in Chrome against a
+local test folder (`pasta-teste/`, already in `.gitignore`) holding `config.json`
+and `declaracoes/`, in several tabs, switching between pessoa, leitor and adm, and
+with two admins editing the registry. When touching `sw.js` or cached assets, use a
+hard reload — a stale version in `versao.js` will serve the previous cache and hide
+your change.
 
 ## Do not
 
-- Add build tooling, package managers, frameworks, or remote assets.
+- Add build tooling, package managers, frameworks, or remote assets — in the app or
+  in `testes/` (Node built-ins only).
 - Create per-version folders or dated copies of files — versions are tags.
 - Rename persisted keys or role names, or reuse the reserved ones.
 - Write the version number anywhere but `versao.js`, or bump it without tagging.
