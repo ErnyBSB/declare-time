@@ -1,6 +1,6 @@
 /* =========================================================
-   CATÁLOGO — o que é fixo no aplicativo: jornadas aceitas,
-   rótulos dos dias e o caminho da pasta exibido como orientação.
+   CATÁLOGO — o que é fixo no aplicativo: rótulos dos dias, tipos
+   de ausência e o caminho da pasta exibido como orientação.
    Pessoas, papéis e senhas NÃO moram aqui: moram no config.json
    da pasta da rede (ver project_design.md, 5.3 e 5.4).
    ========================================================= */
@@ -14,18 +14,23 @@
    são os de antes. Esta data não descongela nada; ela só aparece em
    "Sobre o programa", para que a pergunta "o navegador já está com a
    minha edição?" tenha resposta num relance. */
-const CATALOGO_ATUALIZADO = "20.10.2026";
-
-/* Jornadas aceitas, em horas por dia. A jornada é autodeclarada na
-   identificação e carimbada em cada declaração (campo "carga"); a
-   divergência entre a faixa declarada e a jornada é exibida, nunca
-   corrigida. */
-const JORNADAS = [8, 6];
+const CATALOGO_ATUALIZADO = "21.10.2026";
 
 /* Rótulos dos dias, na ordem de Date.getUTCDay(): 0 = domingo. O que
    fica gravado na declaração é o número, nunca o rótulo — por isso os
    rótulos podem mudar e os números não. */
 const DIAS_SEMANA = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+
+/* Tipos de ausência (v0.5). A chave "k" é o que fica gravado no arquivo
+   da pessoa: NUNCA troque uma chave já em uso — só o rótulo. Um tipo
+   novo entra com chave nova; um tipo que deixar de existir continua
+   aqui, para as ausências antigas que o usam ainda terem nome. */
+const TIPOS_AUSENCIA = [
+  { k: "ferias",  rotulo: "Férias" },
+  { k: "licenca", rotulo: "Licença" },
+  { k: "recesso", rotulo: "Recesso" },
+  { k: "outro",   rotulo: "Outro afastamento" }
+];
 
 /* SEMENTE, e não cadastro. Este arquivo vive num repositório PÚBLICO:
    nome de pessoa NÃO entra aqui, e nem o nome das unidades, que é dado
