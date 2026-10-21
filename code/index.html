@@ -129,9 +129,10 @@ button{font-family:inherit}
 .dica{margin:5px 0 0; color:var(--grafite); font-size:12.5px}
 .rotulo{display:block; font-size:10.5px; letter-spacing:.1em; text-transform:uppercase;
   color:var(--grafite); font-weight:600; margin:0 0 5px}
-select,input[type=text],input[type=password]{
+select,input[type=text],input[type=password],input[type=date],input[type=time],textarea{
   width:100%; padding:9px 11px; font:inherit; font-size:13.5px; color:var(--tinta);
   background:var(--ficha); border:1px solid var(--linha-campo); border-radius:var(--raio-p)}
+textarea{resize:vertical; min-height:60px}
 .campo{margin-bottom:14px}
 .campo:last-child{margin-bottom:0}
 .grade2{display:grid; grid-template-columns:1fr 1fr; gap:12px}
@@ -196,6 +197,55 @@ td.acoes .acao{margin:2px 4px 2px 0}
   border-radius:999px; padding:2px 4px 2px 12px; font-size:13px; background:var(--papel)}
 .lista-unidades .excluir{padding:4px 8px}
 
+/* ---------- Meus horários ---------- */
+.colunas{display:grid; grid-template-columns:380px minmax(0,1fr); gap:20px; align-items:start}
+.colunas > .cartao + .cartao, .colunas .cartao{margin-top:0}
+.ligacao{background:none; border:0; padding:0; font:inherit; font-size:12.5px;
+  color:var(--tinta); text-decoration:underline; cursor:pointer}
+/* Dias da semana: caixas de marcar com cara de chip. Continuam sendo
+   checkboxes de verdade, para o teclado e o leitor de tela. */
+.dias{display:grid; grid-template-columns:repeat(7,1fr); gap:6px}
+.dias label{position:relative; display:flex; align-items:center; justify-content:center;
+  border:1px solid var(--linha-campo); border-radius:var(--raio-p); padding:8px 0;
+  font-size:12.5px; cursor:pointer; background:var(--ficha); color:var(--grafite)}
+.dias input{position:absolute; opacity:0; inset:0; margin:0; cursor:pointer}
+.dias label:has(input:checked){border-color:var(--tinta); background:var(--papel);
+  color:var(--tinta); font-weight:600}
+.dias label:has(input:focus-visible){outline:2px solid var(--verde); outline-offset:2px}
+.total-vivo{margin:14px 0 0; padding:10px 12px; border:1px solid var(--linha);
+  border-radius:var(--raio-p); font-size:13px; background:var(--papel)}
+.total-vivo b{font-family:var(--serif); font-size:17px; font-weight:400}
+.faixa-subst{margin:0 0 14px; padding:10px 12px; border:1px dashed var(--linha-campo);
+  border-radius:var(--raio-p); font-size:12.5px}
+/* Dourado é DIVERGÊNCIA entre a faixa e a jornada, e só isso. */
+.divergente{color:var(--dourado); font-weight:600}
+.tag.diverge{background:var(--dourado-suave); color:var(--dourado); border-color:#E7DDC8}
+/* Verde é declaração VIGENTE, e só isso. */
+.tag.vigente{background:var(--verde-suave); color:var(--verde); border-color:var(--verde-borda)}
+.grupo-decl{margin:16px 0 0}
+.grupo-decl:first-of-type{margin-top:12px}
+.grupo-decl h3{font-size:10.5px; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--grafite); margin:0 0 8px; font-weight:600}
+.lista-decl{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px}
+.decl{border:1px solid var(--linha); border-radius:var(--raio-p); padding:11px 13px}
+.decl.vigente{border-left:3px solid var(--verde-vivo)}
+.decl .faixa{font-weight:600; font-variant-numeric:tabular-nums}
+.decl .periodo{color:var(--grafite); font-size:12.5px; margin-top:2px}
+.decl .obs{font-size:12.5px; margin-top:6px; overflow-wrap:anywhere}
+.decl .acoes-decl{display:flex; gap:6px; flex-wrap:wrap; margin-top:9px}
+details.encerradas summary{cursor:pointer; font-size:10.5px; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--grafite); font-weight:600}
+details.encerradas[open] summary{margin-bottom:8px}
+/* Grade da semana: HTML, e não gráfico. Conta a hora inteira, como o
+   mapa de cobertura: quem sai às 12h30 aparece na hora das 12h. */
+table.semana{min-width:420px; table-layout:fixed; font-size:12px}
+table.semana th, table.semana td{text-align:center; padding:5px 4px}
+table.semana th:first-child, table.semana td:first-child{width:62px; text-align:right;
+  color:var(--grafite); font-variant-numeric:tabular-nums}
+table.semana td.h{border-bottom:1px solid var(--linha-suave)}
+table.semana td.coberta{background:var(--verde-suave); box-shadow:inset 0 0 0 1px var(--verde-borda)}
+table.semana tfoot td{border-top:1px solid var(--linha); font-variant-numeric:tabular-nums}
+
 /* ---------- ficha de identidade (Meus horários) ---------- */
 .ficha{display:grid; grid-template-columns:auto 1fr; gap:7px 18px; margin:14px 0 0; font-size:13.5px}
 .ficha dt{font-weight:600; color:var(--grafite); white-space:nowrap}
@@ -257,6 +307,7 @@ dialog h2{font-family:var(--serif); font-weight:400; font-size:21px; margin:0 0 
   .rail-pe .conexao{margin-left:auto}
   .rail-acao{width:auto}
   .topo,.corpo{padding-left:20px; padding-right:20px}
+  .colunas{grid-template-columns:minmax(0,1fr)}
 }
 @media(max-width:560px){
   .topo{padding:18px 16px 14px}
@@ -413,26 +464,79 @@ dialog h2{font-family:var(--serif); font-weight:400; font-size:21px; margin:0 0 
 </section>
 
 <!-- ====================== MEUS HORÁRIOS ======================
-     Na v0.1 a tela só mostra a identidade em uso e onde o arquivo da
-     pessoa fica. O formulário de declaração chega na v0.2. -->
+     À esquerda, o formulário; à direita, as declarações separadas pelo
+     que ainda se pode fazer com cada uma; embaixo, a semana de hoje. -->
 <section class="vista" id="vHor" hidden>
   <div class="topo">
     <div class="titulo">
       <h1>Meus horários</h1>
-      <p class="sub">Aqui você vai declarar em que horários e períodos estará disponível.
-        É previsão de disponibilidade, não registro de ponto.</p>
+      <p class="sub">Declare em que horários e períodos você estará disponível no trabalho.
+        É previsão de disponibilidade, não registro de ponto: ninguém confere se foi cumprida.</p>
     </div>
   </div>
   <div class="corpo">
+    <div class="colunas">
+      <div class="cartao" id="cartaoForm">
+        <h2 id="tituloForm">Nova declaração</h2>
+        <p class="dica" style="margin-bottom:14px">Um período, os dias da semana e uma faixa
+          de horas. Jornada partida (manhã e tarde) se declara como duas declarações.</p>
+        <div class="faixa-subst" id="faixaSubst" hidden></div>
+        <div class="grade2 campo">
+          <div>
+            <label class="rotulo" for="inpDe">Primeiro dia</label>
+            <input type="date" id="inpDe">
+          </div>
+          <div>
+            <label class="rotulo" for="inpAte">Último dia</label>
+            <input type="date" id="inpAte">
+          </div>
+        </div>
+        <p class="dica" style="margin:-8px 0 14px">Deixe o último dia em branco para valer até
+          nova declaração.</p>
+        <div class="campo">
+          <span class="rotulo" id="rotDias">Dias da semana</span>
+          <div class="dias" id="diasSemana" role="group" aria-labelledby="rotDias"></div>
+          <p class="dica"><button type="button" class="ligacao" id="btnSegSex">segunda a sexta</button>
+            · <button type="button" class="ligacao" id="btnLimparDias">limpar</button></p>
+        </div>
+        <div class="grade2 campo">
+          <div>
+            <label class="rotulo" for="inpInicio">Das</label>
+            <input type="time" id="inpInicio" step="300">
+          </div>
+          <div>
+            <label class="rotulo" for="inpFim">Às</label>
+            <input type="time" id="inpFim" step="300">
+          </div>
+        </div>
+        <div class="campo">
+          <label class="rotulo" for="inpObs">Observação (opcional)</label>
+          <textarea id="inpObs" maxlength="300"></textarea>
+        </div>
+        <div class="total-vivo" id="totalVivo" aria-live="polite"></div>
+        <div style="display:flex; gap:10px; margin-top:14px; flex-wrap:wrap">
+          <button type="button" class="acao" id="btnDeclarar">Declarar</button>
+          <button type="button" class="acao sec" id="btnCancelarSubst" hidden>Cancelar substituição</button>
+        </div>
+        <div class="aviso" id="avisoDecl" role="alert"></div>
+      </div>
+
+      <div class="cartao">
+        <h2>Minhas declarações</h2>
+        <div id="listaMinhas"></div>
+      </div>
+    </div>
+
+    <div class="cartao" style="margin-top:20px">
+      <h2>Minha semana hoje</h2>
+      <p class="dica">O que está valendo hoje, hora a hora. A hora conta inteira: quem sai às
+        12h30 aparece na hora das 12h. O total do dia sai em dourado quando difere da jornada.</p>
+      <div class="rolagem" style="margin-top:12px" id="gradeSemana"></div>
+    </div>
+
     <div class="cartao">
       <h2>Sua identificação</h2>
       <dl class="ficha" id="fichaEu"></dl>
-    </div>
-    <div class="cartao">
-      <h2>Declarações</h2>
-      <p class="dica">O formulário de declaração chega na versão 0.2. Por enquanto, esta
-        versão serve para conectar a pasta, montar o cadastro e confirmar que cada pessoa
-        consegue entrar e gravar a própria jornada.</p>
     </div>
   </div>
 </section>
@@ -547,6 +651,32 @@ dialog h2{font-family:var(--serif); font-weight:400; font-size:21px; margin:0 0 
       </div>
 
       <div class="cartao">
+        <h2>Declarar os seus horários</h2>
+        <div style="margin-top:12px">
+          <p>Em <b>Meus horários</b>, cada declaração é um período, os dias da semana e uma
+            faixa de horas: “de 01/09 a 31/12, de segunda a sexta, das 9h às 15h”. Deixe o
+            último dia em branco para valer até nova declaração.</p>
+          <ul>
+            <li><b>Jornada partida</b> (9h às 12h e 14h às 17h) se declara como duas
+              declarações, uma para cada turno.</li>
+            <li><b>Turno que passa da meia-noite</b> também: uma declaração até 23h59 e outra
+              a partir de 0h.</li>
+            <li>Duas declarações suas só <b>colidem</b> quando período, dia da semana e hora se
+              cruzam ao mesmo tempo. A tela diz com qual.</li>
+          </ul>
+          <h3>Mudou de horário?</h3>
+          <ul>
+            <li><b>Substituir</b> — encerra a declaração atual na véspera e começa a nova, numa
+              só gravação. É o caminho para trocar de horário.</li>
+            <li><b>Encerrar</b> — dá data de fim a uma declaração que está valendo.</li>
+            <li><b>Excluir</b> — só para declaração que ainda não começou.</li>
+          </ul>
+          <p>Uma declaração que já começou não se edita: o painel consulta o passado mês a mês,
+            e editar reescreveria o que ele já mostrou.</p>
+        </div>
+      </div>
+
+      <div class="cartao">
         <h2>Quem faz o quê</h2>
         <div style="margin-top:12px">
           <ul>
@@ -625,7 +755,7 @@ dialog h2{font-family:var(--serif); font-weight:400; font-size:21px; margin:0 0 
 <!-- Senha nova: janela própria, e não prompt(). O prompt do navegador
      mostra o que se digita em claro, ao lado de quem estiver olhando. -->
 <dialog id="dlgSenha" aria-labelledby="senhaTitulo">
-  <form id="formSenha" method="dialog">
+  <form id="formSenha" method="dialog" novalidate>
     <h2 id="senhaTitulo">Definir senha</h2>
     <p class="dica" style="margin:0">Para <b id="senhaPara"></b>. Pelo menos 4 caracteres.</p>
     <p class="dica" id="senhaMotivo" hidden></p>
@@ -641,6 +771,23 @@ dialog h2{font-family:var(--serif); font-weight:400; font-size:21px; margin:0 0 
     <div class="janela-rodape">
       <button type="button" class="acao sec" id="btnSenhaCancelar">Cancelar</button>
       <button type="submit" class="acao">Salvar senha</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="dlgEncerrar" aria-labelledby="encerrarTitulo">
+  <form id="formEncerrar" method="dialog" novalidate>
+    <h2 id="encerrarTitulo">Encerrar declaração</h2>
+    <p class="dica" id="encerrarDesc" style="margin:0"></p>
+    <div class="campo" style="margin-top:14px">
+      <label class="rotulo" for="inpEncerrarAte">Último dia em que ela vale</label>
+      <input type="date" id="inpEncerrarAte">
+    </div>
+    <p class="dica">Hoje ou depois: encerrar não reescreve o que já passou.</p>
+    <div class="aviso erro" id="avisoEncerrar" role="alert"></div>
+    <div class="janela-rodape">
+      <button type="button" class="acao sec" id="btnEncerrarCancelar">Cancelar</button>
+      <button type="submit" class="acao">Encerrar</button>
     </div>
   </form>
 </dialog>
@@ -1067,7 +1214,7 @@ async function atualizarArquivoPessoa(nome, mudar) {
 /* A recusa por arquivo ilegível já explica tudo e não é falha de
    gravação — mostrar "não foi possível gravar" na frente dela mentiria
    sobre o que aconteceu. */
-const msgErro = (e, prefixo) => e.arquivoIlegivel ? e.message : prefixo + e.message;
+const msgErro = (e, prefixo) => (e.arquivoIlegivel || e.recusa) ? e.message : prefixo + e.message;
 
 async function senhaConfere(nome, senha) {
   const hash = hashDe(nome);
@@ -1207,6 +1354,9 @@ async function restaurarIdentidade() {
 }
 function limparIdentidade() {
   ident = null;
+  minhas = []; meuArquivoIlegivel = null;
+  limparFormulario();
+  $("listaMinhas").innerHTML = ""; $("gradeSemana").innerHTML = "";
   lembrar.apagar(CHAVE_ID);
   travarIdentidade(false);
   ajustarConfig();
@@ -1222,7 +1372,101 @@ $("inpSenha").addEventListener("keydown", (e) => {
 });
 
 /* ============================ MEUS HORÁRIOS ============================ */
-function renderHor() {
+let minhas = [];               // declarações do meu arquivo, como lidas
+let meuArquivoIlegivel = null; // motivo, quando o meu arquivo não pôde ser lido
+let substituindo = null;       // id da declaração sendo substituída
+
+/* Datas em ISO (aaaa-mm-dd) e contas em UTC: o dia da semana de uma data
+   não pode depender do fuso de quem abre o arquivo. */
+const hoje = () => new Date().toLocaleDateString("sv");
+const somaDias = (iso, n) => {
+  const d = new Date(iso + "T00:00:00Z");
+  d.setUTCDate(d.getUTCDate() + n);
+  return d.toISOString().slice(0, 10);
+};
+const diaDaSemana = (iso) => new Date(iso + "T00:00:00Z").getUTCDay();
+const minutos = (hhmm) => { const [h, m] = hhmm.split(":").map(Number); return h * 60 + m; };
+const fmtHoras = (min) => {
+  const h = Math.floor(min / 60), m = min % 60;
+  return m ? `${h}h${String(m).padStart(2, "0")}` : `${h}h`;
+};
+/* A semana na tela começa na segunda; o número gravado continua sendo o
+   de Date.getUTCDay() (0 = domingo). */
+const ORDEM_DIAS = [1, 2, 3, 4, 5, 6, 0];
+const rotDias = (dias) => ORDEM_DIAS.filter(d => dias.includes(d)).map(d => DIAS_SEMANA[d]).join(" ");
+const minutosDia = (d) => minutos(d.fim) - minutos(d.inicio);
+/* A situação é sempre relativa a hoje, e nunca gravada: "vigente" ontem
+   pode ser "encerrada" hoje sem que ninguém toque no arquivo. */
+function situacao(d, ref = hoje()) {
+  if (d.de > ref) return "futura";
+  if (d.ate && d.ate < ref) return "encerrada";
+  return "vigente";
+}
+const fimOuSempre = (d) => d.ate || "9999-12-31";
+const periodosCruzam = (a, b) => a.de <= fimOuSempre(b) && b.de <= fimOuSempre(a);
+/* Colisão só quando as TRÊS coisas se cruzam: período, dia da semana e
+   hora. Barrar só por período tornaria "uma faixa por declaração"
+   inútil — a manhã e a tarde do mesmo semestre colidiriam. O dia em
+   comum tem de OCORRER no trecho em que os dois períodos se sobrepõem:
+   duas declarações de quarta que se cruzam só numa segunda não colidem. */
+function colisao(nova, outras) {
+  for (const o of outras) {
+    if (!periodosCruzam(nova, o)) continue;
+    const ini = nova.de > o.de ? nova.de : o.de;
+    const fimN = fimOuSempre(nova), fimO = fimOuSempre(o);
+    const fim = fimN < fimO ? fimN : fimO;
+    const ocorrem = diasNoPeriodo(ini, fim === "9999-12-31" ? null : fim);
+    const comuns = nova.dias.filter(x => o.dias.includes(x) && ocorrem.includes(x));
+    if (!comuns.length) continue;
+    if (minutos(nova.inicio) < minutos(o.fim) && minutos(o.inicio) < minutos(nova.fim))
+      return { outra: o, comuns };
+  }
+  return null;
+}
+/* Dias da semana que de fato ocorrem no período. Um período de uma
+   semana ou mais tem todos; um mais curto pode não ter o dia marcado. */
+function diasNoPeriodo(de, ate) {
+  if (!ate || somaDias(de, 6) <= ate) return [0, 1, 2, 3, 4, 5, 6];
+  const ds = [];
+  for (let d = de; d <= ate; d = somaDias(d, 1)) ds.push(diaDaSemana(d));
+  return ds;
+}
+const periodoTxt = (d) => d.ate
+  ? `${fmtData(d.de)} a ${fmtData(d.ate)}`
+  : `a partir de ${fmtData(d.de)}, sem data de fim`;
+/* Divergência é do DIA, e não de cada declaração: a manhã (9h–12h) e a
+   tarde (14h–17h) de uma jornada partida diferem da jornada cada uma
+   sozinha, e juntas fecham as 8h. Uma declaração só sai em dourado
+   quando, em algum dia seu, a soma de tudo o que vale junto com ela não
+   bate com a jornada que ela carimbou. */
+function divergeNoDia(d, todas) {
+  if (!d.carga) return false;
+  return d.dias.some(x => {
+    const min = todas.filter(o => o.dias.includes(x) && periodosCruzam(d, o))
+      .reduce((t, o) => t + minutosDia(o), 0);
+    return min !== d.carga * 60;
+  });
+}
+const descrever = (d) => `${periodoTxt(d)}, ${rotDias(d.dias)}, ${d.inicio}–${d.fim}`;
+const novoId = () => `dec-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+/* Recusa deliberada, com texto para a tela: lançada de dentro da mudança
+   do arquivo, impede a gravação sem passar por "falha ao gravar". */
+const recusa = (msg) => Object.assign(new Error(msg), { recusa: true });
+
+/* O que se pode fazer com cada declaração, e até quando. */
+function limitesEncerrar(d) {
+  const min = d.de > hoje() ? d.de : hoje();
+  const max = d.ate ? somaDias(d.ate, -1) : null;
+  return (situacao(d) === "vigente" && (!max || min <= max)) ? { min, max } : null;
+}
+function limitesSubstituir(d) {
+  const depoisDoInicio = somaDias(d.de, 1);
+  const min = depoisDoInicio > hoje() ? depoisDoInicio : hoje();
+  const max = d.ate || null;
+  return (situacao(d) === "vigente" && (!max || min <= max)) ? { min, max } : null;
+}
+
+function renderFicha() {
   if (!ident) { $("fichaEu").innerHTML = ""; return; }
   const p = eu() || {};
   const papeis = ["pessoa (declara os próprios horários)"];
@@ -1240,6 +1484,335 @@ function renderHor() {
     `<dt>${escapar(k)}</dt><dd>${k === "Seu arquivo" ? `<code>${escapar(v)}</code>` : escapar(v)}</dd>`
   ).join("");
 }
+function renderHor() {
+  renderFicha();
+  if (ident) carregarMinhas();
+}
+
+/* Leitura ESTRITA também para mostrar: se o meu arquivo estiver
+   ilegível, a pessoa precisa saber agora, e não na hora de gravar. */
+let bilheteMinhas = 0;
+async function carregarMinhas() {
+  const meu = ++bilheteMinhas;
+  let lista = [], motivo = null;
+  try {
+    const dado = await lerArquivoParaGravar(dirRaiz, ident.nome);
+    lista = (dado && dado.declaracoes) || [];
+  } catch (e) {
+    motivo = e.message;
+  }
+  if (meu !== bilheteMinhas || !ident) return;
+  minhas = lista;
+  meuArquivoIlegivel = motivo;
+  renderMinhas();
+}
+
+function renderMinhas() {
+  $("btnDeclarar").disabled = Boolean(meuArquivoIlegivel);
+  if (meuArquivoIlegivel) {
+    $("listaMinhas").innerHTML =
+      `<div class="aviso erro" style="display:block">${escapar(meuArquivoIlegivel)}</div>`;
+    $("gradeSemana").innerHTML = "";
+    return;
+  }
+  const carga = ident.carga;
+  const item = (d) => {
+    const st = situacao(d);
+    const min = minutosDia(d);
+    const diverge = divergeNoDia(d, minhas);
+    const acoes = [];
+    if (limitesSubstituir(d))
+      acoes.push(`<button type="button" class="acao sec mini" data-subst="${escapar(d.id)}">Substituir</button>`);
+    if (limitesEncerrar(d))
+      acoes.push(`<button type="button" class="acao sec mini" data-encerrar="${escapar(d.id)}">Encerrar</button>`);
+    if (st === "futura")
+      acoes.push(`<button type="button" class="excluir" data-excluir="${escapar(d.id)}">Excluir</button>`);
+    return `<li class="decl ${st}">
+      <div class="faixa">${escapar(d.inicio)}–${escapar(d.fim)} · ${escapar(rotDias(d.dias))}
+        ${st === "vigente" ? '<span class="tag vigente">vigente</span>' : ""}</div>
+      <div class="periodo">${escapar(periodoTxt(d))} · ${fmtHoras(min)} por dia ·
+        ${fmtHoras(min * d.dias.length)} por semana</div>
+      ${diverge ? `<div style="margin-top:6px"><span class="tag diverge">o total do dia difere da jornada de ${d.carga}h</span></div>` : ""}
+      ${d.obs ? `<div class="obs">${escapar(d.obs)}</div>` : ""}
+      ${acoes.length ? `<div class="acoes-decl">${acoes.join("")}</div>` : ""}
+    </li>`;
+  };
+  const ord = (a, b) => a.de.localeCompare(b.de) || a.inicio.localeCompare(b.inicio);
+  const por = (st) => minhas.filter(d => situacao(d) === st).sort(ord);
+  const vig = por("vigente"), fut = por("futura"), enc = por("encerrada").reverse();
+  let html = "";
+  html += `<div class="grupo-decl"><h3>Vigentes</h3>` + (vig.length
+    ? `<ul class="lista-decl">${vig.map(item).join("")}</ul>`
+    : `<p class="dica">Nenhuma declaração valendo hoje.</p>`) + `</div>`;
+  if (fut.length)
+    html += `<div class="grupo-decl"><h3>Futuras</h3><ul class="lista-decl">${fut.map(item).join("")}</ul></div>`;
+  if (enc.length)
+    html += `<details class="grupo-decl encerradas"><summary>Encerradas (${enc.length})</summary>` +
+      `<ul class="lista-decl">${enc.map(item).join("")}</ul></details>`;
+  $("listaMinhas").innerHTML = html;
+  renderSemana(vig, carga);
+}
+
+/* A semana de hoje, em HTML: horas nas linhas, dias nas colunas. Sábado
+   e domingo só aparecem se alguma declaração vigente os usar. */
+function renderSemana(vig, carga) {
+  if (!vig.length) {
+    $("gradeSemana").innerHTML = `<p class="dica">Nenhuma declaração vigente hoje.</p>`;
+    return;
+  }
+  const usados = new Set(vig.flatMap(d => d.dias));
+  const cols = ORDEM_DIAS.filter(d => (d >= 1 && d <= 5) || usados.has(d));
+  const h0 = Math.floor(Math.min(...vig.map(d => minutos(d.inicio))) / 60);
+  const h1 = Math.ceil(Math.max(...vig.map(d => minutos(d.fim))) / 60);
+  const cobre = (dia, h) => vig.some(d => d.dias.includes(dia) &&
+    minutos(d.inicio) < (h + 1) * 60 && h * 60 < minutos(d.fim));
+  let html = `<table class="semana"><thead><tr><th scope="col"><span class="rotulo" style="margin:0">Hora</span></th>` +
+    cols.map(d => `<th scope="col">${escapar(DIAS_SEMANA[d])}</th>`).join("") + `</tr></thead><tbody>`;
+  for (let h = h0; h < h1; h++) {
+    html += `<tr><td class="h">${String(h).padStart(2, "0")}h</td>` + cols.map(d =>
+      cobre(d, h) ? `<td class="h coberta" aria-label="${escapar(DIAS_SEMANA[d])} ${h}h: disponível"></td>`
+                  : `<td class="h"></td>`).join("") + `</tr>`;
+  }
+  html += `</tbody><tfoot><tr><td>Total</td>` + cols.map(dia => {
+    const min = vig.filter(d => d.dias.includes(dia)).reduce((t, d) => t + minutosDia(d), 0);
+    const diverge = min && carga && min !== carga * 60;
+    return `<td${diverge ? ' class="divergente"' : ""}>${min ? fmtHoras(min) : "—"}</td>`;
+  }).join("") + `</tr></tfoot></table>`;
+  $("gradeSemana").innerHTML = html;
+}
+
+/* ----------------------------- formulário ----------------------------- */
+function montarDias() {
+  $("diasSemana").innerHTML = ORDEM_DIAS.map(d =>
+    `<label><input type="checkbox" value="${d}">${escapar(DIAS_SEMANA[d])}</label>`).join("");
+}
+const diasMarcados = () =>
+  [...$("diasSemana").querySelectorAll("input:checked")].map(c => +c.value).sort();
+function marcarDias(dias) {
+  for (const c of $("diasSemana").querySelectorAll("input")) c.checked = dias.includes(+c.value);
+  atualizarTotal();
+}
+$("btnSegSex").addEventListener("click", () => marcarDias([1, 2, 3, 4, 5]));
+$("btnLimparDias").addEventListener("click", () => marcarDias([]));
+
+function lerFormulario() {
+  return {
+    de: $("inpDe").value,
+    ate: $("inpAte").value || null,
+    dias: diasMarcados(),
+    inicio: $("inpInicio").value,
+    fim: $("inpFim").value,
+    obs: $("inpObs").value.trim()
+  };
+}
+/* As recusas que não dependem das outras declarações. Cada uma diz o
+   que fazer, e não só o que está errado. */
+function validar(f) {
+  if (!f.de) return "Informe o primeiro dia.";
+  if (f.ate && f.ate < f.de) return "O último dia é anterior ao primeiro.";
+  if (!f.dias.length) return "Marque pelo menos um dia da semana.";
+  if (!f.inicio || !f.fim) return "Informe a faixa de horas: das … às ….";
+  if (minutos(f.fim) <= minutos(f.inicio))
+    return "A faixa termina antes de começar. Jornada que passa da meia-noite se declara " +
+      "como dois horários: um até 23h59 e outro a partir de 0h.";
+  const ocorrem = diasNoPeriodo(f.de, f.ate);
+  if (!f.dias.some(d => ocorrem.includes(d)))
+    return "Nenhum dos dias marcados cai dentro do período.";
+  return null;
+}
+const msgColisao = ({ outra, comuns }) =>
+  `Colide com a declaração de ${periodoTxt(outra)}, das ${outra.inicio} às ${outra.fim}, ` +
+  `em ${rotDias(comuns)}. Duas declarações não podem cobrir o mesmo dia e a mesma hora no ` +
+  "mesmo período; se o horário mudou, use “Substituir”.";
+
+function atualizarTotal() {
+  const f = lerFormulario();
+  const linhas = [];
+  if (f.inicio && f.fim && minutos(f.fim) > minutos(f.inicio)) {
+    const min = minutos(f.fim) - minutos(f.inicio);
+    linhas.push(`<b>${fmtHoras(min)}</b> por dia · <b>${fmtHoras(min * f.dias.length)}</b> por semana`);
+    if (ident && ident.carga && min !== ident.carga * 60)
+      linhas.push(`<span class="divergente">Difere da sua jornada de ${ident.carga}h.</span> ` +
+        "Pode estar certo — jornada reduzida, ou uma das partes de uma jornada partida.");
+  } else {
+    linhas.push("O total aparece aqui enquanto você preenche.");
+  }
+  if (f.de && f.de < hoje() && !substituindo)
+    linhas.push("Começa no passado: depois de gravada, esta declaração só poderá ser encerrada, não excluída.");
+  if (substituindo && f.de) {
+    const velha = minhas.find(d => d.id === substituindo);
+    if (velha)
+      $("faixaSubst").innerHTML = `Substituindo a declaração de <b>${escapar(descrever(velha))}</b>. ` +
+        `Ela passa a terminar em <b>${escapar(fmtData(somaDias(f.de, -1)))}</b>, e esta começa em ` +
+        `<b>${escapar(fmtData(f.de))}</b>.`;
+  }
+  $("totalVivo").innerHTML = linhas.map(l => `<div>${l}</div>`).join("");
+}
+for (const id of ["inpDe", "inpAte", "inpInicio", "inpFim"])
+  $(id).addEventListener("input", atualizarTotal);
+$("diasSemana").addEventListener("change", atualizarTotal);
+
+function limparFormulario() {
+  substituindo = null;
+  for (const id of ["inpDe", "inpAte", "inpInicio", "inpFim", "inpObs"]) $(id).value = "";
+  $("inpDe").min = "";
+  marcarDias([]);
+  $("faixaSubst").hidden = true;
+  $("btnCancelarSubst").hidden = true;
+  $("tituloForm").textContent = "Nova declaração";
+  $("btnDeclarar").textContent = "Declarar";
+  atualizarTotal();
+}
+$("btnCancelarSubst").addEventListener("click", () => { limparFormulario(); calar($("avisoDecl")); });
+
+function comecarSubstituicao(id) {
+  const velha = minhas.find(d => d.id === id);
+  const lim = velha && limitesSubstituir(velha);
+  if (!lim) return;
+  substituindo = id;
+  $("tituloForm").textContent = "Substituir declaração";
+  $("btnDeclarar").textContent = "Substituir";
+  $("btnCancelarSubst").hidden = false;
+  $("faixaSubst").hidden = false;
+  /* Parte do horário atual: quem substitui quase sempre muda uma coisa
+     só — a hora de entrar, um dia da semana. */
+  $("inpDe").value = lim.min;
+  $("inpDe").min = lim.min;
+  $("inpAte").value = velha.ate || "";
+  $("inpInicio").value = velha.inicio;
+  $("inpFim").value = velha.fim;
+  $("inpObs").value = velha.obs || "";
+  marcarDias(velha.dias);
+  calar($("avisoDecl"));
+  $("cartaoForm").scrollIntoView({ block: "start" });
+  $("inpDe").focus();
+}
+
+/* Toda gravação passa pela atualizarArquivoPessoa, e as recusas que
+   dependem das OUTRAS declarações (colisão, substituição) são conferidas
+   lá dentro, contra o arquivo recém-lido — e não contra a lista que esta
+   tela leu antes. Duas abas abertas não conseguem, assim, gravar duas
+   declarações que colidem. */
+async function gravarMinhas(mudar, msgOk) {
+  try {
+    const estado = await atualizarArquivoPessoa(ident.nome, mudar);
+    minhas = estado.declaracoes;
+    meuArquivoIlegivel = null;
+    renderMinhas();
+    avisar($("avisoDecl"), msgOk);
+    return true;
+  } catch (e) {
+    avisar($("avisoDecl"), msgErro(e, "Não foi possível gravar na pasta da rede: "), true, true);
+    return false;
+  }
+}
+
+$("btnDeclarar").addEventListener("click", async () => {
+  calar($("avisoDecl"));
+  const f = lerFormulario();
+  const erro = validar(f);
+  if (erro) return avisar($("avisoDecl"), erro, true, true);
+  /* unidade e jornada vão como RETRATO: o horário de março é lido com a
+     jornada e a unidade de março, mesmo que mudem em outubro. */
+  const nova = {
+    id: novoId(), pessoa: ident.nome, unidade: eu()?.unidade ?? null, carga: ident.carga,
+    de: f.de, ate: f.ate, dias: f.dias, inicio: f.inicio, fim: f.fim, obs: f.obs,
+    criadaEm: new Date().toISOString()
+  };
+  const subst = substituindo;
+  const ok = await gravarMinhas((e) => {
+    let lista = e.declaracoes;
+    if (subst) {
+      const velha = lista.find(d => d.id === subst);
+      if (!velha) throw recusa("A declaração que você estava substituindo não está mais no arquivo. " +
+        "Use “Atualizar dados da rede” e tente de novo.");
+      const lim = limitesSubstituir(velha);
+      if (!lim) throw recusa("A declaração que você estava substituindo não está mais vigente.");
+      if (nova.de < lim.min)
+        throw recusa(`A nova declaração pode começar a partir de ${fmtData(lim.min)}: ` +
+          "a atual já valeu até ontem, e o passado não se reescreve.");
+      if (lim.max && nova.de > lim.max)
+        throw recusa(`A atual já termina em ${fmtData(lim.max)}. Para depois disso, declare sem substituir.`);
+      lista = lista.map(d => d.id === subst ? { ...d, ate: somaDias(nova.de, -1) } : d);
+    }
+    const c = colisao(nova, lista);
+    if (c) throw recusa(msgColisao(c));
+    e.declaracoes = [...lista, nova];
+  }, subst ? "Declaração substituída." : "Declaração gravada.");
+  if (ok) limparFormulario();
+});
+
+/* ---------------------- encerrar e excluir ---------------------- */
+function pedirEncerramento(d, lim) {
+  return new Promise((ok) => {
+    const dlg = $("dlgEncerrar");
+    $("encerrarDesc").textContent = descrever(d);
+    $("inpEncerrarAte").value = lim.min;
+    $("inpEncerrarAte").min = lim.min;
+    $("inpEncerrarAte").max = lim.max || "";
+    calar($("avisoEncerrar"));
+    dlg._lim = lim;
+    dlg._resolver = ok;
+    dlg.showModal();
+  });
+}
+$("formEncerrar").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const dlg = $("dlgEncerrar"), v = $("inpEncerrarAte").value, lim = dlg._lim;
+  if (!v) return avisar($("avisoEncerrar"), "Escolha o último dia.", true, true);
+  if (v < lim.min)
+    return avisar($("avisoEncerrar"), `O último dia pode ser a partir de ${fmtData(lim.min)}.`, true, true);
+  if (lim.max && v > lim.max)
+    return avisar($("avisoEncerrar"), `Ela já termina em ${fmtData(somaDias(lim.max, 1))}: ` +
+      "encerrar só antecipa o fim.", true, true);
+  const ok = dlg._resolver;
+  dlg._resolver = null;
+  dlg.close();
+  if (ok) ok(v);
+});
+$("btnEncerrarCancelar").addEventListener("click", () => $("dlgEncerrar").close());
+$("dlgEncerrar").addEventListener("close", () => {
+  const dlg = $("dlgEncerrar"), ok = dlg._resolver;
+  dlg._resolver = null;
+  if (ok) ok(null);
+});
+
+$("listaMinhas").addEventListener("click", async (e) => {
+  const b = e.target.closest("button");
+  if (!b) return;
+  if (b.dataset.subst) return comecarSubstituicao(b.dataset.subst);
+
+  if (b.dataset.encerrar) {
+    const id = b.dataset.encerrar;
+    const d = minhas.find(x => x.id === id);
+    const lim = d && limitesEncerrar(d);
+    if (!lim) return;
+    const ate = await pedirEncerramento(d, lim);
+    if (!ate) return;
+    await gravarMinhas((est) => {
+      const atual = est.declaracoes.find(x => x.id === id);
+      const l = atual && limitesEncerrar(atual);
+      if (!l) throw recusa("Esta declaração não está mais vigente no arquivo.");
+      if (ate < l.min || (l.max && ate > l.max)) throw recusa("A data de encerramento não vale mais.");
+      est.declaracoes = est.declaracoes.map(x => x.id === id ? { ...x, ate } : x);
+    }, `Declaração encerrada: vale até ${fmtData(ate)}.`);
+  }
+
+  if (b.dataset.excluir) {
+    const id = b.dataset.excluir;
+    const d = minhas.find(x => x.id === id);
+    if (!d || !confirm(`Excluir a declaração de ${descrever(d)}?\n\nEla ainda não começou, então nada do que o painel já mostrou se perde.`)) return;
+    await gravarMinhas((est) => {
+      const atual = est.declaracoes.find(x => x.id === id);
+      if (!atual) throw recusa("Esta declaração não está mais no arquivo.");
+      /* Excluir só o que nunca valeu. O que já começou se encerra: apagar
+         reescreveria meses que o painel já mostrou. */
+      if (situacao(atual) !== "futura")
+        throw recusa("Esta declaração já começou: ela pode ser encerrada, não excluída.");
+      est.declaracoes = est.declaracoes.filter(x => x.id !== id);
+    }, "Declaração excluída.");
+  }
+});
 
 /* ============================ ADMINISTRAÇÃO ============================
    Toda alteração segue o mesmo caminho: copia o CFG, aplica a mudança
@@ -1572,6 +2145,8 @@ $("dlgSobre").addEventListener("close", () => $("btnSobre").focus());
 /* --------------------------- INICIALIZAÇÃO --------------------------- */
 montarSobre();
 montarChipsCarga();
+montarDias();
+atualizarTotal();
 for (const b of railItens()) b.setAttribute("aria-current", "false");
 $("txtCaminho").textContent =
   (typeof PASTA_REDE !== "undefined" && PASTA_REDE) || "definida pela administração";
