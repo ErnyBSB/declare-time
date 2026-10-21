@@ -187,6 +187,24 @@ td.acoes{white-space:nowrap}
 td.acoes .acao{margin:2px 4px 2px 0}
 .vazio{color:var(--grafite); text-align:center; padding:24px 12px; font-size:13px}
 
+/* ---------- painel ---------- */
+.topo .controles .campo{margin:0; min-width:150px}
+.topo .controles select, .topo .controles input{padding:7px 9px; font-size:13px}
+.kpis{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:16px}
+.kpi{background:var(--ficha); border:1px solid var(--linha); border-radius:var(--raio);
+  padding:14px 16px}
+.kpi .valor{font-family:var(--serif); font-size:27px; line-height:1.1; margin-top:2px}
+.kpi .valor .un{font-family:var(--sans); font-size:13px; color:var(--grafite)}
+.kpi .rodape{margin:6px 0 0; font-size:12px; color:var(--grafite)}
+.kpi button.ligacao{font-size:12px}
+.nota-painel{margin:12px 0 16px; font-size:12px; color:var(--grafite)}
+.lista-faltam{margin:10px 0 0; padding-left:18px; font-size:13px; columns:3 220px}
+.lista-faltam li{margin-bottom:3px; break-inside:avoid}
+.cartao-topo{display:flex; align-items:center; gap:12px; flex-wrap:wrap}
+.cartao-topo .direita{margin-left:auto}
+td .sub{display:block; color:var(--grafite); font-size:11.5px; margin-top:2px; overflow-wrap:anywhere}
+td.num{text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap}
+
 /* ---------- etiquetas neutras (papel, senha, unidade) ---------- */
 .tag{display:inline-block; background:var(--papel); color:var(--grafite);
   border:1px solid var(--linha); border-radius:999px; padding:1px 8px;
@@ -308,11 +326,13 @@ dialog h2{font-family:var(--serif); font-weight:400; font-size:21px; margin:0 0 
   .rail-acao{width:auto}
   .topo,.corpo{padding-left:20px; padding-right:20px}
   .colunas{grid-template-columns:minmax(0,1fr)}
+  .kpis{grid-template-columns:1fr 1fr}
 }
 @media(max-width:560px){
   .topo{padding:18px 16px 14px}
   .corpo{padding:16px 16px 44px}
   .grade2{grid-template-columns:1fr}
+  .kpis{grid-template-columns:1fr}
   .topo h1,.entrada h1{font-size:23px}
   .entrada{margin-top:24px}
 }
@@ -326,8 +346,8 @@ dialog h2{font-family:var(--serif); font-weight:400; font-size:21px; margin:0 0 
 <!-- ============================ RAIL ============================
      Cada assunto é uma tela, e o rail diz onde se está. "Meu trabalho"
      é de todos, porque todos declaram; "Gestão" só aparece para quem
-     tem papel de gestão. O painel de leitores e administradores chega
-     na v0.3. -->
+     tem papel de gestão: o Painel é de leitores e administradores, a
+     Administração só de administradores. -->
 <nav class="rail">
   <div class="rail-topo">
     <span class="marca">Declaração&nbsp;de disponibilidade</span>
@@ -345,6 +365,8 @@ dialog h2{font-family:var(--serif); font-weight:400; font-size:21px; margin:0 0 
       <span class="ponto"></span>Meus horários</button>
 
     <p class="rail-grupo" id="grupoGestao">Gestão</p>
+    <button type="button" class="rail-item" data-vista="painel" id="navPainel">
+      <span class="ponto"></span>Painel</button>
     <button type="button" class="rail-item" data-vista="adm" id="navAdm">
       <span class="ponto"></span>Administração</button>
   </div>
@@ -541,6 +563,91 @@ dialog h2{font-family:var(--serif); font-weight:400; font-size:21px; margin:0 0 
   </div>
 </section>
 
+<!-- ====================== PAINEL ======================
+     O mesmo painel serve a leitores e administradores. A diferença é o
+     recorte: o leitor só vê as unidades da sua lista. Os gráficos
+     chegam na v0.4; tudo o que eles mostrarem sairá destes mesmos dados. -->
+<section class="vista" id="vPainel" hidden>
+  <div class="topo">
+    <div class="titulo">
+      <h1>Painel</h1>
+      <p class="sub" id="painelSub">Quem declarou o quê, nas unidades que você acompanha.</p>
+    </div>
+    <div class="controles">
+      <div class="campo">
+        <label class="rotulo" for="selModo">Recorte</label>
+        <select id="selModo">
+          <option value="data">Numa data</option>
+          <option value="mes">Num mês</option>
+        </select>
+      </div>
+      <div class="campo" id="cRefData">
+        <label class="rotulo" for="inpRefData">Data de referência</label>
+        <input type="date" id="inpRefData">
+      </div>
+      <div class="campo" id="cRefMes" hidden>
+        <label class="rotulo" for="inpRefMes">Mês</label>
+        <input type="month" id="inpRefMes">
+      </div>
+      <div class="campo">
+        <label class="rotulo" for="selUnidadeVer">Unidade</label>
+        <select id="selUnidadeVer"></select>
+      </div>
+      <div class="campo">
+        <label class="rotulo" for="selPessoaVer">Pessoa</label>
+        <select id="selPessoaVer"></select>
+      </div>
+    </div>
+  </div>
+
+  <div class="corpo">
+    <p class="dica" id="painelEstado" style="margin:0 0 12px"></p>
+    <div class="kpis" id="kpis"></div>
+    <div class="cartao" id="cartaoFaltam" hidden>
+      <h2 id="tituloFaltam">Sem declaração</h2>
+      <p class="dica" id="dicaFaltam">Contadas pelo cadastro, e não pelas declarações: uma lista
+        só de quem declarou pareceria completa exatamente onde falta gente.</p>
+      <ul class="lista-faltam" id="listaFaltam"></ul>
+    </div>
+    <p class="nota-painel">Horário declarado não é horário cumprido: o programa não confere
+      nada, e estes números não medem desempenho. A ordem é alfabética de propósito.</p>
+
+    <div class="cartao">
+      <div class="cartao-topo">
+        <h2>Declarações <span class="dica" id="contDecl" style="font-weight:400"></span></h2>
+        <button type="button" class="acao sec mini direita" id="btnCSV">Baixar CSV</button>
+      </div>
+      <div class="rolagem" style="margin-top:12px">
+        <table style="min-width:860px">
+          <thead><tr>
+            <th>Pessoa</th><th>Unidade</th><th>Período</th><th>Dias</th><th>Faixa</th>
+            <th class="num">Por dia</th><th class="num">Por semana</th><th class="num">Jornada</th>
+            <th>Situação</th>
+          </tr></thead>
+          <tbody id="tbodyPainel"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Só para administradores: arquivos que não casam com ninguém do
+         cadastro, e arquivos que não puderam ser lidos. Nenhum dos dois
+         pode sumir em silêncio. -->
+    <div class="cartao" id="cartaoArquivos" hidden>
+      <h2>Arquivos que pedem atenção</h2>
+      <p class="dica">Arquivos da pasta <code>declaracoes/</code> que não pertencem a ninguém do
+        cadastro (de quem foi removido ou renomeado) ou que não puderam ser lidos. O programa
+        não apaga nem corrige nenhum deles.</p>
+      <div class="rolagem" style="margin-top:12px">
+        <table>
+          <thead><tr><th>Arquivo</th><th>Situação</th><th>Nome gravado no arquivo</th>
+            <th class="num">Declarações</th></tr></thead>
+          <tbody id="tbodyArquivos"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ====================== ADMINISTRAÇÃO ====================== -->
 <section class="vista" id="vAdm" hidden>
   <div class="topo">
@@ -673,6 +780,23 @@ dialog h2{font-family:var(--serif); font-weight:400; font-size:21px; margin:0 0 
           </ul>
           <p>Uma declaração que já começou não se edita: o painel consulta o passado mês a mês,
             e editar reescreveria o que ele já mostrou.</p>
+        </div>
+      </div>
+
+      <div class="cartao">
+        <h2>O Painel (leitores e administradores)</h2>
+        <div style="margin-top:12px">
+          <p>Mostra quem declarou o quê numa <b>data</b> (padrão: hoje) ou num <b>mês</b>,
+            nas unidades que você acompanha. O leitor só vê as unidades da sua lista.</p>
+          <ul>
+            <li><b>Sem declaração</b> é contado pelo cadastro. Clique em “ver quem” para a
+              lista. Quem tem o arquivo danificado aparece com a marca “arquivo ilegível”.</li>
+            <li>A tabela mostra cada declaração com a unidade em que foi feita. Quem mudou de
+              unidade e ainda não redeclarou aparece pela unidade antiga.</li>
+            <li><b>Baixar CSV</b> gera a tabela do recorte para abrir no Excel.</li>
+          </ul>
+          <p>O painel lê a pasta ao abrir. Para ver o que outras pessoas declararam depois,
+            use “Atualizar dados da rede”.</p>
         </div>
       </div>
 
@@ -906,7 +1030,7 @@ const lembrar = {
    Quem pode ver o quê vem do PAPEL, nunca da tela: o rail apenas esconde
    o que não é da alçada da pessoa, e podeVer() barra qualquer outro
    caminho até a tela. */
-const VISTAS = { entrada: "vEntrada", hor: "vHor", adm: "vAdm", ajuda: "vAjuda" };
+const VISTAS = { entrada: "vEntrada", hor: "vHor", painel: "vPainel", adm: "vAdm", ajuda: "vAjuda" };
 let vistaAtual = "entrada";
 /* De onde se entrou na ajuda, para o "Voltar" devolver ao lugar. */
 let vistaAnterior = "entrada";
@@ -914,6 +1038,7 @@ let vistaAnterior = "entrada";
 function podeVer(v) {
   if (v === "entrada" || v === "ajuda") return true;
   if (v === "hor") return ehPessoa();
+  if (v === "painel") return ehLeitor() || ehAdm();
   if (v === "adm") return ehAdm();
   return false;
 }
@@ -927,6 +1052,9 @@ function irPara(v) {
   for (const b of railItens())
     b.setAttribute("aria-current", b.dataset.vista === v ? "page" : "false");
   window.scrollTo(0, 0);
+  /* O painel relê a pasta a cada entrada: as declarações são de outras
+     pessoas e mudam sem que esta tela saiba. */
+  if (v === "painel") carregarPainel();
 }
 const railItens = () => [...document.querySelectorAll(".rail-item[data-vista]")];
 $("railNav").addEventListener("click", (e) => {
@@ -937,7 +1065,8 @@ $("railNav").addEventListener("click", (e) => {
 function ajustarRail() {
   $("railNav").hidden = !ident;
   $("navHor").hidden = !ehPessoa();
-  $("grupoGestao").hidden = !ehAdm();
+  $("grupoGestao").hidden = !(ehLeitor() || ehAdm());
+  $("navPainel").hidden = !(ehLeitor() || ehAdm());
   $("navAdm").hidden = !ehAdm();
 }
 
@@ -1103,6 +1232,7 @@ async function aposConectar() {
       renderHor();
       if (ehAdm()) renderAdm();
       ajustarConfig();
+      if (vistaAtual === "painel") carregarPainel();
     }
   } else if (ident) {
     // identidade anterior não vale numa pasta não validada
@@ -1411,7 +1541,7 @@ const periodosCruzam = (a, b) => a.de <= fimOuSempre(b) && b.de <= fimOuSempre(a
    duas declarações de quarta que se cruzam só numa segunda não colidem. */
 function colisao(nova, outras) {
   for (const o of outras) {
-    if (!periodosCruzam(nova, o)) continue;
+    if (!declValida(o) || !periodosCruzam(nova, o)) continue;
     const ini = nova.de > o.de ? nova.de : o.de;
     const fimN = fimOuSempre(nova), fimO = fimOuSempre(o);
     const fim = fimN < fimO ? fimN : fimO;
@@ -1442,7 +1572,7 @@ const periodoTxt = (d) => d.ate
 function divergeNoDia(d, todas) {
   if (!d.carga) return false;
   return d.dias.some(x => {
-    const min = todas.filter(o => o.dias.includes(x) && periodosCruzam(d, o))
+    const min = todas.filter(o => declValida(o) && o.dias.includes(x) && periodosCruzam(d, o))
       .reduce((t, o) => t + minutosDia(o), 0);
     return min !== d.carga * 60;
   });
@@ -1538,7 +1668,11 @@ function renderMinhas() {
     </li>`;
   };
   const ord = (a, b) => a.de.localeCompare(b.de) || a.inicio.localeCompare(b.inicio);
-  const por = (st) => minhas.filter(d => situacao(d) === st).sort(ord);
+  /* Declaração com forma inesperada (arquivo editado à mão, versão
+     futura) fica fora da tela e das contas, mas continua no arquivo: a
+     gravação regrava a lista inteira, sem filtrar. */
+  const validas = minhas.filter(declValida);
+  const por = (st) => validas.filter(d => situacao(d) === st).sort(ord);
   const vig = por("vigente"), fut = por("futura"), enc = por("encerrada").reverse();
   let html = "";
   html += `<div class="grupo-decl"><h3>Vigentes</h3>` + (vig.length
@@ -1549,6 +1683,11 @@ function renderMinhas() {
   if (enc.length)
     html += `<details class="grupo-decl encerradas"><summary>Encerradas (${enc.length})</summary>` +
       `<ul class="lista-decl">${enc.map(item).join("")}</ul></details>`;
+  const ignoradas = minhas.length - validas.length;
+  if (ignoradas)
+    html += `<p class="dica" style="margin-top:12px">${ignoradas} item(ns) do seu arquivo com formato ` +
+      "inesperado ficaram fora desta lista. Eles continuam guardados no arquivo; se não souber de onde " +
+      "vieram, mostre o arquivo a um administrador.</p>";
   $("listaMinhas").innerHTML = html;
   renderSemana(vig, carga);
 }
@@ -1812,6 +1951,230 @@ $("listaMinhas").addEventListener("click", async (e) => {
       est.declaracoes = est.declaracoes.filter(x => x.id !== id);
     }, "Declaração excluída.");
   }
+});
+
+/* ================================ PAINEL ================================
+   Tudo sai dos MESMOS dados: indicadores, tabela, CSV e, na v0.4, os
+   gráficos. Se dois deles divergirem, é defeito.
+
+   As declarações são atribuídas pelo ARQUIVO, e não pelo nome escrito
+   dentro dele: o dono de declaracoes/ana-beatriz-nunes.json é quem, no
+   cadastro, tem esse arquivo. O arquivo é JSON comum, e um nome trocado
+   à mão lá dentro não pode fazer uma declaração aparecer como de outra
+   pessoa. */
+let painelArquivos = [];   // [{ arquivo, dono, dado, motivo }]
+let bilhetePainel = 0;
+const ISO_DATA = /^\d{4}-\d{2}-\d{2}$/, HH_MM = /^\d{2}:\d{2}$/;
+/* Declaração com forma inesperada (arquivo editado à mão, versão futura)
+   fica de fora das contas, em vez de derrubar o painel inteiro. */
+const declValida = (d) => Boolean(d) && ISO_DATA.test(d.de) &&
+  (d.ate == null || ISO_DATA.test(d.ate)) && Array.isArray(d.dias) && d.dias.length > 0 &&
+  HH_MM.test(d.inicio || "") && HH_MM.test(d.fim || "") && minutos(d.fim) > minutos(d.inicio);
+const ultimoDiaDoMes = (aaaamm) => {
+  const [a, m] = aaaamm.split("-").map(Number);
+  return new Date(Date.UTC(a, m, 0)).toISOString().slice(0, 10);
+};
+
+async function carregarPainel() {
+  if (!podeVer("painel") || !dirRaiz) return;
+  const meu = ++bilhetePainel;
+  $("painelEstado").textContent = "Lendo as declarações da pasta…";
+  let lista;
+  try { lista = await lerTodasDeclaracoes(dirRaiz); }
+  catch (e) {
+    if (meu === bilhetePainel)
+      $("painelEstado").textContent = "Não foi possível ler a pasta declaracoes/: " + e.message;
+    return;
+  }
+  if (meu !== bilhetePainel) return;
+  const donoDe = new Map(Object.keys(CFG.pessoas).map(n => [arquivoDe(n), n]));
+  painelArquivos = lista.map(a => ({ ...a, dono: donoDe.get(a.arquivo) || null }));
+  $("painelEstado").textContent = `${lista.length} arquivo(s) lido(s) às ` +
+    new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) +
+    ". Use “Atualizar dados da rede” para reler.";
+  montarFiltrosPainel();
+  renderPainel();
+}
+
+function montarFiltrosPainel() {
+  if (!$("inpRefData").value) $("inpRefData").value = hoje();
+  if (!$("inpRefMes").value) $("inpRefMes").value = hoje().slice(0, 7);
+  const vis = unidadesVisiveis();
+  const selU = $("selUnidadeVer"), antesU = selU.value;
+  selU.innerHTML = `<option value="*">${ehAdm() ? "Todas as unidades" : "Todas as minhas unidades"}</option>` +
+    vis.map(u => `<option value="${escapar(u)}">${escapar(u)}</option>`).join("");
+  selU.value = vis.includes(antesU) ? antesU : "*";
+  montarPessoasPainel();
+}
+function montarPessoasPainel() {
+  const selP = $("selPessoaVer"), antesP = selP.value;
+  const nomes = pessoasDoRecorte(unidadesDoRecorte());
+  selP.innerHTML = `<option value="*">Todas as pessoas</option>` +
+    nomes.map(n => `<option value="${escapar(n)}">${escapar(n)}</option>`).join("");
+  selP.value = nomes.includes(antesP) ? antesP : "*";
+}
+const unidadesDoRecorte = () => {
+  const vis = unidadesVisiveis(), u = $("selUnidadeVer").value;
+  return u === "*" ? vis : vis.filter(x => x === u);
+};
+/* Quem DEVERIA declarar, pelo cadastro e pela unidade ATUAL. */
+const pessoasDoRecorte = (unidades) => Object.keys(CFG.pessoas)
+  .filter(n => unidades.includes(cadastro(n)?.unidade)).sort(porNome);
+
+/* O recorte inteiro, calculado uma vez e usado por tudo o que o painel
+   mostra e exporta. */
+function recortePainel() {
+  const modo = $("selModo").value;
+  const ref = $("inpRefData").value || hoje();
+  const mes = $("inpRefMes").value || hoje().slice(0, 7);
+  const janela = modo === "mes" ? { de: mes + "-01", ate: ultimoDiaDoMes(mes) } : null;
+  const noPeriodo = (d) => modo === "mes" ? periodosCruzam(d, janela) : situacao(d, ref) === "vigente";
+  const unidades = unidadesDoRecorte();
+  const pessoaSel = $("selPessoaVer").value;
+  const casaPessoa = (n) => pessoaSel === "*" || n === pessoaSel;
+
+  // Todas as declarações válidas de cada dono, para a divergência por dia.
+  const doDono = new Map();
+  for (const a of painelArquivos) {
+    if (!a.dono || !a.dado) continue;
+    doDono.set(a.dono, a.dado.declaracoes.filter(declValida).map(d => ({ ...d, pessoa: a.dono })));
+  }
+  /* Entram pela unidade CARIMBADA na declaração: o histórico de quem
+     mudou de unidade fica com a unidade em que foi feito. */
+  const decls = [...doDono.values()].flat()
+    .filter(d => unidades.includes(d.unidade) && casaPessoa(d.pessoa) && noPeriodo(d))
+    .sort((x, y) => porNome(x.pessoa, y.pessoa) || x.de.localeCompare(y.de) || x.inicio.localeCompare(y.inicio));
+
+  const pessoas = pessoasDoRecorte(unidades).filter(casaPessoa);
+  const ilegivelDe = new Map(painelArquivos.filter(a => a.dono && !a.dado).map(a => [a.dono, a.motivo]));
+  /* "Sem declaração" olha qualquer declaração da pessoa no período, seja
+     qual for a unidade carimbada: quem mudou de unidade e ainda não
+     redeclarou tem horário, só que com o carimbo antigo. E arquivo
+     ilegível não é "sem declaração": é outra coisa, e a lista diz qual. */
+  const temNoPeriodo = (n) => (doDono.get(n) || []).some(noPeriodo);
+  const faltam = pessoas.filter(n => !temNoPeriodo(n));
+  return { modo, ref, mes, janela, decls, pessoas, faltam, ilegivelDe, doDono,
+           sitRef: modo === "mes" ? hoje() : ref };
+}
+
+const ROTULO_SIT = { vigente: "vigente", futura: "futura", encerrada: "encerrada" };
+function renderPainel() {
+  const r = recortePainel();
+  const comDecl = new Set(r.decls.map(d => d.pessoa));
+  const quando = r.modo === "mes"
+    ? "no mês de " + new Date(r.mes + "-15T12:00:00Z").toLocaleDateString("pt-BR", { month: "long", year: "numeric", timeZone: "UTC" })
+    : (r.ref === hoje() ? "hoje" : "em " + fmtData(r.ref));
+  $("painelSub").textContent = ehAdm()
+    ? `Declarações ${quando}, em todas as unidades.`
+    : `Declarações ${quando}, nas unidades que você acompanha: ${unidadesVisiveis().join(", ")}.`;
+
+  /* Horas por semana só numa data: num mês, as declarações sucessivas de
+     uma mesma pessoa (antes e depois de uma substituição) se somariam. */
+  const minSemana = r.decls.reduce((t, d) => t + minutosDia(d) * d.dias.length, 0);
+  const horas = r.modo === "data"
+    ? `<div class="valor">${fmtHoras(minSemana)}</div><p class="rodape">${comDecl.size
+        ? "média de " + fmtHoras(Math.round(minSemana / comDecl.size)) + " por pessoa com declaração" : "ninguém com declaração"}</p>`
+    : `<div class="valor">—</div><p class="rodape">Escolha uma data: num mês, declarações sucessivas da mesma pessoa se somariam.</p>`;
+  const ilegiveis = r.pessoas.filter(n => r.ilegivelDe.has(n));
+  /* Quem mudou de unidade e ainda não redeclarou conta como "com
+     declaração", mas a declaração dele, carimbada com a unidade antiga,
+     não está na tabela deste recorte. O indicador diz isso, para o número
+     não parecer errado ao lado da tabela. */
+  const comCarimboAntigo = r.pessoas.filter(n => !r.faltam.includes(n) && !comDecl.has(n));
+  const faltamSo = r.faltam.filter(n => !r.ilegivelDe.has(n));
+  $("kpis").innerHTML = `
+    <div class="kpi"><span class="rotulo">Pessoas cadastradas</span>
+      <div class="valor">${r.pessoas.length}</div><p class="rodape">pela unidade atual no cadastro</p></div>
+    <div class="kpi"><span class="rotulo">Com declaração</span>
+      <div class="valor">${r.pessoas.filter(n => !r.faltam.includes(n)).length}</div>
+      <p class="rodape">${r.modo === "mes" ? "valendo em algum dia do mês" : "vigente " + (r.ref === hoje() ? "hoje" : "em " + fmtData(r.ref))}${
+        comCarimboAntigo.length ? ` · ${comCarimboAntigo.length} com declaração feita em outra unidade` : ""}</p></div>
+    <div class="kpi"><span class="rotulo">Sem declaração</span>
+      <div class="valor">${faltamSo.length}</div>
+      <p class="rodape">${faltamSo.length || ilegiveis.length
+        ? `<button type="button" class="ligacao" id="btnFaltam" aria-expanded="${!$("cartaoFaltam").hidden}">ver quem</button>` : "ninguém faltando"}
+        ${ilegiveis.length ? ` · ${ilegiveis.length} com arquivo ilegível` : ""}</p></div>
+    <div class="kpi"><span class="rotulo">Horas por semana declaradas</span>${horas}</div>`;
+  $("listaFaltam").innerHTML = [
+    ...faltamSo.map(n => `<li>${escapar(n)} <span class="dica">· ${escapar(cadastro(n)?.unidade || "")}</span></li>`),
+    ...ilegiveis.map(n => `<li>${escapar(n)} <span class="tag">arquivo ilegível</span></li>`)
+  ].join("") || `<li>Ninguém.</li>`;
+
+  $("contDecl").textContent = `(${r.decls.length})`;
+  $("tbodyPainel").innerHTML = r.decls.length ? r.decls.map(d => {
+    const min = minutosDia(d), st = situacao(d, r.sitRef);
+    const diverge = divergeNoDia(d, r.doDono.get(d.pessoa) || []);
+    return `<tr>
+      <td>${escapar(d.pessoa)}${d.obs ? `<span class="sub">${escapar(d.obs)}</span>` : ""}</td>
+      <td>${escapar(d.unidade || "—")}</td>
+      <td>${escapar(periodoTxt(d))}</td>
+      <td>${escapar(rotDias(d.dias))}</td>
+      <td style="white-space:nowrap">${escapar(d.inicio)}–${escapar(d.fim)}</td>
+      <td class="num">${diverge ? `<span class="tag diverge">${fmtHoras(min)}</span>` : fmtHoras(min)}</td>
+      <td class="num">${fmtHoras(min * d.dias.length)}</td>
+      <td class="num">${d.carga ? d.carga + "h" : "—"}</td>
+      <td>${st === "vigente" ? '<span class="tag vigente">vigente</span>' : `<span class="tag">${ROTULO_SIT[st]}</span>`}</td>
+    </tr>`;
+  }).join("") : `<tr><td colspan="9" class="vazio">Nenhuma declaração neste recorte.</td></tr>`;
+
+  renderArquivosPainel();
+}
+
+function renderArquivosPainel() {
+  const problemas = ehAdm() ? painelArquivos.filter(a => !a.dono || !a.dado)
+    .sort((x, y) => x.arquivo.localeCompare(y.arquivo)) : [];
+  $("cartaoArquivos").hidden = !problemas.length;
+  $("tbodyArquivos").innerHTML = problemas.map(a => `<tr>
+    <td><code>declaracoes/${escapar(a.arquivo)}</code></td>
+    <td>${!a.dado ? `ilegível <span class="sub">${escapar(a.motivo || "")}</span>` : "sem cadastro"}</td>
+    <td>${escapar(a.dado?.pessoa || (a.dono ? a.dono + " (pelo cadastro)" : "—"))}</td>
+    <td class="num">${a.dado ? a.dado.declaracoes.length : "—"}</td>
+  </tr>`).join("");
+}
+
+$("selModo").addEventListener("change", () => {
+  const mes = $("selModo").value === "mes";
+  $("cRefData").hidden = mes;
+  $("cRefMes").hidden = !mes;
+  renderPainel();
+});
+for (const id of ["inpRefData", "inpRefMes", "selPessoaVer"])
+  $(id).addEventListener("change", renderPainel);
+$("selUnidadeVer").addEventListener("change", () => { montarPessoasPainel(); renderPainel(); });
+$("kpis").addEventListener("click", (e) => {
+  if (e.target.id !== "btnFaltam") return;
+  $("cartaoFaltam").hidden = !$("cartaoFaltam").hidden;
+  e.target.setAttribute("aria-expanded", String(!$("cartaoFaltam").hidden));
+});
+
+/* ------------------------------- CSV -------------------------------
+   Uma linha por declaração, colunas na ordem do esquema (5.1), dias por
+   extenso. Separador ";" e BOM UTF-8, para o Excel em pt-BR abrir sem
+   assistente. Texto que comece com = + - @ ganha um apóstrofo na frente:
+   a observação é texto livre, e o Excel trataria "=..." como fórmula. */
+function celulaCSV(v) {
+  let t = String(v ?? "");
+  if (/^[=+\-@\t\r]/.test(t)) t = "'" + t;
+  return `"${t.replaceAll('"', '""')}"`;
+}
+$("btnCSV").addEventListener("click", () => {
+  const r = recortePainel();
+  const cab = ["Identificador", "Pessoa", "Unidade", "Jornada (h/dia)", "Primeiro dia",
+               "Último dia", "Dias da semana", "Início", "Fim", "Observação", "Criada em"];
+  const linhas = r.decls.map(d => [
+    d.id, d.pessoa, d.unidade, d.carga || "", fmtData(d.de), d.ate ? fmtData(d.ate) : "",
+    rotDias(d.dias), d.inicio, d.fim, d.obs || "",
+    d.criadaEm ? new Date(d.criadaEm).toLocaleString("pt-BR") : ""
+  ].map(celulaCSV).join(";"));
+  const escopo = $("selUnidadeVer").value === "*" ? (ehAdm() ? "todas" : "minhas-unidades") : slug($("selUnidadeVer").value);
+  const quando = r.modo === "mes" ? r.mes : r.ref;
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob(
+    ["﻿" + cab.map(celulaCSV).join(";") + "\r\n" + linhas.join("\r\n")],
+    { type: "text/csv;charset=utf-8" }));
+  a.download = `declaracoes-${escopo}-${quando}.csv`;
+  a.click();
+  URL.revokeObjectURL(a.href);
 });
 
 /* ============================ ADMINISTRAÇÃO ============================
