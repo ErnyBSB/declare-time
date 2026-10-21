@@ -246,10 +246,11 @@ restrição de licença.
 
 ## 5. Modelo de dados (esquemas JSON)
 
-Os esquemas abaixo serão **o contrato com arquivos gravados por pessoas reais**.
+Os esquemas abaixo são **o contrato com arquivos gravados por pessoas reais**.
 Depois da primeira gravação em produção nenhuma chave muda de nome; por isso as
 decisões da seção 12 que tocam esquema (12.1, 12.2 e 12.4) foram tomadas **antes**
-do código.
+do código. A lista completa das chaves, congelada para a v1.0, está em **5.6**, e o
+teste `testes/06-contrato.mjs` falha se o programa gravar fora dela.
 
 ### 5.1. Declaração
 
@@ -395,10 +396,47 @@ const PASTA_REDE   = '\\\\SERVIDOR\\Compartilhamento\\declare-time';  // exemplo
 
 ### 5.5. Compatibilidade para trás
 
-Ainda não há arquivos antigos, mas a regra fica escrita desde já: um campo que não
-existir num arquivo é tratado pela **ausência explícita** (`(x && x.campo) || padrão`),
-nunca por migração ou reescrita do arquivo da pessoa. Um arquivo só é regravado
-quando a própria pessoa grava algo nele.
+Um campo que não existir num arquivo é tratado pela **ausência explícita**
+(`(x && x.campo) || padrão`), nunca por migração ou reescrita do arquivo da pessoa.
+Um arquivo só é regravado quando a própria pessoa grava algo nele, e toda gravação
+parte do arquivo inteiro: chaves que esta versão não conhece atravessam intactas.
+
+Já há arquivos antigos de verdade: os gravados até a v0.4 têm `cargaHoraria` no
+cabeçalho e `carga` em cada declaração (12.9). Continuam abrindo, e as chaves ficam.
+
+### 5.6. Contrato congelado (v1.0)
+
+A partir da v1.0, estas são as chaves que o programa grava, e o que cada uma quer
+dizer **não muda mais**. `formato` continua `1` nos dois tipos de arquivo.
+
+| Arquivo | Chaves gravadas | Obrigatórias na leitura |
+|---|---|---|
+| `config.json` | `formato`, `atualizadoEm`, `unidades`, `pessoas`, `senhas`, `exigirSenha`, `instalacao` | `unidades` (lista), `pessoas` (mapa) |
+| `config.json` → `pessoas[nome]` | `unidade`, `leitor` (lista de unidades), `adm` (`true`) | `unidade` |
+| `config.json` → `instalacao` | `id`, `por`, `em` | `id` |
+| `declaracoes/<slug>.json` | `formato`, `pessoa`, `unidade`, `atualizadoEm`, `declaracoes`, `ausencias` | `declaracoes` (lista) |
+| declaração (5.1) | `id`, `pessoa`, `unidade`, `de`, `ate`, `dias`, `inicio`, `fim`, `obs`, `criadaEm` | `de`, `dias`, `inicio`, `fim` |
+| ausência (5.2) | `id`, `pessoa`, `unidade`, `tipo`, `de`, `ate`, `obs`, `criadaEm` | `tipo`, `de`, `ate` |
+
+Lidas mas não mais gravadas: `cargaHoraria` e `carga` (até a v0.4). Reservada e nunca
+gravada: `realizados` (12.1). Valores fixos: as chaves `k` de `TIPOS_AUSENCIA`
+(`ferias`, `licenca`, `recesso`, `outro`), os números de `dias` (0 = domingo) e os
+papéis `leitor` e `adm`.
+
+**Depois da v1.0, mudar o formato obedece a quatro regras:**
+
+1. **Só acrescentar.** Chave nova entra com nome novo; nenhuma muda de nome, de tipo
+   ou de significado, e nenhuma é reaproveitada para outra coisa.
+2. **Ler pela ausência.** A versão que acrescenta uma chave lê com tranquilidade os
+   arquivos que não a têm (5.5).
+3. **Nunca migrar.** Nenhuma versão reescreve arquivos para "atualizá-los"; o arquivo
+   muda só quando o dono grava algo nele, e então leva junto o que não conhecia.
+4. **`formato: 2` só com leitor duplo.** Se um dia uma mudança não couber nas três
+   regras acima, `formato` passa a 2, e a versão que grava 2 tem de continuar lendo
+   1 — e a anterior tem de recusar gravar por cima de um 2 que não entende.
+
+O teste `testes/06-contrato.mjs` grava pelo programa, pela tela, cada tipo de dado e
+falha se aparecer chave fora desta tabela ou se uma chave desconhecida sumir.
 
 ---
 
@@ -657,7 +695,23 @@ decisão em prosa e muda a cada alteração de comportamento; este
 dados, perfis ou limitações mudam. Ao publicar uma *tag*, acrescenta-se uma linha ao
 histórico abaixo.
 
-### 10.3. Histórico de versões
+### 10.3. Lista de publicação da v1.0
+
+A v1.0 marca o primeiro uso em produção, e depois dela o formato (5.6) não muda de
+nome. Só se marca a *tag* com tudo isto feito:
+
+- [x] Contrato dos arquivos escrito (5.6) e conferido por `testes/06-contrato.mjs`.
+- [x] A 1.x recusa gravar por cima de arquivo de formato mais novo (5.6, regra 4).
+- [x] LEIA-ME completo, com instalação, permissões, cópia de segurança e publicação.
+- [ ] **Prova de uso** (fase 5): uma unidade real, numa pasta real, com as permissões
+      NTFS da LEIA-ME aplicadas e conferidas pela TI; ajustes do que aparecer.
+- [ ] **Texto de finalidade da LGPD** na Ajuda, redigido pela área responsável
+      (12.7, issue #17), e o teste de 01 atualizado.
+- [ ] `node testes/rodar.mjs` passando, e conferência à mão em várias abas.
+- [ ] `versao.js` em `1.0` (`versao`, `rotulo`, `atualizado`) e `git tag -a v1.0` no
+      `main`, com a linha da v1.0 no histórico abaixo.
+
+### 10.4. Histórico de versões
 
 | Versão | Data | O que entrou |
 |---|---|---|
@@ -666,6 +720,7 @@ histórico abaixo.
 | v0.3 | out/2026 | Painel para leitores (recorte pelas suas unidades) e administradores: data ou mês, unidade, pessoa; indicadores; "sem declaração" pelo cadastro; tabela; CSV; arquivos sem cadastro ou ilegíveis. |
 | v0.4 | out/2026 | Gráficos do painel em HTML/CSS, sem biblioteca: cobertura por hora e dia (pessoas distintas, zero = descoberta), horas por semana por pessoa com jornada × 5, linha do tempo com raias. |
 | v0.5 | out/2026 | Sem jornada (12.9) e sem o dourado; "Sobre" sem o crédito ao projeto de origem; ausências (férias, licença, recesso, outro) em Meus horários e no painel, descontadas da cobertura na data (#13). |
+| v0.6 | out/2026 | Preparação da 1.0: contrato dos arquivos congelado (5.6) e conferido por `testes/06-contrato.mjs`; recusa de gravar por cima de formato mais novo; testes no navegador no repositório; guia de instalação, permissões, cópia de segurança e publicação na LEIA-ME; lista de publicação da 1.0 (10.3). |
 
 ---
 
@@ -837,7 +892,7 @@ declaração ou ausência.
 | **3. Painel** | Filtros, indicadores, tabela, CSV, "arquivos sem cadastro"; recorte por `unidadesVisiveis()` para o leitor. | v0.3 |
 | **4. Gráficos** | Mapa de cobertura, horas por semana, linha do tempo, todos em HTML/CSS (12.6). | v0.4 |
 | **5. Prova de uso** | Teste com uma unidade real, numa pasta real, com permissões NTFS aplicadas. Ajustes — o primeiro lote (#13: jornada, crédito, ausências) saiu na v0.5. | v0.5… |
-| **6. Produção** | Esquema congelado, LEIA-ME completo, Ajuda com o texto de 12.7. | **v1.0** |
+| **6. Produção** | Esquema congelado, LEIA-ME completo, Ajuda com o texto de 12.7. Preparada em out/2026 (contrato 5.6, teste 06, guia de instalação na LEIA-ME); a *tag* espera a lista de 10.3. | **v1.0** |
 
 Depois da 1.0, nesta ordem de custo/benefício: relatório impresso (o mecanismo da
 v1.13 de origem) e tabela de feriados opcional. (Ausências, antes nesta lista,

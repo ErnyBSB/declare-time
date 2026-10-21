@@ -121,6 +121,17 @@ async function lerArquivoParaGravar(raiz, nome) {
   catch { throw recusa("existe mas está ilegível (JSON inválido)"); }
   if (!dado || typeof dado !== "object" || !Array.isArray(dado.declaracoes))
     throw recusa("não tem a lista de declarações no formato esperado");
+  /* Formato mais novo que este programa: regravar como formato 1
+     apagaria o que a versão nova quis dizer (project_design.md, 5.6). */
+  if (typeof dado.formato === "number" && dado.formato > 1) {
+    const e = new Error(
+      `O arquivo declaracoes/${arquivo} foi gravado por uma versão mais nova do ` +
+      `programa (formato ${dado.formato}). Esta versão não o entende e não grava por ` +
+      `cima dele. Use a versão mais nova, ou peça a um administrador para atualizar a ` +
+      `cópia do programa neste computador.`);
+    e.arquivoIlegivel = true;
+    throw e;
+  }
   return dado;
 }
 
@@ -234,6 +245,9 @@ async function gravarConfig(raiz, cfg, esperado) {
     if (atual.estado === "ausente" || atual.dados.atualizadoEm !== esperado)
       throw recusa("Outro administrador alterou o cadastro desde que esta tela o leu. " +
         "Nada foi gravado: use “Atualizar dados da rede” e refaça a alteração.");
+    if (typeof atual.dados.formato === "number" && atual.dados.formato > 1)
+      throw recusa(`O config.json foi gravado por uma versão mais nova do programa ` +
+        `(formato ${atual.dados.formato}). Esta versão não grava por cima dele.`);
   }
   const novo = { ...cfg, formato: 1, atualizadoEm: new Date().toISOString() };
   await gravarJSONEm(raiz, "config.json", novo);

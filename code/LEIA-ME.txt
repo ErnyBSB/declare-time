@@ -1,4 +1,4 @@
-DECLARAÇÃO DE DISPONIBILIDADE (versão 0.5, out/26 — PWA em rede)
+DECLARAÇÃO DE DISPONIBILIDADE (versão 0.6, out/26 — PWA em rede)
 ================================================================
 
 Este arquivo é a documentação de verdade do programa. Não é uma lista
@@ -589,6 +589,114 @@ Exemplos, capturas de tela e testes usam um elenco inventado: Helena
 Barros, Ana Beatriz Nunes, Carlos Eduardo Prado, Marina Duarte e
 Roberto Aguiar.
 
+PARA QUEM VAI INSTALAR E MANTER
+===============================
+As seções acima explicam por que o programa é como é. As de baixo
+dizem como pô-lo para funcionar numa organização e como cuidar dele
+depois. Valem para a 1.0 em diante.
+
+Duas pastas, e não uma
+----------------------
+O programa e os dados moram em lugares separados:
+
+- a PASTA DO PROGRAMA é uma cópia da pasta code/ do repositório. É
+  ela que as pessoas abrem (index.html). Pode ficar num compartilhamento
+  da rede ou num servidor da intranet;
+- a PASTA DE DADOS é a que cada pessoa conecta na tela de entrada. Nela
+  ficam o config.json e a pasta declaracoes/.
+
+Separadas, uma atualização do programa nunca encosta nos dados, e uma
+cópia de segurança dos dados não precisa levar o programa junto.
+
+Instalar, passo a passo
+-----------------------
+1. Copie a pasta code/ para o lugar escolhido para o programa.
+2. No catalogo.js dessa cópia, troque o exemplo de PASTA_REDE pelo
+   caminho real da pasta de dados (é só o texto que a tela mostra como
+   orientação) e atualize CATALOGO_ATUALIZADO.
+3. Crie a pasta de dados, vazia, e aplique as permissões da seção
+   seguinte.
+4. Quem vai administrar abre o index.html, conecta a pasta de dados e
+   escolhe "Oficializar a pasta": informa o próprio nome, a unidade e
+   uma senha, e vira o primeiro administrador.
+5. Na Administração, cadastre as unidades, as pessoas, os leitores (com
+   as unidades de cada um) e, se for o caso, outros administradores e
+   senhas.
+6. Avise as pessoas: cada uma abre o programa, conecta a mesma pasta de
+   dados uma vez em cada computador e escolhe o próprio nome.
+
+Aberto com dois cliques no index.html (endereço file://), tudo
+funciona. Para instalar como aplicativo e usar sem rede, o programa
+tem de ser servido por HTTPS — numa intranet sem HTTPS, o navegador nem
+oferece o acesso à pasta. Nesse caso, prefira o duplo clique.
+
+Permissões da pasta de dados
+----------------------------
+O programa foi desenhado para caber nas permissões do Windows (NTFS):
+cada arquivo tem um só escritor. A receita abaixo é o ponto de partida;
+CONFIRA COM A ÁREA DE TI numa pasta de teste, com uma pessoa comum e
+um administrador, antes de usar com dados reais — é para isso que
+existe a prova de uso (fase 5 do project_design.md).
+
+- Na pasta de dados (raiz): todos leem; os administradores do programa
+  modificam. É lá que eles gravam o config.json.
+- Em declaracoes/: todos leem, listam e criam arquivos (só nesta
+  pasta); o "Criador proprietário" modifica (só os arquivos). Assim
+  cada pessoa cria o próprio arquivo na primeira declaração e, daí em
+  diante, só ela o altera.
+
+Um detalhe que pega quem configura pela primeira vez: o Chrome não
+grava por cima do arquivo diretamente. Ele escreve numa cópia
+temporária ao lado (nome-do-arquivo.crswap) e depois a põe no lugar.
+Por isso quem grava precisa poder CRIAR arquivos na pasta, e não só
+modificar o próprio. Se a conexão diz que a pasta abriu só para
+leitura, ou se a primeira gravação falha, é aqui que se procura.
+
+O que a receita não impede: como todos podem criar arquivos em
+declaracoes/, alguém poderia criar o arquivo de outra pessoa antes
+dela. O painel atribui cada arquivo pelo nome; nas propriedades do
+arquivo, o Windows mostra quem é o proprietário de verdade.
+
+Cópia de segurança e restauração
+--------------------------------
+Copie a pasta de dados inteira — config.json e declaracoes/ — com a
+frequência que a organização usa para outros arquivos de trabalho. Se
+o servidor oferece "versões anteriores" do Windows, elas servem.
+
+Quando um arquivo se danifica, o programa NÃO grava por cima: o
+config.json ilegível impede a entrada de todos, e o arquivo ilegível de
+uma pessoa desliga só as gravações dela. Nada se perde enquanto o
+arquivo bom não volta. Para restaurar, ponha a cópia boa no lugar do
+arquivo danificado e use "Atualizar dados da rede". Não conserte o JSON
+à mão num editor de texto, a não ser para restaurar uma cópia: uma
+vírgula a mais é o que faz um arquivo ficar ilegível.
+
+Publicar uma versão nova
+------------------------
+1. Troque, no versao.js, a versao, o rotulo e a data em atualizado.
+2. Marque a tag correspondente no repositório (v1.1, v1.2…).
+3. Copie a pasta code/ nova por cima da pasta do programa, conservando
+   o catalogo.js da organização — ele tem o caminho real da pasta e,
+   se alguém o editou, a data da edição.
+4. As pessoas recebem a versão nova ao reabrir o programa. Quem tiver
+   instalado como aplicativo pode precisar fechar e abrir de novo.
+
+Publicar sem trocar a versão no versao.js faz quem já abriu o programa
+continuar recebendo a anterior, guardada no cache.
+
+Antes de publicar, quem mantém o programa roda os testes
+("node testes/rodar.mjs") e confere a tela à mão.
+
+O formato dos arquivos não muda
+-------------------------------
+A partir da 1.0, as chaves gravadas nos arquivos estão congeladas (a
+lista está no project_design.md, seção 5.6). Uma versão nova pode
+ACRESCENTAR chaves, nunca trocar o nome ou o sentido das que existem,
+e nunca reescreve arquivos para "atualizá-los". Se um dia o formato
+precisar mudar de verdade, ele passa a 2, e esta versão — a 1.x — já
+sabe recusar gravar por cima de um arquivo de formato mais novo que
+não entende, em vez de apagar o que ele diz.
+
 Limitações assumidas desde o início
 -----------------------------------
 - Só funciona no Chrome e no Edge, por causa do acesso à pasta.
@@ -607,5 +715,6 @@ O que ainda está em aberto
 --------------------------
 O texto de finalidade exigido pela LGPD — para que o dado serve, quem o
 lê, com que base legal — tem de ser redigido por quem responde pelo
-dado no órgão, e não inventado pelo programa. Até lá, a tela de Ajuda
-trará um aviso de texto pendente. Precisa estar resolvido antes da 1.0.
+dado no órgão, e não inventado pelo programa (issue #17). Até lá, a
+tela de Ajuda traz um aviso de texto pendente. Precisa estar resolvido
+antes da 1.0, junto com a prova de uso numa unidade real.
