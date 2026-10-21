@@ -80,15 +80,6 @@ async function pastaDeclaracoes(raiz, criar = false) {
 }
 
 /* ---------- Arquivo de uma pessoa ---------- */
-/* Leitura indulgente, para EXIBIR: arquivo ausente ou ilegível vira
-   null, e a tela segue. Nunca use isto antes de gravar — ver a
-   lerArquivoParaGravar, logo abaixo. */
-async function lerArquivoPessoa(raiz, nome) {
-  try {
-    return await lerJSONDe(await pastaDeclaracoes(raiz), arquivoDe(nome));
-  } catch { return null; }
-}
-
 /* Leitura ESTRITA, obrigatória antes de qualquer gravação.
 
    A leitura indulgente devolve null tanto para "o arquivo não existe"
@@ -147,17 +138,9 @@ async function gravarArquivoPessoa(raiz, estado) {
     formato: 1,
     pessoa: estado.pessoa,
     unidade: estado.unidade,
-    cargaHoraria: estado.cargaHoraria ?? null,
     atualizadoEm: new Date().toISOString(),
     declaracoes: estado.declaracoes || []
   });
-}
-
-/* Jornada já gravada por esta pessoa, ou null se ainda não marcou. */
-async function lerCargaHoraria(raiz, nome) {
-  const dado = await lerArquivoPessoa(raiz, nome);
-  const c = dado && dado.cargaHoraria;
-  return JORNADAS.includes(c) ? c : null;
 }
 
 /* Todos os arquivos de declaração da pasta, para o painel (v0.3).

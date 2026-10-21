@@ -119,8 +119,8 @@ erros.
 | **Uma faixa por dia**; jornada partida = duas declarações | Sim. Confirmado em 12.2. |
 | Colisão só quando **período + dia da semana + hora** se cruzam | Sim. |
 | Virada de meia-noite **recusada**, com explicação | Sim. |
-| `carga` (jornada) **gravada dentro** da declaração, como retrato | Sim. |
-| Divergência entre faixa e jornada **exibida, nunca corrigida** | Sim. |
+| `carga` (jornada) **gravada dentro** da declaração, como retrato | Até a v0.4. **Removida na v0.5** (12.9): a jornada deixou de ser pedida. |
+| Divergência entre faixa e jornada **exibida, nunca corrigida** | Até a v0.4. **Removida na v0.5** (12.9), junto com a jornada. |
 | Indicador "sem declaração" tirado do **cadastro**, não das declarações | Sim. Uma lista só de quem declarou pareceria completa exatamente onde falta gente. |
 | Mapa de cobertura conta **pessoas**, não registros, e a hora inteira | Sim. |
 
@@ -132,7 +132,7 @@ erros.
 | Lançamentos, aprovações, `aprovacoes.json`, cadeia servidor → chefia → geral | Não há o que aprovar: a declaração é da própria pessoa. |
 | Papéis `chefia` e `geral` | Substituídos por `leitor`, que só lê as unidades que lhe forem atribuídas, e `adm` (seção 6). Nenhum dos dois aprova nada. |
 | A **exceção** do administrador que grava em arquivo alheio para excluir (§2.2) | Aqui administradores e leitores **só leem** as declarações. O escritor único passa a valer **sem exceção nenhuma** nos arquivos de declaração. |
-| Ausências | Fora do escopo da 1.0, com a chave `ausencias` reservada (12.5). O mapa de cobertura não as desconta. |
+| Ausências | Vêm de volta na v0.5 (12.5), com tipos próprios (férias, licença, recesso, outro) e sem efeito em meta nenhuma: só tiram a pessoa da cobertura na data. |
 | Recibo, busca de atividade, relatório impresso, capturas da Ajuda | Ou não se aplicam, ou entram depois (seção 13). |
 | Pastas por unidade (`<UNIDADE>/lancamentos/`) | Sem chefia por unidade, a pasta por unidade não serve a nenhuma permissão. Ver 3.1. |
 
@@ -180,9 +180,9 @@ qual é o nome conflitante (ver 6.2).
 
 | Estado | Local | Escopo |
 |---|---|---|
-| Declarações e jornada de cada pessoa | `declaracoes/<slug>.json` | Compartilhado |
+| Declarações e ausências de cada pessoa | `declaracoes/<slug>.json` | Compartilhado |
 | Cadastro (unidades, pessoas, papéis, senhas, selo, interruptores) | `config.json` na raiz | Compartilhado |
-| Jornadas válidas, rótulos dos dias, caminho exibido da pasta, semente | `catalogo.js` | Estático |
+| Rótulos dos dias, tipos de ausência, caminho exibido da pasta, semente | `catalogo.js` | Estático |
 | Handle da pasta | IndexedDB, base `dt-rede`, chave `raiz` | Local ao navegador |
 | Identidade confirmada | `localStorage` → `dt.identificacao.v1` | Local ao navegador |
 | Selo aceito neste PC | `localStorage` → `dt.instalacao.v1` | Local ao navegador |
@@ -208,7 +208,7 @@ apaga qualquer nome diferente do atual.
 code/                    o aplicativo: uma cópia só, sempre a versão atual
   index.html             interface, lógica e CSS embutido
   versao.js              o único lugar onde a versão é escrita
-  catalogo.js            semente: jornadas, rótulos, caminho da pasta, unidades vazias
+  catalogo.js            semente: rótulos, tipos de ausência, caminho da pasta, unidades vazias
   rede.js                acesso à pasta: handle, permissões, leitura/gravação de JSON
   sw.js                  service worker; chave do cache a partir do versao.js
   manifest.webmanifest   metadados do PWA
@@ -259,7 +259,6 @@ Cada item do array `declaracoes`, no arquivo da própria pessoa:
   id:       'dec-1757000000000-x3k9a',  // Date.now() + sufixo aleatório
   pessoa:   'Ana Beatriz Nunes',
   unidade:  'SEORE',                    // retrato do cadastro no momento
-  carga:    6,                          // jornada no momento (retrato), 8|6|null
   de:       '2026-09-01',               // primeiro dia (inclusive), ISO
   ate:      '2026-12-31',               // último dia (inclusive), ou null = vigente
   dias:     [1, 2, 3, 4, 5],            // 0 = domingo, como Date.getUTCDay()
@@ -277,6 +276,7 @@ Diferenças em relação ao horário do projeto de origem, todas deliberadas:
 | `servidor` / `papel` | sim | **`pessoa`**, sem `papel` | Só há um papel que declara; e "servidor" presume vínculo que nem todo usuário tem (terceirizado, estagiário). |
 | `ate` | obrigatório | **pode ser `null`** | Um horário de trabalho costuma valer "até nova declaração". Obrigar uma data final inventada faz a pessoa escolher 31/12 e o horário desaparecer em janeiro. Na colisão e nos gráficos, `null` vale como "sem fim". |
 | `criadaEm` | não | sim | Permite ao administrador saber quando a declaração foi feita, não só quando vale. Também serve a "quem atualizou nos últimos 30 dias". |
+| `carga` | sim | **não, desde a v0.5** | A jornada deixou de ser pedida (12.9). Declarações gravadas até a v0.4 continuam com a chave, que é lida como dado antigo e ignorada — nunca apagada (5.5). |
 
 ### 5.2. Arquivo de uma pessoa (`declaracoes/<slug>.json`)
 
@@ -285,11 +285,34 @@ Diferenças em relação ao horário do projeto de origem, todas deliberadas:
   formato:      1,                       // formato DO ARQUIVO; não é a versão do app
   pessoa:       'Ana Beatriz Nunes',
   unidade:      'SEORE',
-  cargaHoraria: 6,                       // jornada atual (8|6|null)
   atualizadoEm: '2026-08-28T13:00:00.000Z',
-  declaracoes:  [ { ...declaração... }, ... ]
+  declaracoes:  [ { ...declaração... }, ... ],
+  ausencias:    [ { ...ausência... }, ... ]  // desde a v0.5; ausente = nenhuma
 }
 ```
+
+Arquivos gravados até a v0.4 têm também `cargaHoraria` (8|6). A chave não é mais
+escrita nem lida, e continua no arquivo: toda gravação parte do arquivo inteiro.
+
+**Ausência** (cada item de `ausencias`, v0.5):
+
+```js
+{
+  id:       'aus-1757000000000-k2m7p',
+  pessoa:   'Ana Beatriz Nunes',
+  unidade:  'SEORE',                    // retrato do cadastro no momento
+  tipo:     'ferias',                   // chave de TIPOS_AUSENCIA (catalogo.js); nunca muda
+  de:       '2026-12-01',               // primeiro dia (inclusive)
+  ate:      '2026-12-30',               // último dia (inclusive); OBRIGATÓRIO
+  obs:      '',
+  criadaEm: '2026-11-10T13:00:00.000Z'
+}
+```
+
+Mesmas regras de vida da declaração (12.4): a futura se exclui, a que está em curso se
+encerra (só antecipando o fim, de hoje em diante), a passada fica. Duas ausências da
+mesma pessoa não cobrem o mesmo dia. Ausência pode cruzar declarações: ela não as
+encerra, só tira a pessoa da cobertura enquanto dura.
 
 **Por que `formato` e não `versao`.** No projeto de origem o arquivo da pessoa tem
 uma chave `versao` que é rótulo de formato (3, depois 4), enquanto `versao.js`
@@ -310,10 +333,10 @@ passado que o administrador consulta por mês. Trocar de horário é **substitui
 encerrar a atual na véspera e declarar a nova a partir do dia seguinte, numa única
 gravação.
 
-**Chaves reservadas.** Fora da 1.0, mas com nome fixado desde já para não nascerem
-com outro: `realizados` (registro pontual, 12.1) e `ausencias` (12.5). Nenhuma das
-duas é gravada pela 1.0; quando existirem, terão esquema próprio e não tocarão em
-`declaracoes`.
+**Chave reservada.** Fora da 1.0, mas com nome fixado desde já para não nascer com
+outro: `realizados` (registro pontual, 12.1). Quando existir, terá esquema próprio e
+não tocará em `declaracoes`. (`ausencias`, reservada até a v0.4, passou a ser usada
+na v0.5.)
 
 ### 5.3. Configuração central (`config.json`)
 
@@ -360,7 +383,8 @@ de uma tela aberta.
 
 ```js
 const CATALOGO_ATUALIZADO = 'dd.mm.aaaa';
-const JORNADAS     = [8, 6];                         // horas por dia aceitas
+const TIPOS_AUSENCIA = [ { k: 'ferias', rotulo: 'Férias' }, { k: 'licenca', rotulo: 'Licença' },
+                         { k: 'recesso', rotulo: 'Recesso' }, { k: 'outro', rotulo: 'Outro afastamento' } ];
 const DIAS_SEMANA  = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 const UNIDADES     = [];                             // semente vazia (repo público)
 const SENHAS       = {};
@@ -413,11 +437,10 @@ do rail não é controle de acesso.
    oficializa informa nome, unidade e senha, e vira o primeiro `adm` do
    `config.json` criado nesse ato. Pasta divergente: ninguém entra, e só um
    administrador do `config.json` da pasta pode adotá-la.
-3. **Identificar-se.** Nome, senha se houver, e **jornada** (8h ou 6h). Quem tem
-   `adm` sempre tem senha, com ou sem `exigirSenha`. A jornada é obrigatória para
-   todos, porque todos declaram, lida do arquivo da rede quando já existe e
-   gravada **antes** de a identidade travar: se a gravação falhar, a pessoa vê o
-   motivo ainda na tela de entrada.
+3. **Identificar-se.** Nome e senha, se houver. Quem tem `adm` sempre tem senha, com
+   ou sem `exigirSenha`. Até a v0.4 pedia-se também a jornada (8h ou 6h); desde a
+   v0.5, não (12.9), e entrar não grava nada — o arquivo da pessoa nasce na primeira
+   declaração ou ausência.
 4. **Declarar** (todos) e **consultar** o painel (leitor, nas suas unidades; adm, em tudo).
 5. **Atualizar dados da rede.** Não há tempo real.
 
@@ -440,22 +463,22 @@ para que não desapareça em silêncio.
 ## 7. Interface
 
 Rail fixo à esquerda e telas, como o projeto de origem desde a v14. Tokens de cor em
-`:root` com nomes pt-BR (`--tinta`, `--papel`, `--ficha`, `--verde`, `--dourado`,
+`:root` com nomes pt-BR (`--tinta`, `--papel`, `--ficha`, `--verde`,
 `--grafite`, `--linha`, `--linha-campo`, `--raio`).
 
 **O significado das cores muda.** No projeto de origem, verde é aprovado e dourado é
 pendente. Aqui não há aprovação, e as duas cores ficam livres para significados
 novos, que precisam ser fixados e não reaproveitados decorativamente. Fixado:
-**verde = declaração vigente; dourado = divergência entre faixa e jornada**, ou
-seja, algo que pede olhar humano.
+**verde = declaração vigente.** Dourado marcava a divergência entre a faixa e a
+jornada até a v0.4; saiu com a jornada (12.9), e o token foi retirado da paleta.
 
 ### 7.1. Telas
 
 | Tela | Quem | O que mostra |
 |---|---|---|
 | **Entrada** | todos | Pasta e identificação. Some quando as duas se resolvem. |
-| **Meus horários** | pessoa | Formulário à esquerda: período (`de`, `ate` opcional), dias da semana, faixa de horas, observação. O total ("6h por dia · 30h por semana") é calculado enquanto se digita, e a divergência com a jornada aparece em dourado. À direita, as declarações separadas em *vigentes*, *futuras* e *encerradas*, cada uma com a ação permitida (encerrar, substituir ou excluir; ver 12.4). Abaixo, uma grade semanal simples, em HTML e não em gráfico, com o que está vigente hoje. |
-| **Painel** | leitor, adm | Filtros (data de referência ou mês, unidade, pessoa); indicadores; os gráficos da seção 8; tabela; exportação CSV. Para o leitor, tudo restrito a `unidadesVisiveis()`, e o filtro de unidade só oferece essas. |
+| **Meus horários** | pessoa | Formulário à esquerda: período (`de`, `ate` opcional), dias da semana, faixa de horas, observação. O total ("6h por dia · 30h por semana") é calculado enquanto se digita. À direita, as declarações separadas em *vigentes*, *futuras* e *encerradas*, cada uma com a ação permitida (encerrar, substituir ou excluir; ver 12.4). Abaixo, o registro de **ausências** (tipo, período, observação) e a lista delas (em curso e futuras; passadas), e uma grade semanal simples, em HTML, com o que está vigente hoje — avisando se a pessoa está ausente. |
+| **Painel** | leitor, adm | Filtros (data de referência ou mês, unidade, pessoa); indicadores (com **ausentes**); os gráficos da seção 8; tabelas de declarações e de ausências; exportação CSV de cada uma. Para o leitor, tudo restrito a `unidadesVisiveis()`, e o filtro de unidade só oferece essas. |
 | **Administração** | adm | Selo, cadastro de unidades e pessoas, papéis (`leitor` e suas unidades, `adm`), senhas. |
 | **Ajuda** e **Sobre** | todos, antes da identificação inclusive | Texto curto; "Sobre" mostra `versao.js` e `CATALOGO_ATUALIZADO`. |
 
@@ -525,22 +548,31 @@ caso.
    sábado e domingo só se alguém os usar; zero escrito dentro da célula, porque
    significa *hora descoberta*. Filtrável por unidade.
 2. **Horas por semana, por pessoa**: barra horizontal, em ordem **alfabética** por
-   padrão e "ordenar por volume" como opção. A linha da jornada × 5 aparece como
-   referência, e a barra que diverge dela sai em dourado.
+   padrão e "ordenar por volume" como opção. Uma cor só; a referência da jornada × 5
+   saiu com a jornada (12.9).
 3. **Linha do tempo das declarações**: uma faixa por pessoa no eixo das datas,
    mostrando os períodos declarados, os buracos e as sobreposições entre
    declarações sucessivas. É o único gráfico **novo**, e o que responde à parte
    "períodos" do escopo. A janela é o mês escolhido ou, numa data, três meses para
-   cada lado; declarações que valem ao mesmo tempo ficam em raias, uma sob a outra.
+   cada lado; declarações que valem ao mesmo tempo ficam em raias, uma sob a outra,
+   e as ausências em raias próprias, com textura a 45°.
 
 Os três são **HTML e CSS** (12.6), saem do mesmo recorte da tabela e têm dica no
 ponteiro e no foco do teclado, preenchida por `textContent`. A cobertura usa uma
 rampa de um só verde (conferida: monótona, degraus visíveis, o tom claro a 2,1:1 do
-branco), com o zero em cinza e o número escrito; as barras são de tinta neutra e só a
-divergência sai em dourado. As horas por semana só aparecem no recorte por data.
+branco), com o zero em cinza e o número escrito; as barras são de tinta neutra. As
+horas por semana só aparecem no recorte por data.
+
+**Ausências no painel (v0.5).** Num recorte por **data**, quem está ausente nela sai
+da cobertura — mas a grade (horas e dias) continua saindo de todas as declarações,
+para que a hora que só o ausente cobria apareça como **zero**, e não suma. A nota do
+gráfico diz quem saiu da conta. Num recorte por **mês**, ninguém sai: uma ausência de
+uma semana não apaga as outras três, e a nota diz isso. O indicador **Ausentes**
+conta as pessoas do recorte ausentes na data (ou com ausência no mês), e a tabela de
+declarações marca "ausente: férias" ao lado da declaração de quem está fora.
 
 **A nota embaixo de cada gráfico diz o que ele não é**: horário declarado não é
-horário cumprido, e o mapa de cobertura não desconta ausências nem feriados.
+horário cumprido, e o mapa de cobertura não desconta feriados.
 
 ### 8.3. Exportação
 
@@ -622,6 +654,7 @@ histórico abaixo.
 | v0.2 | out/2026 | Meus horários: formulário com total ao vivo, recusas de 7.2, colisão conferida contra o arquivo relido, encerrar/substituir/excluir, divergência por dia, grade da semana. |
 | v0.3 | out/2026 | Painel para leitores (recorte pelas suas unidades) e administradores: data ou mês, unidade, pessoa; indicadores; "sem declaração" pelo cadastro; tabela; CSV; arquivos sem cadastro ou ilegíveis. |
 | v0.4 | out/2026 | Gráficos do painel em HTML/CSS, sem biblioteca: cobertura por hora e dia (pessoas distintas, zero = descoberta), horas por semana por pessoa com jornada × 5, linha do tempo com raias. |
+| v0.5 | out/2026 | Sem jornada (12.9) e sem o dourado; "Sobre" sem o crédito ao projeto de origem; ausências (férias, licença, recesso, outro) em Meus horários e no painel, descontadas da cobertura na data (#13). |
 
 ---
 
@@ -630,13 +663,13 @@ histórico abaixo.
 - **Somente Chrome/Edge**, pela File System Access API.
 - **Sem tempo real**: "Atualizar dados da rede" relê os arquivos.
 - **Cada pessoa aponta a pasta uma vez por PC**: o handle não se transfere.
-- **Autodeclarado**: nem horário nem jornada são conferidos contra RH ou ponto, e
+- **Autodeclarado**: nem horário nem ausência são conferidos contra RH ou ponto, e
   não vão ser. Conferir exigiria registro de ponto, que este programa não é.
 - **Sem feriados** no mapa de cobertura: uma segunda-feira feriada conta como
   qualquer outra.
 - **Hora inteira** no mapa: quem sai às 12h30 conta na hora das 12h.
-- **Sem ausências** na 1.0: quem está de férias aparece cobrindo o horário
-  declarado.
+- **Ausências só descontam numa data**: no recorte por mês, quem esteve de férias
+  parte do mês continua contando na cobertura daquele mês.
 - **Segurança dependente de NTFS**: sem as permissões, o controle é só contra uso
   casual. O recorte do leitor por unidade nunca passa de controle de tela.
 - **Administradores simultâneos**: a releitura antes de gravar (5.3) recusa a
@@ -720,12 +753,14 @@ A situação (vigente, futura, encerrada) é calculada contra hoje, nunca gravad
 Alternativa descartada: edição livre. É mais simples na tela, mas apaga o histórico
 que o painel consulta por mês.
 
-### 12.5. Ausências — **Decidido: fora da 1.0, chave reservada**
+### 12.5. Ausências — **Decidido: entram na v0.5** (revisto em 21/10/2026, #13)
 
-**Decisão:** não entram na 1.0. Quando entrarem: mesma forma do projeto de origem
-(período + tipo, chaves `k` imutáveis), no arquivo da própria pessoa, como chave
-**`ausencias`** (nome reservado, ver 5.2), com o mapa de cobertura passando a
-descontá-las, como lá.
+A primeira decisão as deixava para depois da 1.0, com a chave reservada. Revista a
+pedido no uso da v0.4: **entram na v0.5**, na forma prevista — período + tipo, chaves
+`k` imutáveis em `TIPOS_AUSENCIA` (férias, licença, recesso, outro), no arquivo da
+própria pessoa, chave **`ausencias`** (esquema em 5.2). Último dia obrigatório; sem
+sobreposição entre ausências da mesma pessoa; encerrar e excluir como as declarações.
+O mapa de cobertura passa a descontá-las no recorte por data (8.2).
 
 ### 12.6. Como desenhar os gráficos — **Decidido: HTML/CSS puro, sem ECharts**
 
@@ -765,6 +800,20 @@ manifesto. A primeira proposta, "Declaração de Horários", foi trocada porque 
 que se declara é **disponibilidade** prevista, e não horário cumprido (seção 1). O nome do repositório continua
 `declare-time`.
 
+### 12.9. Jornada (8h ou 6h) — **Decidido: removida na v0.5** (21/10/2026, #13)
+
+A jornada era pedida na entrada, carimbada em cada declaração (`carga`) e usada para
+marcar em dourado o dia cujo total não batia com ela. No uso da v0.4, pediu-se que
+não fosse mais perguntada. **Decisão:** sai da entrada, do formulário e do painel; a
+comparação em dourado sai junto, porque sem jornada não há com o que comparar.
+Alternativa descartada: comparar com uma semana-padrão definida por unidade — mais
+cadastro para manter, para uma marcação que o programa não usa em conta nenhuma.
+
+O que já foi gravado fica (5.5): `cargaHoraria` no arquivo da pessoa e `carga` nas
+declarações antigas continuam lá, intocados, e deixam de ser lidos. Como
+consequência, entrar não grava mais nada: o arquivo da pessoa nasce na primeira
+declaração ou ausência.
+
 ---
 
 ## 13. Roteiro de construção
@@ -776,11 +825,12 @@ que se declara é **disponibilidade** prevista, e não horário cumprido (seçã
 | **2. Declarar** | Tela *Meus horários*: formulário, total ao vivo, recusas de 7.2, colisão, encerrar/excluir/substituir, grade semanal. `atualizarArquivoPessoa`. | v0.2 |
 | **3. Painel** | Filtros, indicadores, tabela, CSV, "arquivos sem cadastro"; recorte por `unidadesVisiveis()` para o leitor. | v0.3 |
 | **4. Gráficos** | Mapa de cobertura, horas por semana, linha do tempo, todos em HTML/CSS (12.6). | v0.4 |
-| **5. Prova de uso** | Teste com uma unidade real, numa pasta real, com permissões NTFS aplicadas. Ajustes. | v0.5… |
+| **5. Prova de uso** | Teste com uma unidade real, numa pasta real, com permissões NTFS aplicadas. Ajustes — o primeiro lote (#13: jornada, crédito, ausências) saiu na v0.5. | v0.5… |
 | **6. Produção** | Esquema congelado, LEIA-ME completo, Ajuda com o texto de 12.7. | **v1.0** |
 
 Depois da 1.0, nesta ordem de custo/benefício: relatório impresso (o mecanismo da
-v1.13 de origem), ausências (12.5), tabela de feriados opcional.
+v1.13 de origem) e tabela de feriados opcional. (Ausências, antes nesta lista,
+entraram na v0.5.)
 
 ---
 
@@ -790,11 +840,11 @@ v1.13 de origem), ausências (12.5), tabela de feriados opcional.
 |---|---|
 | **Declaração** | Um período + dias da semana + uma faixa de horas em que a pessoa diz que estará em atividade. |
 | **Vigente** | Declaração cujo intervalo `de`…`ate` contém a data de referência (`ate` nulo = sem fim). |
-| **Jornada / carga** | Horas por dia (8 ou 6) autodeclaradas; carimbada em cada declaração. |
+| **Ausência** | Período de férias, licença, recesso ou outro afastamento declarado pela própria pessoa. Tira a pessoa da cobertura na data. |
+| **Jornada / carga** | Horas por dia (8 ou 6) pedidas até a v0.4; removidas na v0.5 (12.9). Ficam nos arquivos antigos, sem uso. |
 | **Encerrar** | Preencher `ate` numa declaração vigente. Única alteração permitida depois que ela começou. |
 | **Excluir** | Apagar uma declaração que ainda não começou (`de` > hoje). |
 | **Substituir** | Encerrar a vigente na véspera e declarar a nova, numa só gravação. |
-| **Divergência** | Total do dia (soma das declarações que valem juntas naquele dia da semana) diferente da jornada. Exibida em dourado, nunca corrigida. |
 | **Cobertura** | Quantas pessoas declararam estar em atividade numa hora de um dia da semana. |
 | **Selo** | UUID gravado no `config.json` que identifica a pasta oficial. |
 | **Escritor único** | Regra pela qual cada arquivo tem um só papel que o grava. Nos arquivos de declaração, também uma só pessoa; no `config.json`, vários administradores, com conferência de `atualizadoEm`. |

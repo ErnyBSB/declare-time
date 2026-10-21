@@ -15,11 +15,10 @@
 /* ===================== PALETA =====================
    Herdada do projeto de origem, com o significado das cores trocado:
    lá verde era aprovado e dourado, pendente. Aqui não há aprovação, e
-   as duas ficam com significados novos, fixos:
-     verde   = declaração vigente;
-     dourado = divergência entre a faixa declarada e a jornada.
-   Nenhuma das duas serve de enfeite nem de "status" de cadastro —
-   etiqueta de papel ou de senha é neutra (.tag). O rail escuro é
+   verde ganha um significado novo, fixo: declaração VIGENTE. Dourado
+   marcava a divergência com a jornada até a v0.4; a jornada saiu na
+   v0.5, e o dourado saiu junto da paleta.
+   Etiqueta de papel ou de senha é neutra (.tag). O rail escuro é
    superfície, não estado. */
 :root{
   --tinta:#1B211D; --papel:#F0F2F0; --ficha:#FFFFFF;
@@ -31,7 +30,6 @@
   --grafite:#646B65;
   --verde:#3D5840; --verde-fundo:#2A442E; --verde-suave:#EDF6EE;
   --verde-borda:#DBEEDD; --verde-vivo:#51BF68;
-  --dourado:#775814; --dourado-suave:#F8EDD8;
   --erro:#A03F3C; --erro-suave:#FFD9D4;
   /* rail de navegação */
   --rail:#1D2720; --rail-linha:#2E3831; --rail-ativo:#2B3930;
@@ -155,15 +153,6 @@ textarea{resize:vertical; min-height:60px}
   font-size:12.5px; padding:6px 8px}
 .excluir:hover{text-decoration:underline}
 
-/* chips de jornada */
-.chips{display:grid; grid-template-columns:1fr 1fr; gap:10px}
-.chip{border:1px solid var(--linha-campo); background:var(--ficha); border-radius:var(--raio-p);
-  padding:12px 14px; font:inherit; cursor:pointer; color:var(--grafite);
-  display:flex; align-items:baseline; gap:7px; justify-content:center}
-.chip b{font-family:var(--serif); font-size:19px; font-weight:400; color:var(--tinta)}
-.chip small{font-size:10.5px; letter-spacing:.09em; text-transform:uppercase}
-.chip[aria-pressed=true]{border-color:var(--tinta); background:var(--papel); color:var(--tinta)}
-
 /* ---------- avisos ----------
    O aviso comum é neutro, e não verde: verde aqui é "declaração
    vigente". O de erro continua vermelho, que nunca foi cor de dado. */
@@ -190,7 +179,7 @@ td.acoes .acao{margin:2px 4px 2px 0}
 /* ---------- painel ---------- */
 .topo .controles .campo{margin:0; min-width:150px}
 .topo .controles select, .topo .controles input{padding:7px 9px; font-size:13px}
-.kpis{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:16px}
+.kpis{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:12px; margin-bottom:16px}
 .kpi{background:var(--ficha); border:1px solid var(--linha); border-radius:var(--raio);
   padding:14px 16px}
 .kpi .valor{font-family:var(--serif); font-size:27px; line-height:1.1; margin-top:2px}
@@ -212,7 +201,7 @@ td.num{text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap}
      - cobertura: rampa de um só verde, do claro ao escuro, conferida no
        validador (monótona, degraus visíveis, o claro a 2,1:1 do branco);
        o zero fica no cinza do papel, com o número em negrito;
-     - barras: tinta neutra; dourado SÓ para divergência com a jornada;
+     - barras: tinta neutra, uma série só;
      - linha do tempo: verde para vigente, cinza para o resto.
    Texto nunca leva a cor do dado; dentro da célula, tinta ou branco pelo
    contraste do fundo (todos acima de 4,5:1). */
@@ -242,8 +231,6 @@ table.hm td.c:hover{outline:2px solid var(--tinta); outline-offset:-2px}
 .trilho{position:relative; height:22px}
 .trilho .b{position:absolute; left:0; top:5px; height:12px; background:#5C6A60;
   border-radius:0 4px 4px 0; min-width:2px}
-.trilho .b.diverge{background:var(--dourado)}
-.trilho .ref{position:absolute; top:1px; bottom:1px; width:2px; margin-left:-1px; background:var(--tinta)}
 .trilho:focus-visible, .lt-bloco:focus-visible{outline:2px solid var(--verde); outline-offset:2px}
 .barras .v{text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap}
 .lt{margin-top:12px; font-size:12px}
@@ -296,9 +283,6 @@ table.hm td.c:hover{outline:2px solid var(--tinta); outline-offset:-2px}
 .total-vivo b{font-family:var(--serif); font-size:17px; font-weight:400}
 .faixa-subst{margin:0 0 14px; padding:10px 12px; border:1px dashed var(--linha-campo);
   border-radius:var(--raio-p); font-size:12.5px}
-/* Dourado é DIVERGÊNCIA entre a faixa e a jornada, e só isso. */
-.divergente{color:var(--dourado); font-weight:600}
-.tag.diverge{background:var(--dourado-suave); color:var(--dourado); border-color:#E7DDC8}
 /* Verde é declaração VIGENTE, e só isso. */
 .tag.vigente{background:var(--verde-suave); color:var(--verde); border-color:var(--verde-borda)}
 .grupo-decl{margin:16px 0 0}
@@ -324,6 +308,13 @@ table.semana th:first-child, table.semana td:first-child{width:62px; text-align:
 table.semana td.h{border-bottom:1px solid var(--linha-suave)}
 table.semana td.coberta{background:var(--verde-suave); box-shadow:inset 0 0 0 1px var(--verde-borda)}
 table.semana tfoot td{border-top:1px solid var(--linha); font-variant-numeric:tabular-nums}
+
+/* Ausência: textura neutra a 45°, para não se confundir com declaração
+   (verde = vigente, cinza liso = as demais) nem com hora descoberta. */
+.lt-bloco.lt-aus{background:repeating-linear-gradient(45deg,#5C6A60 0 3px,#C9CFCA 3px 6px)}
+.chave.aus{background:repeating-linear-gradient(45deg,#5C6A60 0 3px,#C9CFCA 3px 6px)}
+.aviso-hoje{margin:12px 0 0; padding:9px 12px; border:1px solid var(--linha);
+  border-radius:var(--raio-p); background:var(--papel); font-size:12.5px}
 
 /* ---------- ficha de identidade (Meus horários) ---------- */
 .ficha{display:grid; grid-template-columns:auto 1fr; gap:7px 18px; margin:14px 0 0; font-size:13.5px}
@@ -531,11 +522,6 @@ dialog h2{font-family:var(--serif); font-weight:400; font-size:21px; margin:0 0 
                   </div>
                 </div>
               </div>
-              <div class="campo" id="cCarga">
-                <span class="rotulo" id="rotCarga">Jornada diária</span>
-                <div class="chips" id="chipsCarga" role="group" aria-labelledby="rotCarga"></div>
-                <p class="dica" id="hintCarga"></p>
-              </div>
               <button type="button" class="acao" id="btnIniciar" style="width:100%">Confirmar identidade</button>
             </div>
             <div id="resumoIdent" hidden>
@@ -614,10 +600,47 @@ dialog h2{font-family:var(--serif); font-weight:400; font-size:21px; margin:0 0 
       </div>
     </div>
 
+    <!-- Ausências (v0.5): férias, licenças, recessos e outros afastamentos.
+         Ficam no mesmo arquivo da pessoa, na chave "ausencias". -->
+    <div class="colunas" style="margin-top:20px">
+      <div class="cartao" id="cartaoAus">
+        <h2>Registrar ausência</h2>
+        <p class="dica" style="margin-bottom:14px">Férias, licença, recesso ou outro afastamento.
+          Durante a ausência você não conta na cobertura do painel; as suas declarações
+          continuam valendo antes e depois.</p>
+        <div class="campo">
+          <label class="rotulo" for="selAusTipo">Tipo</label>
+          <select id="selAusTipo"></select>
+        </div>
+        <div class="grade2 campo">
+          <div>
+            <label class="rotulo" for="inpAusDe">Primeiro dia</label>
+            <input type="date" id="inpAusDe">
+          </div>
+          <div>
+            <label class="rotulo" for="inpAusAte">Último dia</label>
+            <input type="date" id="inpAusAte">
+          </div>
+        </div>
+        <div class="campo">
+          <label class="rotulo" for="inpAusObs">Observação (opcional)</label>
+          <textarea id="inpAusObs" maxlength="300"></textarea>
+        </div>
+        <p class="dica" id="notaAus" hidden></p>
+        <button type="button" class="acao" id="btnAus" style="margin-top:6px">Registrar ausência</button>
+        <div class="aviso" id="avisoAus" role="alert"></div>
+      </div>
+      <div class="cartao">
+        <h2>Minhas ausências</h2>
+        <div id="listaAus"></div>
+      </div>
+    </div>
+
     <div class="cartao" style="margin-top:20px">
       <h2>Minha semana hoje</h2>
       <p class="dica">O que está valendo hoje, hora a hora. A hora conta inteira: quem sai às
-        12h30 aparece na hora das 12h. O total do dia sai em dourado quando difere da jornada.</p>
+        12h30 aparece na hora das 12h.</p>
+      <div id="avisoHoje"></div>
       <div class="rolagem" style="margin-top:12px" id="gradeSemana"></div>
     </div>
 
@@ -685,8 +708,7 @@ dialog h2{font-family:var(--serif); font-weight:400; font-size:21px; margin:0 0 
         Zero é hora descoberta.</p>
       <div class="legenda" id="legCobertura"></div>
       <div class="rolagem" style="margin-top:10px" id="gCobertura"></div>
-      <p class="nota-grafico">Conta pessoas, e não declarações; a hora conta inteira (quem sai às
-        12h30 conta na hora das 12h). Não desconta ausências nem feriados.</p>
+      <p class="nota-grafico" id="notaCobertura"></p>
     </figure>
 
     <figure class="cartao grafico" id="figHoras" style="margin-left:0;margin-right:0">
@@ -694,11 +716,7 @@ dialog h2{font-family:var(--serif); font-weight:400; font-size:21px; margin:0 0 
         <h2>Horas por semana, por pessoa</h2>
         <button type="button" class="ligacao direita" id="btnOrdem">ordenar por volume</button>
       </div>
-      <div class="legenda">
-        <span><span class="chave" style="background:#5C6A60"></span>horas declaradas</span>
-        <span><span class="chave traco"></span>jornada × 5</span>
-        <span><span class="chave" style="background:var(--dourado)"></span>difere da jornada × 5</span>
-      </div>
+      <p class="dica">Soma das horas declaradas por semana, na data de referência.</p>
       <div id="gHoras"></div>
       <p class="nota-grafico">Ordenar por volume não é ranking: o programa não sabe se as horas
         declaradas foram cumpridas.</p>
@@ -710,6 +728,7 @@ dialog h2{font-family:var(--serif); font-weight:400; font-size:21px; margin:0 0 
       <div class="legenda">
         <span><span class="chave" style="background:#55A065"></span>vigente na data</span>
         <span><span class="chave" style="background:#7E8A83"></span>outras</span>
+        <span><span class="chave aus"></span>ausência</span>
         <span><span class="chave traco"></span>data de referência</span>
       </div>
       <div class="lt" id="gLinha"></div>
@@ -726,10 +745,24 @@ dialog h2{font-family:var(--serif); font-weight:400; font-size:21px; margin:0 0 
         <table style="min-width:860px">
           <thead><tr>
             <th>Pessoa</th><th>Unidade</th><th>Período</th><th>Dias</th><th>Faixa</th>
-            <th class="num">Por dia</th><th class="num">Por semana</th><th class="num">Jornada</th>
+            <th class="num">Por dia</th><th class="num">Por semana</th>
             <th>Situação</th>
           </tr></thead>
           <tbody id="tbodyPainel"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="cartao">
+      <div class="cartao-topo">
+        <h2>Ausências <span class="dica" id="contAus" style="font-weight:400"></span></h2>
+        <button type="button" class="acao sec mini direita" id="btnCSVAus">Baixar CSV</button>
+      </div>
+      <div class="rolagem" style="margin-top:12px">
+        <table>
+          <thead><tr><th>Pessoa</th><th>Unidade</th><th>Tipo</th><th>Período</th>
+            <th class="num">Dias</th><th>Situação</th></tr></thead>
+          <tbody id="tbodyAusPainel"></tbody>
         </table>
       </div>
     </div>
@@ -854,8 +887,7 @@ dialog h2{font-family:var(--serif); font-weight:400; font-size:21px; margin:0 0 
           <ol>
             <li><b>Conecte a pasta da rede</b> indicada pela administração. O navegador
               pergunta se pode ler e gravar nela: as duas permissões são necessárias.</li>
-            <li><b>Escolha o seu nome</b> na lista, digite a senha se houver e marque a sua
-              <b>jornada diária</b> (8 ou 6 horas).</li>
+            <li><b>Escolha o seu nome</b> na lista e digite a senha, se houver.</li>
             <li>Pronto: nas próximas vezes, neste computador, a tela abre direto.</li>
           </ol>
           <p>Se o seu nome não está na lista, peça a um administrador para cadastrá-lo.</p>
@@ -876,6 +908,11 @@ dialog h2{font-family:var(--serif); font-weight:400; font-size:21px; margin:0 0 
             <li>Duas declarações suas só <b>colidem</b> quando período, dia da semana e hora se
               cruzam ao mesmo tempo. A tela diz com qual.</li>
           </ul>
+          <h3>Férias, licença, recesso</h3>
+          <p>Em <b>Registrar ausência</b>, escolha o tipo e o período. Durante a ausência você
+            não conta na cobertura do painel; as suas declarações continuam valendo antes e
+            depois, e não precisam ser encerradas. Ausência futura pode ser excluída; a que
+            está em curso pode ser encerrada mais cedo.</p>
           <h3>Mudou de horário?</h3>
           <ul>
             <li><b>Substituir</b> — encerra a declaração atual na véspera e começa a nova, numa
@@ -901,7 +938,7 @@ dialog h2{font-family:var(--serif); font-weight:400; font-size:21px; margin:0 0 
             <li><b>Baixar CSV</b> gera a tabela do recorte para abrir no Excel.</li>
             <li><b>Gráficos:</b> a cobertura conta quantas pessoas estão disponíveis em cada
               hora de cada dia (zero é hora descoberta); as barras mostram as horas por
-              semana de cada pessoa, com um traço na jornada × 5; a linha do tempo mostra os
+              semana de cada pessoa; a linha do tempo mostra os
               períodos de cada declaração. Passe o ponteiro, ou chegue pelo teclado, para ver
               os detalhes.</li>
           </ul>
@@ -979,7 +1016,6 @@ dialog h2{font-family:var(--serif); font-weight:400; font-size:21px; margin:0 0 
     <p>Cada pessoa declara em que horários e períodos estará disponível no ambiente de
       trabalho. Previsão de disponibilidade, não registro de ponto.</p>
     <p>Licença livre: Creative Commons CC0 1.0 (domínio público).</p>
-    <p>Derivado do Programa de Resultados — COBIB.</p>
     <p id="sobreAtualizado"></p>
     <p id="sobreCatalogo"></p>
     <p>Disponível no GitHub:<br><a id="sobreLink" target="_blank" rel="noopener"></a></p>
@@ -1014,10 +1050,10 @@ dialog h2{font-family:var(--serif); font-weight:400; font-size:21px; margin:0 0 
 
 <dialog id="dlgEncerrar" aria-labelledby="encerrarTitulo">
   <form id="formEncerrar" method="dialog" novalidate>
-    <h2 id="encerrarTitulo">Encerrar declaração</h2>
+    <h2 id="encerrarTitulo">Encerrar</h2>
     <p class="dica" id="encerrarDesc" style="margin:0"></p>
     <div class="campo" style="margin-top:14px">
-      <label class="rotulo" for="inpEncerrarAte">Último dia em que ela vale</label>
+      <label class="rotulo" for="inpEncerrarAte">Novo último dia</label>
       <input type="date" id="inpEncerrarAte">
     </div>
     <p class="dica">Hoje ou depois: encerrar não reescreve o que já passou.</p>
@@ -1056,9 +1092,8 @@ dialog h2{font-family:var(--serif); font-weight:400; font-size:21px; margin:0 0 
    chaves; crie outra com sufixo de versão. */
 const CHAVE_ID = "dt.identificacao.v1";
 const CHAVE_INST = "dt.instalacao.v1";
-let ident = null;          // { nome, carga } — os papéis vêm sempre do CFG
+let ident = null;          // { nome } — os papéis vêm sempre do CFG
 let dirRaiz = null;
-let cargaSel = null;       // 8 ou 6, marcada na identificação
 let situacaoPasta = null;  // "oficial" | "nao-oficializada" | "divergente" | "ilegivel"
 /* Motivo, quando o config.json existe mas não pôde ser lido. Fica fora
    do CFG de propósito: o CFG é o cadastro EM VIGOR, e neste caso não há
@@ -1206,7 +1241,7 @@ function ajustarConfig() {
   $("btnTrocar").hidden = !ident;
   $("idAtual").textContent = ident ? ident.nome : "Ninguém identificado";
   $("txtIdentResumo").textContent = ident
-    ? [eu()?.unidade, ident.carga ? ident.carga + "h/dia" : null, ...resumoPapeis(ident.nome)]
+    ? [eu()?.unidade, ...resumoPapeis(ident.nome)]
         .filter(Boolean).join(" · ")
     : "";
   $("railIniciais").textContent = ident ? iniciais(ident.nome) : "";
@@ -1362,7 +1397,6 @@ function montarPessoas() {
   const escolher = situacaoPasta === "oficial" || situacaoPasta === "divergente";
   $("blocoOficializar").hidden = !oficializar;
   $("blocoEscolha").hidden = !escolher;
-  $("cCarga").hidden = !(oficializar || escolher);
   $("btnIniciar").hidden = !(oficializar || escolher);
   $("tituloIdent").textContent = oficializar ? "Oficializar a pasta" : "Identificação";
   $("btnIniciar").textContent = oficializar ? "Oficializar a pasta e entrar" : "Confirmar identidade";
@@ -1388,47 +1422,13 @@ function montarPessoas() {
   aoTrocarPessoa();
 }
 
-/* ---------------------------- JORNADA ----------------------------
-   Obrigatória para todos, porque todos declaram. Ela é carimbada em
-   cada declaração (v0.2) e é com ela que a faixa declarada é comparada. */
-function montarChipsCarga() {
-  $("chipsCarga").innerHTML = JORNADAS.map(h =>
-    `<button type="button" class="chip" data-h="${h}" aria-pressed="false">` +
-    `<b>${h}</b><small>horas por dia</small></button>`).join("");
-}
-function marcarCarga(h) {
-  cargaSel = h;
-  for (const c of $("chipsCarga").querySelectorAll(".chip"))
-    c.setAttribute("aria-pressed", String(+c.dataset.h === h));
-}
-$("chipsCarga").addEventListener("click", (e) => {
-  const c = e.target.closest(".chip");
-  if (c) { marcarCarga(+c.dataset.h); calar($("avisoIdent")); }
-});
-
-/* Um "change" tardio (rede lenta) não pode sobrescrever a jornada de uma
-   pessoa escolhida depois: cada chamada carimba um bilhete e só a mais
-   recente escreve na tela. */
-let bilheteCarga = 0;
-async function aoTrocarPessoa() {
-  marcarCarga(null);
-  if (situacaoPasta === "nao-oficializada") {
-    $("hintCarga").textContent = "Marque a sua jornada diária.";
-    return;
-  }
+/* A jornada (8 ou 6 horas) era pedida aqui até a v0.4; saiu na v0.5.
+   Escolher o nome agora só decide se a senha é pedida. */
+function aoTrocarPessoa() {
+  if (situacaoPasta === "nao-oficializada") return;
   const nome = $("selPessoa").value;
   $("cSenha").hidden = !(nome && (hashDe(nome) || ehAdmNome(nome)));
   $("inpSenha").value = "";
-  if (!nome) { $("hintCarga").textContent = ""; return; }
-  const meu = ++bilheteCarga;
-  $("hintCarga").textContent = "Verificando a jornada já registrada…";
-  let salva = null;
-  if (dirRaiz) { try { salva = await lerCargaHoraria(dirRaiz, nome); } catch {} }
-  if (meu !== bilheteCarga) return;   // a pessoa já mudou: descarta
-  if (salva) marcarCarga(salva);
-  $("hintCarga").textContent = salva
-    ? `Marcada como ${salva} horas da última vez. Só altere se a sua jornada tiver mudado.`
-    : "Ainda não registrada — marque a sua jornada diária para continuar.";
 }
 $("selPessoa").addEventListener("change", aoTrocarPessoa);
 
@@ -1447,7 +1447,6 @@ async function atualizarArquivoPessoa(nome, mudar) {
     ...(atual || {}),
     pessoa: nome,
     unidade: cadastro(nome)?.unidade ?? atual?.unidade ?? null,
-    cargaHoraria: atual?.cargaHoraria ?? null,
     declaracoes: (atual && atual.declaracoes) || []
   };
   mudar(estado);
@@ -1495,8 +1494,6 @@ $("btnIniciar").addEventListener("click", async () => {
       "Senha obrigatória, mas ainda não definida para você. Peça a um administrador.", true, true);
   }
   $("inpSenha").value = "";
-  if (!cargaSel)
-    return avisar($("avisoIdent"), "Marque a sua jornada diária para continuar.", true);
   if (situacaoPasta === "divergente") {
     if (!ehAdmNome(nome))
       return avisar($("avisoIdent"),
@@ -1507,21 +1504,8 @@ $("btnIniciar").addEventListener("click", async () => {
     lembrar.gravar(CHAVE_INST, CFG.instalacao.id);
     situacaoPasta = "oficial";
   }
-  await gravarJornadaEEntrar(nome, cargaSel);
+  identificar(nome);
 });
-
-/* Grava antes de travar a identidade: se a rede recusar a escrita, a
-   pessoa continua na entrada e vê o motivo, em vez de seguir com uma
-   jornada que só existe nesta aba. */
-async function gravarJornadaEEntrar(nome, carga) {
-  try {
-    await atualizarArquivoPessoa(nome, (e) => { e.cargaHoraria = carga; });
-  } catch (e) {
-    return avisar($("avisoIdent"),
-      msgErro(e, "Não foi possível gravar a jornada na pasta da rede: "), true, true);
-  }
-  identificar(nome, carga);
-}
 
 /* Oficializar é criar o config.json, e quem o cria vira o primeiro
    administrador. Não há nome fixo de administrador nem senha inicial
@@ -1537,7 +1521,6 @@ async function oficializarEEntrar() {
   if (!unidade) return recusar("Informe a sua unidade.");
   if (s1.length < 4) return recusar("Use uma senha com pelo menos 4 caracteres.");
   if (s1 !== s2) return recusar("As senhas não conferem.");
-  if (!cargaSel) return recusar("Marque a sua jornada diária para continuar.");
   if (!confirm("Oficializar a pasta conectada como a pasta deste programa?\n" +
       "Você passará a administrar o cadastro, e todas as pessoas passarão a entrar por ela.\n\n" +
       "Isto GRAVA o config.json na pasta.")) return;
@@ -1560,19 +1543,17 @@ async function oficializarEEntrar() {
   lembrar.gravar(CHAVE_INST, CFG.instalacao.id);
   situacaoPasta = "oficial";
   configIlegivel = null;
-  const carga = cargaSel;
   montarPessoas();
   $("selPessoa").value = nome;
-  await gravarJornadaEEntrar(nome, carga);
+  identificar(nome);
 }
 
 function travarIdentidade(travar) {
   $("linhaPessoa").hidden = travar;
   $("resumoIdent").hidden = !travar;
 }
-function identificar(nome, carga) {
-  ident = { nome, carga };
-  cargaSel = carga;
+function identificar(nome) {
+  ident = { nome };
   lembrar.gravar(CHAVE_ID, JSON.stringify(ident));
   travarIdentidade(true);
   renderHor();
@@ -1586,20 +1567,15 @@ async function restaurarIdentidade() {
   let salvo = null;
   try { salvo = JSON.parse(lembrar.ler(CHAVE_ID)); } catch {}
   if (!salvo || !cadastro(salvo.nome)) { lembrar.apagar(CHAVE_ID); return; }
-  /* O arquivo da rede manda: se a pessoa mudou a jornada em outra
-     máquina, é aquele valor que vale, não o guardado aqui. */
-  let carga = null;
-  try { carga = await lerCargaHoraria(dirRaiz, salvo.nome); } catch {}
-  carga = carga || (JORNADAS.includes(salvo.carga) ? salvo.carga : null);
   $("selPessoa").value = salvo.nome;
-  if (!carga) { lembrar.apagar(CHAVE_ID); return aoTrocarPessoa(); }
-  identificar(salvo.nome, carga);
+  identificar(salvo.nome);
 }
 function limparIdentidade() {
   ident = null;
-  minhas = []; meuArquivoIlegivel = null;
+  minhas = []; minhasAus = []; ausIlegivel = false; meuArquivoIlegivel = null;
   limparFormulario();
   $("listaMinhas").innerHTML = ""; $("gradeSemana").innerHTML = "";
+  $("listaAus").innerHTML = ""; $("avisoHoje").innerHTML = "";
   lembrar.apagar(CHAVE_ID);
   travarIdentidade(false);
   ajustarConfig();
@@ -1616,6 +1592,8 @@ $("inpSenha").addEventListener("keydown", (e) => {
 
 /* ============================ MEUS HORÁRIOS ============================ */
 let minhas = [];               // declarações do meu arquivo, como lidas
+let minhasAus = [];            // ausências do meu arquivo, como lidas
+let ausIlegivel = false;       // a chave "ausencias" existe e não é uma lista
 let meuArquivoIlegivel = null; // motivo, quando o meu arquivo não pôde ser lido
 let substituindo = null;       // id da declaração sendo substituída
 
@@ -1677,19 +1655,6 @@ function diasNoPeriodo(de, ate) {
 const periodoTxt = (d) => d.ate
   ? `${fmtData(d.de)} a ${fmtData(d.ate)}`
   : `a partir de ${fmtData(d.de)}, sem data de fim`;
-/* Divergência é do DIA, e não de cada declaração: a manhã (9h–12h) e a
-   tarde (14h–17h) de uma jornada partida diferem da jornada cada uma
-   sozinha, e juntas fecham as 8h. Uma declaração só sai em dourado
-   quando, em algum dia seu, a soma de tudo o que vale junto com ela não
-   bate com a jornada que ela carimbou. */
-function divergeNoDia(d, todas) {
-  if (!d.carga) return false;
-  return d.dias.some(x => {
-    const min = todas.filter(o => declValida(o) && o.dias.includes(x) && periodosCruzam(d, o))
-      .reduce((t, o) => t + minutosDia(o), 0);
-    return min !== d.carga * 60;
-  });
-}
 const descrever = (d) => `${periodoTxt(d)}, ${rotDias(d.dias)}, ${d.inicio}–${d.fim}`;
 const novoId = () => `dec-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 /* Recusa deliberada, com texto para a tela: lançada de dentro da mudança
@@ -1719,7 +1684,6 @@ function renderFicha() {
   const linhas = [
     ["Nome", ident.nome],
     ["Unidade", p.unidade || "—"],
-    ["Jornada", ident.carga ? ident.carga + " horas por dia" : "—"],
     ["Papéis", papeis.join("; ")],
     ["Seu arquivo", "declaracoes/" + arquivoDe(ident.nome)]
   ];
@@ -1737,32 +1701,37 @@ function renderHor() {
 let bilheteMinhas = 0;
 async function carregarMinhas() {
   const meu = ++bilheteMinhas;
-  let lista = [], motivo = null;
+  let lista = [], motivo = null, aus = [], ausRuim = false;
   try {
     const dado = await lerArquivoParaGravar(dirRaiz, ident.nome);
     lista = (dado && dado.declaracoes) || [];
+    aus = Array.isArray(dado?.ausencias) ? dado.ausencias : [];
+    ausRuim = dado?.ausencias !== undefined && !Array.isArray(dado.ausencias);
   } catch (e) {
     motivo = e.message;
   }
   if (meu !== bilheteMinhas || !ident) return;
   minhas = lista;
+  minhasAus = aus;
+  ausIlegivel = ausRuim;
   meuArquivoIlegivel = motivo;
   renderMinhas();
 }
 
 function renderMinhas() {
   $("btnDeclarar").disabled = Boolean(meuArquivoIlegivel);
+  $("btnAus").disabled = Boolean(meuArquivoIlegivel) || ausIlegivel;
   if (meuArquivoIlegivel) {
     $("listaMinhas").innerHTML =
       `<div class="aviso erro" style="display:block">${escapar(meuArquivoIlegivel)}</div>`;
+    $("listaAus").innerHTML = ""; $("avisoHoje").innerHTML = "";
     $("gradeSemana").innerHTML = "";
     return;
   }
-  const carga = ident.carga;
+  renderMinhasAus();
   const item = (d) => {
     const st = situacao(d);
     const min = minutosDia(d);
-    const diverge = divergeNoDia(d, minhas);
     const acoes = [];
     if (limitesSubstituir(d))
       acoes.push(`<button type="button" class="acao sec mini" data-subst="${escapar(d.id)}">Substituir</button>`);
@@ -1775,7 +1744,6 @@ function renderMinhas() {
         ${st === "vigente" ? '<span class="tag vigente">vigente</span>' : ""}</div>
       <div class="periodo">${escapar(periodoTxt(d))} · ${fmtHoras(min)} por dia ·
         ${fmtHoras(min * d.dias.length)} por semana</div>
-      ${diverge ? `<div style="margin-top:6px"><span class="tag diverge">o total do dia difere da jornada de ${d.carga}h</span></div>` : ""}
       ${d.obs ? `<div class="obs">${escapar(d.obs)}</div>` : ""}
       ${acoes.length ? `<div class="acoes-decl">${acoes.join("")}</div>` : ""}
     </li>`;
@@ -1802,12 +1770,16 @@ function renderMinhas() {
       "inesperado ficaram fora desta lista. Eles continuam guardados no arquivo; se não souber de onde " +
       "vieram, mostre o arquivo a um administrador.</p>";
   $("listaMinhas").innerHTML = html;
-  renderSemana(vig, carga);
+  renderSemana(vig);
 }
 
 /* A semana de hoje, em HTML: horas nas linhas, dias nas colunas. Sábado
    e domingo só aparecem se alguma declaração vigente os usar. */
-function renderSemana(vig, carga) {
+function renderSemana(vig) {
+  const hojeAus = minhasAus.filter(ausValida).find(a => situacao(a) === "vigente");
+  $("avisoHoje").innerHTML = hojeAus
+    ? `<p class="aviso-hoje">Hoje você está em <b>${escapar(rotuloTipo(hojeAus.tipo))}</b>, até
+       ${escapar(fmtData(hojeAus.ate))}: no painel, você não conta na cobertura destes dias.</p>` : "";
   if (!vig.length) {
     $("gradeSemana").innerHTML = `<p class="dica">Nenhuma declaração vigente hoje.</p>`;
     return;
@@ -1827,8 +1799,7 @@ function renderSemana(vig, carga) {
   }
   html += `</tbody><tfoot><tr><td>Total</td>` + cols.map(dia => {
     const min = vig.filter(d => d.dias.includes(dia)).reduce((t, d) => t + minutosDia(d), 0);
-    const diverge = min && carga && min !== carga * 60;
-    return `<td${diverge ? ' class="divergente"' : ""}>${min ? fmtHoras(min) : "—"}</td>`;
+    return `<td>${min ? fmtHoras(min) : "—"}</td>`;
   }).join("") + `</tr></tfoot></table>`;
   $("gradeSemana").innerHTML = html;
 }
@@ -1883,9 +1854,6 @@ function atualizarTotal() {
   if (f.inicio && f.fim && minutos(f.fim) > minutos(f.inicio)) {
     const min = minutos(f.fim) - minutos(f.inicio);
     linhas.push(`<b>${fmtHoras(min)}</b> por dia · <b>${fmtHoras(min * f.dias.length)}</b> por semana`);
-    if (ident && ident.carga && min !== ident.carga * 60)
-      linhas.push(`<span class="divergente">Difere da sua jornada de ${ident.carga}h.</span> ` +
-        "Pode estar certo — jornada reduzida, ou uma das partes de uma jornada partida.");
   } else {
     linhas.push("O total aparece aqui enquanto você preenche.");
   }
@@ -1945,16 +1913,17 @@ function comecarSubstituicao(id) {
    lá dentro, contra o arquivo recém-lido — e não contra a lista que esta
    tela leu antes. Duas abas abertas não conseguem, assim, gravar duas
    declarações que colidem. */
-async function gravarMinhas(mudar, msgOk) {
+async function gravarMinhas(mudar, msgOk, aviso = $("avisoDecl")) {
   try {
     const estado = await atualizarArquivoPessoa(ident.nome, mudar);
     minhas = estado.declaracoes;
+    minhasAus = Array.isArray(estado.ausencias) ? estado.ausencias : [];
     meuArquivoIlegivel = null;
     renderMinhas();
-    avisar($("avisoDecl"), msgOk);
+    avisar(aviso, msgOk);
     return true;
   } catch (e) {
-    avisar($("avisoDecl"), msgErro(e, "Não foi possível gravar na pasta da rede: "), true, true);
+    avisar(aviso, msgErro(e, "Não foi possível gravar na pasta da rede: "), true, true);
     return false;
   }
 }
@@ -1964,10 +1933,10 @@ $("btnDeclarar").addEventListener("click", async () => {
   const f = lerFormulario();
   const erro = validar(f);
   if (erro) return avisar($("avisoDecl"), erro, true, true);
-  /* unidade e jornada vão como RETRATO: o horário de março é lido com a
-     jornada e a unidade de março, mesmo que mudem em outubro. */
+  /* A unidade vai como RETRATO: o horário de março é lido com a unidade
+     de março, mesmo que a pessoa mude de unidade em outubro. */
   const nova = {
-    id: novoId(), pessoa: ident.nome, unidade: eu()?.unidade ?? null, carga: ident.carga,
+    id: novoId(), pessoa: ident.nome, unidade: eu()?.unidade ?? null,
     de: f.de, ate: f.ate, dias: f.dias, inicio: f.inicio, fim: f.fim, obs: f.obs,
     criadaEm: new Date().toISOString()
   };
@@ -1994,11 +1963,132 @@ $("btnDeclarar").addEventListener("click", async () => {
   if (ok) limparFormulario();
 });
 
+/* ============================== AUSÊNCIAS ==============================
+   Férias, licença, recesso, outro afastamento (v0.5). Mesmo arquivo da
+   pessoa, chave "ausencias", e as mesmas regras de vida das declarações:
+   a futura se exclui, a que está em curso se encerra (só antecipando o
+   fim, de hoje em diante), a passada fica como está. Ausência sempre tem
+   último dia: quem não sabe quando volta registra a data prevista e
+   encerra antes, se for o caso. */
+const rotuloTipo = (k) => (TIPOS_AUSENCIA.find(t => t.k === k) || {}).rotulo || k;
+const ausValida = (a) => Boolean(a) && typeof a.tipo === "string" &&
+  ISO_DATA.test(a.de) && ISO_DATA.test(a.ate || "") && a.ate >= a.de;
+const novoIdAus = () => `aus-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+const diasCorridos = (a) => diasEntre(a.de, a.ate) + 1;
+const descreverAus = (a) => `${rotuloTipo(a.tipo)}, de ${fmtData(a.de)} a ${fmtData(a.ate)}`;
+
+function montarTiposAusencia() {
+  $("selAusTipo").innerHTML = TIPOS_AUSENCIA
+    .map(t => `<option value="${escapar(t.k)}">${escapar(t.rotulo)}</option>`).join("");
+}
+function notaAus() {
+  const de = $("inpAusDe").value;
+  $("notaAus").hidden = !(de && de < hoje());
+  $("notaAus").textContent = "Começa no passado: depois de registrada, esta ausência só poderá ser encerrada, não excluída.";
+}
+$("inpAusDe").addEventListener("input", notaAus);
+
+function renderMinhasAus() {
+  if (ausIlegivel) {
+    $("listaAus").innerHTML = `<div class="aviso erro" style="display:block">O seu arquivo tem a chave
+      “ausencias” num formato inesperado. Nada foi alterado nela; mostre o arquivo a um administrador.</div>`;
+    return;
+  }
+  const validas = minhasAus.filter(ausValida);
+  const item = (a) => {
+    const st = situacao(a);
+    const acoes = [];
+    if (limitesEncerrar(a))
+      acoes.push(`<button type="button" class="acao sec mini" data-aus-encerrar="${escapar(a.id)}">Encerrar</button>`);
+    if (st === "futura")
+      acoes.push(`<button type="button" class="excluir" data-aus-excluir="${escapar(a.id)}">Excluir</button>`);
+    return `<li class="decl">
+      <div class="faixa">${escapar(rotuloTipo(a.tipo))} ${st === "vigente" ? '<span class="tag">em curso</span>' : ""}</div>
+      <div class="periodo">${escapar(fmtData(a.de))} a ${escapar(fmtData(a.ate))} · ${diasCorridos(a)} dia(s)</div>
+      ${a.obs ? `<div class="obs">${escapar(a.obs)}</div>` : ""}
+      ${acoes.length ? `<div class="acoes-decl">${acoes.join("")}</div>` : ""}
+    </li>`;
+  };
+  const por = (st) => validas.filter(a => situacao(a) === st).sort((x, y) => x.de.localeCompare(y.de));
+  const vig = por("vigente"), fut = por("futura"), enc = por("encerrada").reverse();
+  let html = "";
+  if (vig.length || fut.length)
+    html += `<div class="grupo-decl"><h3>Em curso e futuras</h3><ul class="lista-decl">${[...vig, ...fut].map(item).join("")}</ul></div>`;
+  else html += `<p class="dica" style="margin-top:12px">Nenhuma ausência em curso ou marcada.</p>`;
+  if (enc.length)
+    html += `<details class="grupo-decl encerradas"><summary>Passadas (${enc.length})</summary>` +
+      `<ul class="lista-decl">${enc.map(item).join("")}</ul></details>`;
+  $("listaAus").innerHTML = html;
+}
+
+$("btnAus").addEventListener("click", async () => {
+  calar($("avisoAus"));
+  const f = { tipo: $("selAusTipo").value, de: $("inpAusDe").value, ate: $("inpAusAte").value,
+              obs: $("inpAusObs").value.trim() };
+  const recusar = (m) => avisar($("avisoAus"), m, true, true);
+  if (!TIPOS_AUSENCIA.some(t => t.k === f.tipo)) return recusar("Escolha o tipo da ausência.");
+  if (!f.de) return recusar("Informe o primeiro dia.");
+  if (!f.ate) return recusar("Informe o último dia. Se ainda não souber, use a data prevista: " +
+    "dá para encerrar antes depois.");
+  if (f.ate < f.de) return recusar("O último dia é anterior ao primeiro.");
+  const nova = { id: novoIdAus(), pessoa: ident.nome, unidade: eu()?.unidade ?? null,
+    tipo: f.tipo, de: f.de, ate: f.ate, obs: f.obs, criadaEm: new Date().toISOString() };
+  const ok = await gravarMinhas((e) => {
+    /* Uma chave "ausencias" que não é lista foi escrita por outra coisa:
+       regravá-la como lista apagaria o que está lá. */
+    if (e.ausencias !== undefined && !Array.isArray(e.ausencias))
+      throw recusa("O seu arquivo tem a chave “ausencias” num formato inesperado; nada foi gravado.");
+    const lista = e.ausencias || [];
+    const cruza = lista.filter(ausValida).find(o => periodosCruzam(nova, o));
+    if (cruza) throw recusa(`Cruza com a ausência de ${descreverAus(cruza)}. ` +
+      "Duas ausências não podem cobrir o mesmo dia; se mudou, encerre ou exclua a outra.");
+    e.ausencias = [...lista, nova];
+  }, "Ausência registrada.", $("avisoAus"));
+  if (ok) {
+    for (const id of ["inpAusDe", "inpAusAte", "inpAusObs"]) $(id).value = "";
+    notaAus();
+  }
+});
+
+$("listaAus").addEventListener("click", async (e) => {
+  const b = e.target.closest("button");
+  if (!b) return;
+  if (b.dataset.ausEncerrar) {
+    const id = b.dataset.ausEncerrar;
+    const a = minhasAus.find(x => x.id === id);
+    const lim = a && limitesEncerrar(a);
+    if (!lim) return;
+    const ate = await pedirEncerramento({ ...a, inicio: "", fim: "", dias: [] }, lim, descreverAus(a));
+    if (!ate) return;
+    await gravarMinhas((est) => {
+      const lista = Array.isArray(est.ausencias) ? est.ausencias : [];
+      const atual = lista.find(x => x.id === id);
+      const l = atual && limitesEncerrar(atual);
+      if (!l) throw recusa("Esta ausência não está mais em curso no arquivo.");
+      if (ate < l.min || (l.max && ate > l.max)) throw recusa("A data de encerramento não vale mais.");
+      est.ausencias = lista.map(x => x.id === id ? { ...x, ate } : x);
+    }, `Ausência encerrada: vai até ${fmtData(ate)}.`, $("avisoAus"));
+  }
+  if (b.dataset.ausExcluir) {
+    const id = b.dataset.ausExcluir;
+    const a = minhasAus.find(x => x.id === id);
+    if (!a || !confirm(`Excluir a ausência de ${descreverAus(a)}?`)) return;
+    await gravarMinhas((est) => {
+      const lista = Array.isArray(est.ausencias) ? est.ausencias : [];
+      const atual = lista.find(x => x.id === id);
+      if (!atual) throw recusa("Esta ausência não está mais no arquivo.");
+      if (situacao(atual) !== "futura")
+        throw recusa("Esta ausência já começou: ela pode ser encerrada, não excluída.");
+      est.ausencias = lista.filter(x => x.id !== id);
+    }, "Ausência excluída.", $("avisoAus"));
+  }
+});
+
 /* ---------------------- encerrar e excluir ---------------------- */
-function pedirEncerramento(d, lim) {
+function pedirEncerramento(d, lim, desc = descrever(d)) {
   return new Promise((ok) => {
     const dlg = $("dlgEncerrar");
-    $("encerrarDesc").textContent = descrever(d);
+    $("encerrarDesc").textContent = desc;
     $("inpEncerrarAte").value = lim.min;
     $("inpEncerrarAte").min = lim.min;
     $("inpEncerrarAte").max = lim.max || "";
@@ -2146,7 +2236,7 @@ function recortePainel() {
   const pessoaSel = $("selPessoaVer").value;
   const casaPessoa = (n) => pessoaSel === "*" || n === pessoaSel;
 
-  // Todas as declarações válidas de cada dono, para a divergência por dia.
+  // Todas as declarações válidas de cada dono.
   const doDono = new Map();
   for (const a of painelArquivos) {
     if (!a.dono || !a.dado) continue;
@@ -2158,6 +2248,26 @@ function recortePainel() {
     .filter(d => unidades.includes(d.unidade) && casaPessoa(d.pessoa) && noPeriodo(d))
     .sort((x, y) => porNome(x.pessoa, y.pessoa) || x.de.localeCompare(y.de) || x.inicio.localeCompare(y.inicio));
 
+  /* Ausências, pelo mesmo critério das declarações: dono do arquivo,
+     forma válida, unidade carimbada. Num recorte por data, entram as que
+     cobrem a data; por mês, as que tocam o mês. */
+  const ausDoDono = new Map();
+  for (const a of painelArquivos) {
+    if (!a.dono || !a.dado || !Array.isArray(a.dado.ausencias)) continue;
+    ausDoDono.set(a.dono, a.dado.ausencias.filter(ausValida).map(x => ({ ...x, pessoa: a.dono })));
+  }
+  const aus = [...ausDoDono.values()].flat()
+    .filter(x => unidades.includes(x.unidade) && casaPessoa(x.pessoa) && noPeriodo(x))
+    .sort((x, y) => porNome(x.pessoa, y.pessoa) || x.de.localeCompare(y.de));
+  /* Quem está ausente NA DATA, seja qual for a unidade carimbada: é isso
+     que tira a pessoa da cobertura. Num mês não se tira ninguém — uma
+     ausência de uma semana não apaga as outras três. */
+  const ausenteNaData = new Map();
+  if (modo === "data")
+    for (const [dono, lista] of ausDoDono) {
+      const a = lista.find(x => situacao(x, ref) === "vigente");
+      if (a) ausenteNaData.set(dono, a);
+    }
   const pessoas = pessoasDoRecorte(unidades).filter(casaPessoa);
   const ilegivelDe = new Map(painelArquivos.filter(a => a.dono && !a.dado).map(a => [a.dono, a.motivo]));
   /* "Sem declaração" olha qualquer declaração da pessoa no período, seja
@@ -2167,7 +2277,7 @@ function recortePainel() {
   const temNoPeriodo = (n) => (doDono.get(n) || []).some(noPeriodo);
   const faltam = pessoas.filter(n => !temNoPeriodo(n));
   return { modo, ref, mes, janela, decls, pessoas, faltam, ilegivelDe, doDono,
-           sitRef: modo === "mes" ? hoje() : ref };
+           aus, ausDoDono, ausenteNaData, sitRef: modo === "mes" ? hoje() : ref };
 }
 
 const ROTULO_SIT = { vigente: "vigente", futura: "futura", encerrada: "encerrada" };
@@ -2189,6 +2299,9 @@ function renderPainel() {
         ? "média de " + fmtHoras(Math.round(minSemana / comDecl.size)) + " por pessoa com declaração" : "ninguém com declaração"}</p>`
     : `<div class="valor">—</div><p class="rodape">Escolha uma data: num mês, declarações sucessivas da mesma pessoa se somariam.</p>`;
   const ilegiveis = r.pessoas.filter(n => r.ilegivelDe.has(n));
+  const ausentes = r.pessoas.filter(n => r.modo === "mes"
+    ? (r.ausDoDono.get(n) || []).some(a => periodosCruzam(a, r.janela))
+    : r.ausenteNaData.has(n));
   /* Quem mudou de unidade e ainda não redeclarou conta como "com
      declaração", mas a declaração dele, carimbada com a unidade antiga,
      não está na tabela deste recorte. O indicador diz isso, para o número
@@ -2207,28 +2320,45 @@ function renderPainel() {
       <p class="rodape">${faltamSo.length || ilegiveis.length
         ? `<button type="button" class="ligacao" id="btnFaltam" aria-expanded="${!$("cartaoFaltam").hidden}">ver quem</button>` : "ninguém faltando"}
         ${ilegiveis.length ? ` · ${ilegiveis.length} com arquivo ilegível` : ""}</p></div>
-    <div class="kpi"><span class="rotulo">Horas por semana declaradas</span>${horas}</div>`;
+    <div class="kpi"><span class="rotulo">Horas por semana declaradas</span>${horas}</div>
+    <div class="kpi"><span class="rotulo">Ausentes</span>
+      <div class="valor">${ausentes.length}</div>
+      <p class="rodape">${r.modo === "mes" ? "com ausência em algum dia do mês" :
+        (r.ref === hoje() ? "hoje" : "em " + fmtData(r.ref)) + (ausentes.length ? " — fora da cobertura" : "")}</p></div>`;
   $("listaFaltam").innerHTML = [
-    ...faltamSo.map(n => `<li>${escapar(n)} <span class="dica">· ${escapar(cadastro(n)?.unidade || "")}</span></li>`),
+    ...faltamSo.map(n => `<li>${escapar(n)} <span class="dica">· ${escapar(cadastro(n)?.unidade || "")}</span>${
+      r.ausenteNaData.has(n) ? ` <span class="tag">${escapar(rotuloTipo(r.ausenteNaData.get(n).tipo))}</span>` : ""}</li>`),
     ...ilegiveis.map(n => `<li>${escapar(n)} <span class="tag">arquivo ilegível</span></li>`)
   ].join("") || `<li>Ninguém.</li>`;
 
   $("contDecl").textContent = `(${r.decls.length})`;
   $("tbodyPainel").innerHTML = r.decls.length ? r.decls.map(d => {
     const min = minutosDia(d), st = situacao(d, r.sitRef);
-    const diverge = divergeNoDia(d, r.doDono.get(d.pessoa) || []);
     return `<tr>
       <td>${escapar(d.pessoa)}${d.obs ? `<span class="sub">${escapar(d.obs)}</span>` : ""}</td>
       <td>${escapar(d.unidade || "—")}</td>
       <td>${escapar(periodoTxt(d))}</td>
       <td>${escapar(rotDias(d.dias))}</td>
       <td style="white-space:nowrap">${escapar(d.inicio)}–${escapar(d.fim)}</td>
-      <td class="num">${diverge ? `<span class="tag diverge">${fmtHoras(min)}</span>` : fmtHoras(min)}</td>
+      <td class="num">${fmtHoras(min)}</td>
       <td class="num">${fmtHoras(min * d.dias.length)}</td>
-      <td class="num">${d.carga ? d.carga + "h" : "—"}</td>
-      <td>${st === "vigente" ? '<span class="tag vigente">vigente</span>' : `<span class="tag">${ROTULO_SIT[st]}</span>`}</td>
+      <td>${st === "vigente" ? '<span class="tag vigente">vigente</span>' : `<span class="tag">${ROTULO_SIT[st]}</span>`}${
+        r.ausenteNaData.has(d.pessoa) ? ` <span class="tag">ausente: ${escapar(rotuloTipo(r.ausenteNaData.get(d.pessoa).tipo).toLowerCase())}</span>` : ""}</td>
     </tr>`;
-  }).join("") : `<tr><td colspan="9" class="vazio">Nenhuma declaração neste recorte.</td></tr>`;
+  }).join("") : `<tr><td colspan="8" class="vazio">Nenhuma declaração neste recorte.</td></tr>`;
+
+  $("contAus").textContent = `(${r.aus.length})`;
+  $("tbodyAusPainel").innerHTML = r.aus.length ? r.aus.map(a => {
+    const st = situacao(a, r.sitRef);
+    return `<tr>
+      <td>${escapar(a.pessoa)}${a.obs ? `<span class="sub">${escapar(a.obs)}</span>` : ""}</td>
+      <td>${escapar(a.unidade || "—")}</td>
+      <td>${escapar(rotuloTipo(a.tipo))}</td>
+      <td>${escapar(fmtData(a.de))} a ${escapar(fmtData(a.ate))}</td>
+      <td class="num">${diasCorridos(a)}</td>
+      <td><span class="tag">${st === "vigente" ? "em curso" : ROTULO_SIT[st]}</span></td>
+    </tr>`;
+  }).join("") : `<tr><td colspan="6" class="vazio">Nenhuma ausência neste recorte.</td></tr>`;
 
   renderArquivosPainel();
   renderGraficos(r);
@@ -2281,8 +2411,19 @@ function renderGraficos(r) {
    mesma pessoa na mesma hora (antes e depois de uma substituição, num
    mês) contam uma vez. */
 function renderCobertura(r) {
-  const ds = r.decls;
-  if (!ds.length) {
+  /* Numa data, quem está ausente sai da cobertura: a declaração continua
+     valendo, mas a pessoa não está lá. Num mês, ninguém sai. */
+  const ds = r.decls.filter(d => !r.ausenteNaData.has(d.pessoa));
+  /* A grade (horas e dias) sai de TODAS as declarações do recorte, e a
+     contagem só de quem está presente: a hora que só um ausente cobria
+     tem de aparecer como zero — hora descoberta —, e não sumir. */
+  const base = r.decls;
+  const fora = [...new Set(r.decls.filter(d => r.ausenteNaData.has(d.pessoa)).map(d => d.pessoa))];
+  $("notaCobertura").textContent = "Conta pessoas, e não declarações; a hora conta inteira (quem sai às " +
+    "12h30 conta na hora das 12h). Não desconta feriados. " + (r.modo === "mes"
+      ? "No recorte por mês, as ausências não são descontadas: escolha uma data para vê-las fora."
+      : (fora.length ? `Fora da conta por ausência na data: ${fora.join(", ")}.` : "Ninguém ausente na data."));
+  if (!base.length) {
     $("gCobertura").innerHTML = `<p class="dica">Nenhuma declaração neste recorte.</p>`;
     $("legCobertura").innerHTML = "";
     return;
@@ -2291,10 +2432,10 @@ function renderCobertura(r) {
     ? "Quantas pessoas declararam estar disponíveis em cada hora em algum momento do mês."
     : "Quantas pessoas declararam estar disponíveis em cada hora, na data de referência.") +
     " Zero é hora descoberta.";
-  const usados = new Set(ds.flatMap(d => d.dias));
+  const usados = new Set(base.flatMap(d => d.dias));
   const cols = ORDEM_DIAS.filter(d => (d >= 1 && d <= 5) || usados.has(d));
-  const h0 = Math.floor(Math.min(...ds.map(d => minutos(d.inicio))) / 60);
-  const h1 = Math.ceil(Math.max(...ds.map(d => minutos(d.fim))) / 60);
+  const h0 = Math.floor(Math.min(...base.map(d => minutos(d.inicio))) / 60);
+  const h1 = Math.ceil(Math.max(...base.map(d => minutos(d.fim))) / 60);
   const quem = (dia, h) => [...new Set(ds.filter(d => d.dias.includes(dia) &&
     minutos(d.inicio) < (h + 1) * 60 && h * 60 < minutos(d.fim)).map(d => d.pessoa))].sort(porNome);
   const grade = [];
@@ -2333,7 +2474,7 @@ function renderHorasPessoa(r) {
   }
   const porPessoa = new Map();
   for (const d of r.decls) {
-    const p = porPessoa.get(d.pessoa) || { min: 0, carga: d.carga || null };
+    const p = porPessoa.get(d.pessoa) || { min: 0 };
     p.min += minutosDia(d) * d.dias.length;
     porPessoa.set(d.pessoa, p);
   }
@@ -2344,17 +2485,15 @@ function renderHorasPessoa(r) {
   }
   linhas.sort(ordemHoras === "volume" ? (a, b) => b.min - a.min || porNome(a.nome, b.nome)
                                        : (a, b) => porNome(a.nome, b.nome));
-  const escala = Math.max(...linhas.map(l => Math.max(l.min, (l.carga || 0) * 5 * 60)));
+  const escala = Math.max(...linhas.map(l => l.min));
   const pct = (m) => (m / escala * 100).toFixed(2) + "%";
   $("gHoras").innerHTML = `<div class="barras">` + linhas.map(l => {
-    const ref = l.carga ? l.carga * 5 * 60 : null;
-    const diverge = ref !== null && l.min !== ref;
+    const a = r.ausenteNaData.get(l.nome);
     const dica = `${l.nome}: ${fmtHoras(l.min)} por semana` +
-      (ref !== null ? ` · jornada × 5 = ${fmtHoras(ref)}${diverge ? " (difere)" : ""}` : "");
+      (a ? ` · ausente na data (${rotuloTipo(a.tipo).toLowerCase()} até ${fmtData(a.ate)})` : "");
     return `<span class="nome" title="${escapar(l.nome)}">${escapar(l.nome)}</span>
       <div class="trilho" tabindex="0" data-dica="${escapar(dica)}" aria-label="${escapar(dica)}">
-        <div class="b${diverge ? " diverge" : ""}" style="width:${pct(l.min)}"></div>
-        ${ref !== null ? `<div class="ref" style="left:${pct(ref)}"></div>` : ""}
+        <div class="b" style="width:${pct(l.min)}"></div>
       </div>
       <span class="v">${fmtHoras(l.min)}</span>`;
   }).join("") + `</div>`;
@@ -2378,14 +2517,20 @@ function renderLinhaTempo(r) {
   const unidades = unidadesDoRecorte(), pessoaSel = $("selPessoaVer").value;
   const marco = r.modo === "mes" ? hoje() : r.ref;
   $("subLinha").textContent = `De ${fmtData(jan.de)} a ${fmtData(jan.ate)}. ` +
-    "Mostra todas as declarações que tocam essa janela, vigentes ou não.";
-  const porPessoa = new Map();
+    "Mostra todas as declarações e ausências que tocam essa janela.";
+  const casa = (x, dono) => unidades.includes(x.unidade) && (pessoaSel === "*" || dono === pessoaSel) && periodosCruzam(x, jan);
+  const porPessoa = new Map(), ausPorPessoa = new Map();
   for (const [dono, lista] of r.doDono)
     for (const d of lista)
-      if (unidades.includes(d.unidade) && (pessoaSel === "*" || dono === pessoaSel) && periodosCruzam(d, jan))
-        (porPessoa.get(dono) || porPessoa.set(dono, []).get(dono)).push(d);
+      if (casa(d, dono)) (porPessoa.get(dono) || porPessoa.set(dono, []).get(dono)).push(d);
+  for (const [dono, lista] of r.ausDoDono)
+    for (const a of lista)
+      if (casa(a, dono)) {
+        (ausPorPessoa.get(dono) || ausPorPessoa.set(dono, []).get(dono)).push(a);
+        if (!porPessoa.has(dono)) porPessoa.set(dono, []);
+      }
   if (!porPessoa.size) {
-    $("gLinha").innerHTML = `<p class="dica">Nenhuma declaração nesta janela.</p>`;
+    $("gLinha").innerHTML = `<p class="dica">Nenhuma declaração ou ausência nesta janela.</p>`;
     return;
   }
   // Marcas de mês no eixo e nas faixas.
@@ -2416,9 +2561,25 @@ function renderLinhaTempo(r) {
         tabindex="0" data-dica="${escapar(dica)}" aria-label="${escapar(dica)}"
         style="top:${raia * 14 + 4}px; left:${pos(ini)}%; width:max(4px, ${((diasEntre(ini, fim) + 1) / total * 100).toFixed(3)}%)"></span>`;
     });
-    const resumo = `${nome}: ` + ds.map(d => `${periodoTxt(d)}, ${rotDias(d.dias)}, ${d.inicio}–${d.fim}`).join("; ");
+    /* Ausências em raias próprias, abaixo das declarações, com textura. */
+    const base = fimRaia.length, fimAus = [];
+    const ausencias = (ausPorPessoa.get(nome) || []).sort((a, b) => a.de.localeCompare(b.de));
+    for (const a of ausencias) {
+      let raia = fimAus.findIndex(f => f < a.de);
+      if (raia < 0) { raia = fimAus.length; fimAus.push(""); }
+      fimAus[raia] = a.ate;
+      const ini = a.de < jan.de ? jan.de : a.de, fim = a.ate > jan.ate ? jan.ate : a.ate;
+      const dica = `${nome} · ${descreverAus(a)} · ${diasCorridos(a)} dia(s)`;
+      blocos.push(`<span class="lt-bloco lt-aus${a.de < jan.de ? " antes" : ""}${a.ate > jan.ate ? " segue" : ""}"
+        tabindex="0" data-dica="${escapar(dica)}" aria-label="${escapar(dica)}"
+        style="top:${(base + raia) * 14 + 4}px; left:${pos(ini)}%; width:max(4px, ${((diasEntre(ini, fim) + 1) / total * 100).toFixed(3)}%)"></span>`);
+    }
+    const raias = base + fimAus.length;
+    const resumo = `${nome}: ` + [
+      ...ds.map(d => `${periodoTxt(d)}, ${rotDias(d.dias)}, ${d.inicio}–${d.fim}`),
+      ...ausencias.map(a => "ausência: " + descreverAus(a))].join("; ");
     html += `<div class="lt-linha"><span class="nome" title="${escapar(nome)}">${escapar(nome)}</span>
-      <div class="lt-faixa" role="group" aria-label="${escapar(resumo)}" style="height:${fimRaia.length * 14 + 4}px">
+      <div class="lt-faixa" role="group" aria-label="${escapar(resumo)}" style="height:${raias * 14 + 4}px">
         ${linhasMes}${ref}${blocos.join("")}</div></div>`;
   }
   $("gLinha").innerHTML = html;
@@ -2461,24 +2622,37 @@ function celulaCSV(v) {
   if (/^[=+\-@\t\r]/.test(t)) t = "'" + t;
   return `"${t.replaceAll('"', '""')}"`;
 }
+function baixarCSV(nome, cab, linhas) {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob(
+    ["\ufeff" + cab.map(celulaCSV).join(";") + "\r\n" + linhas.join("\r\n")],
+    { type: "text/csv;charset=utf-8" }));
+  a.download = nome;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+const escopoCSV = () => $("selUnidadeVer").value === "*"
+  ? (ehAdm() ? "todas" : "minhas-unidades") : slug($("selUnidadeVer").value);
+$("btnCSVAus").addEventListener("click", () => {
+  const r = recortePainel();
+  const cab = ["Identificador", "Pessoa", "Unidade", "Tipo", "Primeiro dia", "Último dia",
+               "Dias corridos", "Observação", "Criada em"];
+  const linhas = r.aus.map(a => [
+    a.id, a.pessoa, a.unidade, rotuloTipo(a.tipo), fmtData(a.de), fmtData(a.ate),
+    diasCorridos(a), a.obs || "", a.criadaEm ? new Date(a.criadaEm).toLocaleString("pt-BR") : ""
+  ].map(celulaCSV).join(";"));
+  baixarCSV(`ausencias-${escopoCSV()}-${r.modo === "mes" ? r.mes : r.ref}.csv`, cab, linhas);
+});
 $("btnCSV").addEventListener("click", () => {
   const r = recortePainel();
-  const cab = ["Identificador", "Pessoa", "Unidade", "Jornada (h/dia)", "Primeiro dia",
+  const cab = ["Identificador", "Pessoa", "Unidade", "Primeiro dia",
                "Último dia", "Dias da semana", "Início", "Fim", "Observação", "Criada em"];
   const linhas = r.decls.map(d => [
-    d.id, d.pessoa, d.unidade, d.carga || "", fmtData(d.de), d.ate ? fmtData(d.ate) : "",
+    d.id, d.pessoa, d.unidade, fmtData(d.de), d.ate ? fmtData(d.ate) : "",
     rotDias(d.dias), d.inicio, d.fim, d.obs || "",
     d.criadaEm ? new Date(d.criadaEm).toLocaleString("pt-BR") : ""
   ].map(celulaCSV).join(";"));
-  const escopo = $("selUnidadeVer").value === "*" ? (ehAdm() ? "todas" : "minhas-unidades") : slug($("selUnidadeVer").value);
-  const quando = r.modo === "mes" ? r.mes : r.ref;
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(new Blob(
-    ["﻿" + cab.map(celulaCSV).join(";") + "\r\n" + linhas.join("\r\n")],
-    { type: "text/csv;charset=utf-8" }));
-  a.download = `declaracoes-${escopo}-${quando}.csv`;
-  a.click();
-  URL.revokeObjectURL(a.href);
+  baixarCSV(`declaracoes-${escopoCSV()}-${r.modo === "mes" ? r.mes : r.ref}.csv`, cab, linhas);
 });
 
 /* ============================ ADMINISTRAÇÃO ============================
@@ -2811,8 +2985,8 @@ $("dlgSobre").addEventListener("close", () => $("btnSobre").focus());
 
 /* --------------------------- INICIALIZAÇÃO --------------------------- */
 montarSobre();
-montarChipsCarga();
 montarDias();
+montarTiposAusencia();
 atualizarTotal();
 for (const b of railItens()) b.setAttribute("aria-current", "false");
 $("txtCaminho").textContent =
