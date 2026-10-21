@@ -1,4 +1,4 @@
-DECLARAÇÃO DE DISPONIBILIDADE (versão 0.4, out/26 — PWA em rede)
+DECLARAÇÃO DE DISPONIBILIDADE (versão 0.5, out/26 — PWA em rede)
 ================================================================
 
 Este arquivo é a documentação de verdade do programa. Não é uma lista
@@ -10,6 +10,84 @@ nova, com a troca que foi feita e a limitação admitida.
 A referência estruturada — esquemas, tabelas, papéis, roteiro — fica no
 project_design.md, na raiz do repositório. Os dois dizem a mesma coisa
 de jeitos diferentes: lá, para consultar; aqui, para entender.
+
+As seções vêm da mais nova para a mais antiga. Uma seção antiga não é
+apagada quando a decisão muda: a nova diz o que mudou e por quê, e a
+antiga fica como registro do que valia antes.
+
+Versão 0.5: sem jornada, com ausências (novidade da v0.5)
+---------------------------------------------------------
+Três correções pedidas por quem usou a 0.4 (issue #13).
+
+A jornada saiu. Até a 0.4, toda pessoa marcava na entrada se cumpria 8
+ou 6 horas por dia, e o programa usava isso para pintar de dourado o
+dia cujas declarações não somavam a jornada. A pergunta foi retirada:
+ninguém mais escolhe 8 ou 6 horas. E o dourado saiu junto, porque sem
+jornada não há com o que comparar. Pensou-se em trocá-la por uma
+semana-padrão definida pela administração, unidade por unidade; não
+valia o cadastro a mais, para uma marcação que o programa não usa em
+conta nenhuma.
+
+O que já estava gravado fica onde está. Arquivos da 0.4 têm a jornada
+no cabeçalho e em cada declaração; nada disso é apagado nem migrado —
+só deixa de ser lido. É a regra de sempre: o arquivo de uma pessoa só
+muda quando ela grava algo nele, e mesmo então as chaves que esta
+versão não usa atravessam a gravação intactas.
+
+Uma consequência que convém saber: entrar no programa não grava mais
+nada. Antes, a jornada era gravada na entrada, e o arquivo da pessoa
+nascia ali. Agora ele nasce na primeira declaração ou ausência. Quem
+entrou e não declarou nada continua aparecendo como "sem declaração"
+no painel, como antes — só não tem arquivo.
+
+O crédito "Derivado do Programa de Resultados — COBIB" saiu da janela
+"Sobre o programa". A origem continua registrada onde importa para
+quem mantém o programa: neste arquivo e no project_design.md.
+
+Ausências: férias, licença, recesso, outro
+------------------------------------------
+Em "Meus horários", abaixo das declarações, há agora o registro de
+ausências: escolhe-se o tipo, o primeiro e o último dia, e uma
+observação, se quiser. Os quatro tipos estão no catalogo.js; a chave
+que vai para o arquivo ("ferias", "licenca", "recesso", "outro") nunca
+muda — só o rótulo pode mudar.
+
+Ausência sempre tem último dia. Quem ainda não sabe quando volta
+registra a data prevista e encerra antes, se for o caso. Uma ausência
+sem fim seria uma pessoa que some do painel para sempre por esquecer
+de voltar.
+
+As regras de vida são as mesmas das declarações, pelo mesmo motivo: o
+painel consulta o passado, e o passado não se reescreve. A ausência que
+ainda não começou pode ser excluída; a que está em curso pode ser
+encerrada mais cedo, de hoje em diante; a que já passou fica. Duas
+ausências da mesma pessoa não podem cobrir o mesmo dia.
+
+A ausência NÃO encerra as declarações. Quem tira férias em dezembro
+continua com o horário de sempre declarado de setembro a junho: a
+ausência só diz que, naqueles dias, a pessoa não está. Encerrar e
+redeclarar o horário a cada férias seria trabalho à toa e apagaria a
+continuidade que a linha do tempo mostra.
+
+No painel
+---------
+Numa data, quem está ausente sai da cobertura. A grade continua com as
+mesmas horas e os mesmos dias, e a hora que só o ausente cobria aparece
+como zero — hora descoberta, que é exatamente a informação que a
+ausência traz. Uma primeira versão tirava a pessoa e, com ela, as horas
+que ela cobria; a grade encolhia e o buraco sumia da tela. A nota
+embaixo do gráfico diz quem saiu da conta.
+
+Num mês, ninguém sai da cobertura: uma semana de férias não apaga as
+outras três, e a grade do mês responde "em que horas houve alguém em
+algum momento". A nota diz isso, e quem quiser ver o efeito das
+ausências escolhe uma data.
+
+Há também um indicador "Ausentes", uma tabela de ausências com o seu
+próprio CSV, a marca "ausente: férias" ao lado da declaração de quem
+está fora, e as ausências na linha do tempo, em raias próprias e com
+textura — nem verde, que é declaração vigente, nem o cinza liso das
+demais declarações.
 
 A versão 0.4 completa o Painel com três gráficos: a cobertura por hora
 e dia da semana, as horas por semana de cada pessoa e a linha do tempo
@@ -225,8 +303,8 @@ A situação (vigente, futura, encerrada) nunca é gravada: é calculada
 contra o dia de hoje sempre que a tela abre. Uma declaração vigente
 ontem pode amanhecer encerrada sem que ninguém toque no arquivo.
 
-Quando a faixa não fecha com a jornada
---------------------------------------
+Quando a faixa não fecha com a jornada (até a v0.4 — ver a v0.5)
+-----------------------------------------------------------------
 Alguém com jornada de 8h que declara das 8h às 14h está declarando 6h.
 Pode estar certo — jornada reduzida naquele período — ou pode ter errado
 a digitação, e o programa não tem como distinguir uma coisa da outra.
@@ -494,9 +572,10 @@ Limitações assumidas desde o início
 - Só funciona no Chrome e no Edge, por causa do acesso à pasta.
 - Não há tempo real: "Atualizar dados da rede" relê os arquivos.
 - Cada pessoa aponta a pasta uma vez em cada computador.
-- Tudo é autodeclarado: nem horário nem jornada são conferidos.
-- O mapa de cobertura não conhece feriados nem ausências, e conta a
-  hora inteira (quem sai às 12h30 conta na hora das 12h).
+- Tudo é autodeclarado: nem horário nem ausência são conferidos.
+- O mapa de cobertura não conhece feriados, e conta a hora inteira
+  (quem sai às 12h30 conta na hora das 12h). Ausências só saem da
+  conta num recorte por data, não num mês.
 - Sem as permissões NTFS recomendadas, a proteção é só contra uso
   casual.
 - Publicar sem trocar a versão no versao.js continua servindo a

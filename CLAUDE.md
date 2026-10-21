@@ -99,8 +99,8 @@ not access control; scope lives in `podeVer(v)`.
 
 **Styling.** CSS custom properties in `:root` with pt-BR names (`--tinta`, `--papel`,
 `--ficha`, `--verde`, `--dourado`, `--grafite`, `--linha`, `--raio`). Colors carry
-meaning — **green is a current declaration, gold is a mismatch between the declared
-range and the workday** — so do not reuse them decoratively. Keep
+meaning — **green is a current declaration** — so do not reuse it decoratively. The
+gold token was removed in v0.5 along with the jornada (decision 12.9). Keep
 `[hidden]{display:none !important}`.
 
 ## Domain model
@@ -111,20 +111,15 @@ range and the workday** — so do not reuse them decoratively. Keep
   leitores per unit, many admins. The last `adm` cannot be removed.
 - **Declaration** (`project_design.md` 5.1): period `de`…`ate` (`ate: null` = open
   ended), weekdays `dias` (0 = Sunday), one range `inicio`–`fim` per declaration
-  (split shifts are two declarations; crossing midnight is refused), `carga` and
-  `unidade` stamped as snapshots.
+  (split shifts are two declarations; crossing midnight is refused), `unidade`
+  stamped as a snapshot. There is **no jornada** since v0.5 (12.9): never ask for it;
+  `cargaHoraria`/`carga` in old files are left untouched and unread.
 - **Collision** only when period + weekday + hour all overlap.
 - **Lifecycle**: delete only before it starts (`de` > today); end a current one by
   setting `ate` to today or later (only shortening); never edit one that has started;
   "substituir" ends the current on the eve of the new start (today or later) and
   creates the new one in a single write. Status (vigente/futura/encerrada) is
   computed against today, never stored.
-- **Divergence** (gold) compares the jornada with the day's total across all
-  declarations valid together on that weekday — not each declaration alone, so a
-  split shift is not flagged.
-- **Every write** to a person's file goes through `atualizarArquivoPessoa`, which
-  reads with `lerArquivoParaGravar` (missing ≠ unreadable), rebuilds the state with
-  **all** keys of the file, applies the change and rewrites it.
 - **Panel** (leitor and adm, scoped by `unidadesVisiveis()`): declarations are
   attributed to the **file owner** (registry name whose slug is the file name), never
   to the `pessoa` field inside; invalid declarations are skipped, not fatal, and kept
@@ -134,9 +129,15 @@ range and the workday** — so do not reuse them decoratively. Keep
 - **Charts** (panel, v0.4) are HTML/CSS fed by the same `recortePainel()` as the
   table and CSV — never a second computation. Coverage counts distinct people per
   weekday-hour (whole hour), on a validated single-green ramp with zero in grey;
-  bars are neutral ink, gold only for divergence from jornada × 5; weekly hours only
+  bars are neutral ink, one series; weekly hours only
   in date mode. Tooltips use `textContent` and also show on keyboard focus.
-- **Reserved names**, not used in 1.0: keys `realizados` and `ausencias`.
+- **Absences** (`ausencias`, v0.5) live in the person's file: `{id, pessoa, unidade,
+  tipo, de, ate, obs, criadaEm}`, `tipo` from `TIPOS_AUSENCIA` keys in `catalogo.js`
+  (never rename a key), `ate` required, no overlap between one person's absences,
+  same end/delete lifecycle as declarations. They never end declarations. In the
+  panel they remove the person from coverage on the reference date only (the grid
+  keeps its hours so uncovered hours show as zero); in month mode nobody is removed.
+- **Reserved name**, not used in 1.0: key `realizados`.
 
 ## Verifying changes
 
