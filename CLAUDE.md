@@ -126,6 +126,12 @@ range and the workday** — so do not reuse them decoratively. Keep
 - **Every write** to a person's file goes through `atualizarArquivoPessoa`, which
   reads with `lerArquivoParaGravar` (missing ≠ unreadable), rebuilds the state with
   **all** keys of the file, applies the change and rewrites it.
+- **Panel** (leitor and adm, scoped by `unidadesVisiveis()`): declarations are
+  attributed to the **file owner** (registry name whose slug is the file name), never
+  to the `pessoa` field inside; invalid declarations are skipped, not fatal, and kept
+  in the file. Table filters by the stamped unit, "sem declaração" by the current
+  registry unit; unreadable files are never counted as "sem declaração". CSV cells
+  starting with `= + - @` are prefixed with `'`.
 - **Reserved names**, not used in 1.0: keys `realizados` and `ausencias`.
 
 ## Verifying changes
