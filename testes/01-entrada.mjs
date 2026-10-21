@@ -151,7 +151,16 @@ export default async function (t) {
   console.log("10. Ajuda e Sobre antes de entrar");
   await clica("#btnAjuda"); await dorme(200);
   confere(await ev(vis("vAjuda")), "ajuda abre sem identidade");
-  confere((await ev(`document.querySelector(".pendente").textContent`)).includes("Texto pendente"), "marcador LGPD pendente visível");
+  const lgpd = await ev(`document.querySelector(".aviso-lgpd").textContent.replace(/\\s+/g, " ")`);
+  confere(!(await ev(`!!document.querySelector(".pendente")`)) && !lgpd.includes("pendente"), "marcador de texto pendente removido");
+  confere(["Propósito:", "Base Legal:", "Acesso aos Dados:", "Tempo de Guarda:", "Seus Direitos:"].every(k => lgpd.includes(k)),
+    "aviso LGPD com os cinco itens aprovados");
+  /* Os dois itens que descrevem o programa têm de continuar verdadeiros:
+     quem lê (leitores e administradores, e leitura na pasta) e o que não
+     existe (aprovação, pontuação). Se o programa mudar, o texto muda junto. */
+  confere(lgpd.includes("leitores designados para a sua unidade e pelos administradores") &&
+    lgpd.includes("têm acesso de leitura") && lgpd.includes("Não há aprovação, pontuação nem medição de desempenho"),
+    "itens factuais do aviso batem com o programa");
   await clica("#btnSobre"); await dorme(200);
   confere(await ev(`document.getElementById("dlgSobre").open`) && (await ev(txt("sobreVersao"))) === "Versão " + await ev("APP.versao"), "Sobre mostra a versão");
 

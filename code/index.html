@@ -359,8 +359,7 @@ dialog h2{font-family:var(--serif); font-weight:400; font-size:21px; margin:0 0 
 .ajuda p, .ajuda ul, .ajuda ol{margin:0 0 10px; font-size:13.5px}
 .ajuda ul, .ajuda ol{padding-left:20px}
 .ajuda li{margin-bottom:5px}
-.ajuda .pendente{border:1px dashed var(--linha-campo); border-radius:var(--raio-p);
-  padding:11px 13px; margin:12px 0 0; color:var(--grafite)}
+.ajuda .aviso-lgpd li{margin-bottom:8px}
 
 /* ===================== TELAS ESTREITAS =====================
    O rail vira uma barra no topo, que rola na horizontal. */
@@ -985,18 +984,32 @@ dialog h2{font-family:var(--serif); font-weight:400; font-size:21px; margin:0 0 
       </div>
 
       <div class="cartao">
-        <h2>Seus dados</h2>
-        <div style="margin-top:12px">
-          <p>O horário em que você declara estar no trabalho é dado pessoal. Ele fica num
-            arquivo só seu, na pasta da rede, e é lido pelos leitores da sua unidade e pela
-            administração.</p>
-          <!-- Texto que o programa NÃO pode inventar: finalidade e base legal
-               são redigidas por quem responde pelo dado no órgão
-               (project_design.md, 12.7). O marcador fica visível de
-               propósito até lá. -->
-          <p class="pendente"><b>Texto pendente.</b> A finalidade do tratamento e a base
-            legal serão informadas aqui pela área responsável pelos dados do órgão.</p>
-        </div>
+        <h2 id="avisoLgpd">Aviso de Privacidade e Proteção de Dados (LGPD)</h2>
+        <!-- Texto aprovado (project_design.md, 12.7; issue #17). Não reescreva:
+             "Base legal", "Tempo de guarda" e "Seus direitos" são texto
+             jurídico de quem responde pelo dado. "Propósito" e "Acesso aos
+             dados" descrevem o que o programa de fato faz, e têm de mudar
+             junto se o programa mudar quem lê o quê. -->
+        <ul class="aviso-lgpd" style="margin-top:12px">
+          <li><b>Propósito:</b> Os horários e períodos de disponibilidade e as ausências que
+            você declara neste aplicativo são usados exclusivamente para organizar a
+            cobertura do serviço da sua unidade. Não há aprovação, pontuação nem medição de
+            desempenho.</li>
+          <li><b>Base Legal:</b> O tratamento é realizado em conformidade com a Lei Geral de
+            Proteção de Dados (Lei nº 13.709/2018), fundamentado no cumprimento de obrigações
+            legais e no legítimo interesse da empresa para a execução de contratos de
+            trabalho.</li>
+          <li><b>Acesso aos Dados:</b> No aplicativo, suas declarações são vistas por você,
+            pelos leitores designados para a sua unidade e pelos administradores do
+            aplicativo. Os arquivos ficam numa pasta de rede da organização, onde as pessoas
+            que usam o aplicativo têm acesso de leitura.</li>
+          <li><b>Tempo de Guarda:</b> Os dados serão mantidos por tempo indeterminado enquanto
+            houver necessidade operacional ou obrigação legal de arquivamento.</li>
+          <li><b>Seus Direitos:</b> Você pode, a qualquer momento, solicitar a confirmação da
+            existência do tratamento, o acesso aos seus dados, a correção de informações
+            incompletas ou incorretas e esclarecimentos sobre o uso através do canal do
+            Encarregado de Dados (DPO) da empresa.</li>
+        </ul>
       </div>
     </div>
   </div>
