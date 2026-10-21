@@ -470,7 +470,9 @@ Cada uma com mensagem própria, nunca falha silenciosa:
   meia-noite se declara como dois horários";
 - nenhum dia da semana marcado;
 - `ate` anterior a `de`;
-- colisão com outra declaração da mesma pessoa, citando qual (período + dia + hora);
+- dias marcados que não ocorrem dentro do período;
+- colisão com outra declaração da mesma pessoa, citando qual (período + dia + hora, com o
+  dia em comum ocorrendo no trecho em que os períodos se sobrepõem);
 - arquivo da pessoa ilegível: não grava, cita o nome do arquivo e manda procurar o
   administrador;
 - `config.json` ilegível: ninguém entra, administradores inclusive;
@@ -599,6 +601,7 @@ histórico abaixo.
 | Versão | Data | O que entrou |
 |---|---|---|
 | v0.1 | out/2026 | Entrada (conexão, selo, oficialização pelo primeiro administrador, identificação com jornada), Administração (unidades, pessoas, papéis `leitor`/`adm`, senhas, conferência de `atualizadoEm`), Ajuda, Sobre, PWA. |
+| v0.2 | out/2026 | Meus horários: formulário com total ao vivo, recusas de 7.2, colisão conferida contra o arquivo relido, encerrar/substituir/excluir, divergência por dia, grade da semana. |
 
 ---
 
@@ -688,6 +691,12 @@ de uma pessoa escritora, e a gravação ganha a conferência de `atualizadoEm` (
   nova data (por exemplo, em 30/09) e declara a nova a partir dela (01/10), as duas
   coisas **numa única gravação** por `atualizarArquivoPessoa`.
 
+Limites fixados na v0.2: encerrar escolhe um último dia **de hoje em diante**, que
+só antecipa o fim já existente; substituir começa **hoje ou depois**, e depois do
+início da atual. Declarar um período que começou no passado é permitido (adoção do
+programa no meio do semestre), com aviso de que a declaração não poderá ser excluída.
+A situação (vigente, futura, encerrada) é calculada contra hoje, nunca gravada.
+
 Alternativa descartada: edição livre. É mais simples na tela, mas apaga o histórico
 que o painel consulta por mês.
 
@@ -760,7 +769,7 @@ v1.13 de origem), ausências (12.5), tabela de feriados opcional.
 | **Encerrar** | Preencher `ate` numa declaração vigente. Única alteração permitida depois que ela começou. |
 | **Excluir** | Apagar uma declaração que ainda não começou (`de` > hoje). |
 | **Substituir** | Encerrar a vigente na véspera e declarar a nova, numa só gravação. |
-| **Divergência** | Faixa diária diferente da jornada. Exibida em dourado, nunca corrigida. |
+| **Divergência** | Total do dia (soma das declarações que valem juntas naquele dia da semana) diferente da jornada. Exibida em dourado, nunca corrigida. |
 | **Cobertura** | Quantas pessoas declararam estar em atividade numa hora de um dia da semana. |
 | **Selo** | UUID gravado no `config.json` que identifica a pasta oficial. |
 | **Escritor único** | Regra pela qual cada arquivo tem um só papel que o grava. Nos arquivos de declaração, também uma só pessoa; no `config.json`, vários administradores, com conferência de `atualizadoEm`. |

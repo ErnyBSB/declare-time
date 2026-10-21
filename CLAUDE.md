@@ -116,8 +116,13 @@ range and the workday** — so do not reuse them decoratively. Keep
   `unidade` stamped as snapshots.
 - **Collision** only when period + weekday + hour all overlap.
 - **Lifecycle**: delete only before it starts (`de` > today); end a current one by
-  setting `ate`; never edit one that has started; "substituir" ends the current and
-  creates the new one in a single write.
+  setting `ate` to today or later (only shortening); never edit one that has started;
+  "substituir" ends the current on the eve of the new start (today or later) and
+  creates the new one in a single write. Status (vigente/futura/encerrada) is
+  computed against today, never stored.
+- **Divergence** (gold) compares the jornada with the day's total across all
+  declarations valid together on that weekday — not each declaration alone, so a
+  split shift is not flagged.
 - **Every write** to a person's file goes through `atualizarArquivoPessoa`, which
   reads with `lerArquivoParaGravar` (missing ≠ unreadable), rebuilds the state with
   **all** keys of the file, applies the change and rewrites it.
