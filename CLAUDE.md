@@ -42,9 +42,9 @@ Section 13 is the roadmap.
    (JSON fields, role names, `localStorage` keys) — add a new versioned key instead.
 4. **Legible to non-technical staff.** UI, code comments, and docs are **pt-BR**.
    The interface explains refusals rather than failing silently.
-5. **Accessible and dependency-light.** Native elements first. ECharts is the only
-   vendored library, and it is vendored, not fetched. The declarations timeline is
-   plain HTML/CSS, not ECharts.
+5. **Accessible and dependency-light.** Native elements first. There is **no
+   library at all**: the panel charts are plain HTML/CSS (decision 12.6) — do not
+   bring ECharts or any other chart library back.
 
 ## Layout
 
@@ -58,7 +58,6 @@ code/                    the app — one copy, always the current version
   sw.js                  service worker; cache key "dt-" + versao
   manifest.webmanifest   PWA metadata (name shows on the installed icon)
   gerar-senha.html       standalone tool: sha256("nome|senha")
-  echarts.min.js         vendored chart library (phase 4)
   icons/                 icon-192.png, icon-512.png — required for offline install
   LEIA-ME.txt            the real documentation: what changed and WHY
 project_design.md        structured reference: schemas, roles, decisions, roadmap
@@ -132,6 +131,11 @@ range and the workday** — so do not reuse them decoratively. Keep
   in the file. Table filters by the stamped unit, "sem declaração" by the current
   registry unit; unreadable files are never counted as "sem declaração". CSV cells
   starting with `= + - @` are prefixed with `'`.
+- **Charts** (panel, v0.4) are HTML/CSS fed by the same `recortePainel()` as the
+  table and CSV — never a second computation. Coverage counts distinct people per
+  weekday-hour (whole hour), on a validated single-green ramp with zero in grey;
+  bars are neutral ink, gold only for divergence from jornada × 5; weekly hours only
+  in date mode. Tooltips use `textContent` and also show on keyboard focus.
 - **Reserved names**, not used in 1.0: keys `realizados` and `ausencias`.
 
 ## Verifying changes

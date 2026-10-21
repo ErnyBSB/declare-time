@@ -1,4 +1,4 @@
-DECLARAÇÃO DE DISPONIBILIDADE (versão 0.3, out/26 — PWA em rede)
+DECLARAÇÃO DE DISPONIBILIDADE (versão 0.4, out/26 — PWA em rede)
 ================================================================
 
 Este arquivo é a documentação de verdade do programa. Não é uma lista
@@ -11,9 +11,68 @@ A referência estruturada — esquemas, tabelas, papéis, roteiro — fica no
 project_design.md, na raiz do repositório. Os dois dizem a mesma coisa
 de jeitos diferentes: lá, para consultar; aqui, para entender.
 
-A versão 0.3 traz o Painel: leitores veem as declarações das unidades
-que acompanham, e administradores veem o conjunto, com indicadores,
-tabela e exportação em CSV. Os gráficos chegam na 0.4.
+A versão 0.4 completa o Painel com três gráficos: a cobertura por hora
+e dia da semana, as horas por semana de cada pessoa e a linha do tempo
+das declarações.
+
+Os gráficos (novidade da v0.4)
+------------------------------
+Os três ficam no Painel, entre os indicadores e a tabela, e saem do
+MESMO recorte que a tabela e o CSV: mesma data ou mês, mesma unidade,
+mesma pessoa. Se um gráfico e a tabela discordarem, é defeito. Os
+gráficos servem para achar onde olhar; o número exato está na tabela.
+
+Cobertura por hora e dia da semana. Uma grade com as horas nas linhas
+e os dias nas colunas; cada célula diz quantas PESSOAS declararam estar
+disponíveis naquela hora. Pessoas, e não declarações: quem tem duas
+declarações na mesma hora (a antiga e a nova, num mês em que trocou de
+horário) conta uma vez. O zero aparece escrito, num cinza diferente de
+todos os verdes, porque é a informação mais importante da grade: hora
+descoberta. Passar o ponteiro numa célula mostra quem a cobre.
+
+Horas por semana, por pessoa. Uma barra por pessoa, em ordem
+alfabética; um traço marca a jornada × 5, e a barra que não bate com
+ele sai em dourado. "Ordenar por volume" existe, mas não é o padrão:
+ordenar por horas transforma o gráfico num ranking que o dado não
+sustenta, porque ninguém confere se as horas declaradas foram
+cumpridas. Como o indicador de horas, este gráfico só aparece numa
+data, e não num mês.
+
+Linha do tempo. Uma faixa por pessoa no eixo das datas, com os
+períodos declarados: os buracos entre uma declaração e outra, e as
+sobreposições. É o gráfico que responde à parte "períodos" do nome do
+programa. A janela é o mês escolhido, ou três meses para cada lado da
+data de referência. Declarações que valem ao mesmo tempo (a manhã e a
+tarde de uma jornada partida) ficam uma sob a outra, em vez de uma
+esconder a outra. Borda reta quer dizer que a declaração continua além
+da janela.
+
+Por que sem biblioteca de gráficos
+----------------------------------
+O plano era trazer do projeto de origem o mesmo echarts.min.js, uma
+compilação própria do ECharts. Ao abri-lo, o arquivo se mostrou um
+bloco de 533 KB sem o cabeçalho da licença (o ECharts é Apache-2.0, e
+redistribuí-lo pede o aviso) e sem registro de qual versão era. Para o
+que este programa desenha — uma grade, que é uma tabela, e barras —, o
+custo não se pagava: meio megabyte a mais no cache offline de cada
+computador, e um arquivo que ninguém saberia atualizar.
+
+Em HTML, o gráfico é texto de verdade: o leitor de tela lê os números
+da grade, a impressão sai igual à tela, a dica aparece também no foco
+do teclado, e nada depende de rede. E some uma regra herdada que só
+existia por causa da biblioteca: desenhar o gráfico depois que o
+contêiner fica visível, porque o ECharts media altura zero no que
+estava oculto.
+
+As cores seguem o resto do programa. Verde continua sendo "vigente": a
+cobertura usa uma rampa de um só verde, do claro ao escuro, e a linha
+do tempo pinta de verde o que vale na data. Dourado continua sendo
+divergência, e só isso. A rampa da cobertura foi conferida com um
+validador, e não a olho: os quatro tons ficam em ordem de claridade,
+com degraus visíveis entre eles, e o mais claro ainda se distingue do
+branco — senão "uma pessoa" se confundiria com "ninguém". O número
+dentro da célula vai em tinta ou em branco, conforme o fundo, sempre
+acima do contraste mínimo de leitura.
 
 O Painel (novidade da v0.3)
 ---------------------------
