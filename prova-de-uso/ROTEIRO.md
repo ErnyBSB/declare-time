@@ -11,9 +11,11 @@ completo está em `code/LEIA-ME.txt`, na parte "Para quem vai instalar e manter"
 estrutura das pastas, em `project_design.md`, 4.2.
 
 > **O repositório é público.** Nenhum nome real, senha, `config.json` ou arquivo de
-> declaração vai para issues, comentários ou capturas de tela. Ao relatar um problema,
-> descreva-o com o elenco inventado (Helena Barros, Ana Beatriz Nunes, Carlos Eduardo
-> Prado, Marina Duarte, Roberto Aguiar).
+> declaração vai para issues, comentários ou capturas de tela. A cópia preenchida
+> deste roteiro também não: ela tem nomes e caminhos reais, e fica com quem coordena
+> (o `.gitignore` barra arquivos com "preenchido" ou "preenchida" no nome). Ao
+> relatar um problema, descreva-o com o elenco inventado (Helena Barros, Ana Beatriz
+> Nunes, Carlos Eduardo Prado, Marina Duarte, Roberto Aguiar).
 
 ---
 
@@ -31,6 +33,9 @@ estrutura das pastas, em `project_design.md`, 4.2.
 ### TI — pastas
 
 - [ ] Pasta administrativa criada: `\\________\________\`
+      (caminho de rede completo, começando com `\\SERVIDOR\`, ou uma letra de
+      unidade mapeada igual em todos os computadores, como `Z:\`. Um caminho que
+      começa com uma barra só depende da unidade de cada computador.)
 - [ ] `code\` com a pasta `code/` da **última tag** publicada (versão no rodapé de
       "Sobre o programa": ______).
 - [ ] `code\catalogo.js` com `PASTA_REDE` trocado pelo caminho real de
@@ -38,6 +43,31 @@ estrutura das pastas, em `project_design.md`, 4.2.
 - [ ] `Compartilhamento\` criada, vazia, ao lado de `code\`.
 - [ ] `Compartilhamento\declaracoes\` criada, vazia (o programa a criaria na primeira
       declaração, mas as permissões dela precisam existir antes).
+
+### Se a prova começar sem as permissões NTFS
+
+A prova pode começar antes de a TI aplicar as permissões — para não esperar e já
+colher o uso do dia a dia —, desde que se saiba o que fica de fora:
+
+- **Sem as permissões, nada fora do programa impede ninguém de mexer em nada.** Pelo
+  Explorador do Windows, qualquer participante consegue abrir, alterar ou **apagar**
+  qualquer arquivo de `Compartilhamento\` — o `config.json` e as declarações dos
+  outros. O programa continua gravando só o arquivo de quem está identificado e só
+  deixa administradores mudarem o cadastro; o que falta é a barreira de fora dele.
+- **Enquanto isso, três cuidados:**
+  - uma **cópia diária** de `Compartilhamento\` inteira, guardada fora dela, por quem
+    coordena (ver "Ensaio de cópia de segurança" para restaurar);
+  - pedir aos participantes que **não abram nem editem** os arquivos de
+    `Compartilhamento\` pelo Explorador: tudo pelo programa;
+  - se aparecer um arquivo de declaração que ninguém reconhece, ou um `config.json`
+    alterado sem passar pela Administração, anotar e relatar (seção 4).
+- **O que dá para conferir sem as permissões:** declarar, substituir, encerrar e
+  excluir; ausências; o Painel, os CSV e o recorte do leitor (que é de tela); dois
+  administradores salvando ao mesmo tempo; vários computadores, Chrome e Edge.
+- **O que só se confere com elas:** a seção "TI — permissões" e a tabela "TI —
+  conferência com duas contas de teste", logo abaixo. Elas são a razão principal da
+  prova: **a prova só se encerra (seção 5) com as duas feitas**, numa segunda etapa,
+  ainda na mesma pasta.
 
 ### TI — permissões
 
@@ -187,6 +217,9 @@ Nunca nomes reais, senhas, nem o conteúdo dos arquivos.
 ## 5. Encerramento
 
 - [ ] Todos os itens acima marcados — ou, os que não, com relato aberto e decisão.
+- [ ] Se a prova começou sem as permissões NTFS: "TI — permissões" e "TI —
+      conferência com duas contas de teste" feitas depois, na mesma pasta, sem
+      perder nada do que foi declarado.
 - [ ] Os ajustes encontrados publicados (v0.8 em diante) e conferidos na mesma pasta.
 - [ ] No `project_design.md`, 10.3, o item **Prova de uso** marcado.
 - [ ] Issue #20 fechada.

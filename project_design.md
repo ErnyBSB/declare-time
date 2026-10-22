@@ -757,7 +757,9 @@ nome. Só se marca a *tag* com tudo isto feito:
 - [x] LEIA-ME completo, com instalação, permissões, cópia de segurança e publicação.
 - [ ] **Prova de uso** (fase 5, issue #20): uma unidade real, numa pasta real, com as
       permissões NTFS aplicadas e conferidas pela TI, seguindo
-      `prova-de-uso/ROTEIRO.md`; ajustes do que aparecer.
+      `prova-de-uso/ROTEIRO.md`; ajustes do que aparecer. A prova pode **começar** sem
+      as permissões (só o uso do dia a dia, com cópia diária dos dados), mas este item
+      só se marca depois que a TI as aplicar e conferir, na mesma pasta.
 - [x] **Texto de finalidade da LGPD** na Ajuda (12.7, issue #17), e o teste de 01
       atualizado (v0.7).
 - [ ] `node testes/rodar.mjs` passando sobre a 1.0 e registrado em `testes/REGISTRO.md`
