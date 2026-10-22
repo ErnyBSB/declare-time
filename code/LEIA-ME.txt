@@ -675,7 +675,9 @@ O programa foi desenhado para caber nas permissões do Windows (NTFS):
 cada arquivo tem um só escritor. A receita abaixo é o ponto de partida;
 CONFIRA COM A ÁREA DE TI numa pasta de teste, com uma pessoa comum e
 um administrador, antes de usar com dados reais — é para isso que
-existe a prova de uso (fase 5 do project_design.md).
+existe a prova de uso (fase 5 do project_design.md). O roteiro da
+prova, no repositório (prova-de-uso/ROTEIRO.md), traz os comandos
+icacls que aplicam esta receita e a tabela de testes para conferi-la.
 
 - Na pasta administrativa: todos leem e listam.
 - Em code\: todos leem e executam; só quem publica versões modifica.

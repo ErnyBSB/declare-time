@@ -64,6 +64,8 @@ testes/                  end-to-end browser tests (dev tooling, not part of the 
   rodar.mjs              runner: node testes/rodar.mjs [prefixes…]
   navegador.mjs          harness: static server, headless Chrome over CDP, OPFS folder
   NN-*.mjs               one suite per version (01-entrada … 05-ausencias)
+prova-de-uso/ROTEIRO.md  phase 5 trial guide (pt-BR): setup, icacls permissions, tasks
+.github/ISSUE_TEMPLATE/  "Prova de uso: relato" issue template (privacy reminder)
 project_design.md        structured reference: schemas, roles, decisions, roadmap
 ```
 

@@ -217,6 +217,8 @@ code/                    o aplicativo: uma cópia só, sempre a versão atual
   icons/                 icon-192.png, icon-512.png
   LEIA-ME.txt            o porquê de cada decisão, em prosa
 testes/                  testes ponta a ponta no navegador (node testes/rodar.mjs)
+prova-de-uso/ROTEIRO.md  roteiro da fase 5: preparação, permissões (icacls), tarefas, relato
+.github/ISSUE_TEMPLATE/  modelo de issue "Prova de uso: relato"
 project_design.md        este documento
 CLAUDE.md                instruções para agentes de IA
 README.md                apresentação curta
@@ -275,7 +277,8 @@ duas subpastas lado a lado:
   intocado. A cópia de segurança é a de `Compartilhamento\` inteira.
 
 **Permissões NTFS, por pasta** (ponto de partida; conferir com a TI na prova de uso,
-issue #20, como descreve a LEIA-ME):
+issue #20). Os comandos `icacls` que aplicam esta tabela e a conferência com duas
+contas de teste estão em `prova-de-uso/ROTEIRO.md`:
 
 | Pasta | Todos que usam o programa | Administradores do programa | Quem publica versões |
 |---|---|---|---|
@@ -748,8 +751,9 @@ nome. Só se marca a *tag* com tudo isto feito:
 - [x] Contrato dos arquivos escrito (5.6) e conferido por `testes/06-contrato.mjs`.
 - [x] A 1.x recusa gravar por cima de arquivo de formato mais novo (5.6, regra 4).
 - [x] LEIA-ME completo, com instalação, permissões, cópia de segurança e publicação.
-- [ ] **Prova de uso** (fase 5): uma unidade real, numa pasta real, com as permissões
-      NTFS da LEIA-ME aplicadas e conferidas pela TI; ajustes do que aparecer.
+- [ ] **Prova de uso** (fase 5, issue #20): uma unidade real, numa pasta real, com as
+      permissões NTFS aplicadas e conferidas pela TI, seguindo
+      `prova-de-uso/ROTEIRO.md`; ajustes do que aparecer.
 - [x] **Texto de finalidade da LGPD** na Ajuda (12.7, issue #17), e o teste de 01
       atualizado (v0.7).
 - [ ] `node testes/rodar.mjs` passando, e conferência à mão em várias abas.
@@ -950,7 +954,7 @@ declaração ou ausência.
 | **2. Declarar** | Tela *Meus horários*: formulário, total ao vivo, recusas de 7.2, colisão, encerrar/excluir/substituir, grade semanal. `atualizarArquivoPessoa`. | v0.2 |
 | **3. Painel** | Filtros, indicadores, tabela, CSV, "arquivos sem cadastro"; recorte por `unidadesVisiveis()` para o leitor. | v0.3 |
 | **4. Gráficos** | Mapa de cobertura, horas por semana, linha do tempo, todos em HTML/CSS (12.6). | v0.4 |
-| **5. Prova de uso** | Teste com uma unidade real, numa pasta real, com permissões NTFS aplicadas. Ajustes — o primeiro lote (#13: jornada, crédito, ausências) saiu na v0.5. | v0.5… |
+| **5. Prova de uso** | Teste com uma unidade real, numa pasta real, com permissões NTFS aplicadas. Ajustes — o primeiro lote (#13: jornada, crédito, ausências) saiu na v0.5. Roteiro em `prova-de-uso/ROTEIRO.md`; relatos pelo modelo de issue "Prova de uso: relato" (#20). | v0.5… |
 | **6. Produção** | Esquema congelado, LEIA-ME completo, Ajuda com o texto de 12.7. Preparada em out/2026 (contrato 5.6, teste 06, guia de instalação na LEIA-ME; aviso LGPD na v0.7); a *tag* espera a prova de uso (10.3, #20). | **v1.0** |
 
 Depois da 1.0, nesta ordem de custo/benefício: relatório impresso (o mecanismo da
