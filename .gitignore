@@ -24,6 +24,10 @@ dados/
 teste/
 teste-*/
 
+# Saída de execuções avulsas dos testes. As execuções registradas (uma por
+# versão publicada) vão para testes/resultados/ e entram no repositório.
+resultado-testes*.txt
+
 # Cópia local do catálogo com dados de verdade, se alguém preferir
 # trabalhar assim em vez de cadastrar pelo painel de Administração.
 *.local.js
