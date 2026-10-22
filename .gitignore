@@ -28,6 +28,11 @@ teste-*/
 # versão publicada) vão para testes/resultados/ e entram no repositório.
 resultado-testes*.txt
 
+# Roteiro da prova de uso preenchido: tem nomes, unidade e caminhos reais, e
+# fica com quem coordena. Só o modelo em branco (prova-de-uso/ROTEIRO.md) entra.
+# O padrão pega "preenchido", "prreenchido" e "preenchida".
+*reenchid*
+
 # Cópia local do catálogo com dados de verdade, se alguém preferir
 # trabalhar assim em vez de cadastrar pelo painel de Administração.
 *.local.js
