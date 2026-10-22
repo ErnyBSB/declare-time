@@ -63,7 +63,9 @@ code/                    the app — one copy, always the current version
 testes/                  end-to-end browser tests (dev tooling, not part of the app)
   rodar.mjs              runner: node testes/rodar.mjs [prefixes…]
   navegador.mjs          harness: static server, headless Chrome over CDP, OPFS folder
-  NN-*.mjs               one suite per version (01-entrada … 05-ausencias)
+  NN-*.mjs               one suite per area (01-entrada … 06-contrato)
+  REGISTRO.md            registered run per published tag (pt-BR)
+  resultados/            full output of each registered run
 prova-de-uso/ROTEIRO.md  phase 5 trial guide (pt-BR): setup, icacls permissions, tasks
 .github/ISSUE_TEMPLATE/  "Prova de uso: relato" issue template (privacy reminder)
 project_design.md        structured reference: schemas, roles, decisions, roadmap
@@ -155,6 +157,11 @@ local port, drive headless Chrome over the DevTools Protocol, and replace only t
 folder picker and permission prompt: the network folder is the browser's OPFS, so
 the real `rede.js` reads and writes real files. `FOTOS=/some/dir` saves
 screenshots for a visual check; look at them after any layout change.
+
+**When a version is tagged, register its test run** in `testes/REGISTRO.md`: run
+the suites on the tag's code, save the output to `testes/resultados/<aaaa-mm-dd>_<versão>.txt`
+and add a row (date, version, commit, `node -v`, browser version, checks, failures).
+Ad-hoc `resultado-testes*.txt` files are git-ignored.
 
 **The file contract is frozen for v1.0** (`project_design.md` 5.6, checked by
 `testes/06-contrato.mjs`): only add keys, never rename, retype or reuse one, never

@@ -55,6 +55,11 @@ pedido de permissão, que precisariam de alguém clicando, são trocados.
 Um teste também falha se aparecer qualquer erro no console da página,
 mesmo que a tela pareça certa: erro calado é defeito esperando a hora.
 
+Cada versão publicada tem a execução dos testes registrada em
+testes/REGISTRO.md: data, ambiente, quantas conferências e quantas
+falhas, com a saída completa guardada ao lado. O primeiro registro é o
+da 0.7, em 22/10/2026: 181 conferências, nenhuma falha.
+
 Os testes usam só o Node — nenhum pacote de npm — e o Node é ferramenta
 de quem mantém o programa, não parte dele: o aplicativo continua
 abrindo com um duplo clique, sem instalar nada. E os testes não

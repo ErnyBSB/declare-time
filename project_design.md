@@ -217,6 +217,8 @@ code/                    o aplicativo: uma cópia só, sempre a versão atual
   icons/                 icon-192.png, icon-512.png
   LEIA-ME.txt            o porquê de cada decisão, em prosa
 testes/                  testes ponta a ponta no navegador (node testes/rodar.mjs)
+  REGISTRO.md            resultado registrado de cada versão publicada
+  resultados/            saída completa de cada execução registrada
 prova-de-uso/ROTEIRO.md  roteiro da fase 5: preparação, permissões (icacls), tarefas, relato
 .github/ISSUE_TEMPLATE/  modelo de issue "Prova de uso: relato"
 project_design.md        este documento
@@ -706,7 +708,9 @@ rel="manifest">` ficam condicionados a `location.protocol.startsWith("http")`.
 `node testes/rodar.mjs` (ou só algumas suítes: `node testes/rodar.mjs 02 05`). Eles
 sobem um servidor HTTP mínimo para `code/` e um Chrome sem tela, simulam a pasta da
 rede com o OPFS do navegador — o `rede.js` de verdade lê e grava arquivos de verdade —
-e falham também com qualquer erro no console da página. Só usam módulos do Node 22
+e falham também com qualquer erro no console da página. Cada versão publicada tem
+a execução registrada em `testes/REGISTRO.md` (a primeira: v0.7, 181 conferências,
+0 falhas), com a saída completa em `testes/resultados/`. Só usam módulos do Node 22
 (nenhum pacote npm): o Node é ferramenta de quem mantém o programa, nunca dependência
 do aplicativo. `CHROME=` indica o navegador; `FOTOS=<pasta>` guarda capturas de tela
 para conferir o layout a olho.
@@ -756,7 +760,9 @@ nome. Só se marca a *tag* com tudo isto feito:
       `prova-de-uso/ROTEIRO.md`; ajustes do que aparecer.
 - [x] **Texto de finalidade da LGPD** na Ajuda (12.7, issue #17), e o teste de 01
       atualizado (v0.7).
-- [ ] `node testes/rodar.mjs` passando, e conferência à mão em várias abas.
+- [ ] `node testes/rodar.mjs` passando sobre a 1.0 e registrado em `testes/REGISTRO.md`
+      (a v0.7 já passa: 181 conferências, 0 falhas), e conferência à mão em várias
+      abas.
 - [ ] `versao.js` em `1.0` (`versao`, `rotulo`, `atualizado`) e `git tag -a v1.0` no
       `main`, com a linha da v1.0 no histórico abaixo.
 
