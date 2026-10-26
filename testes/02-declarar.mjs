@@ -2,7 +2,8 @@
    02 — Meus horários: declarar (v0.2)
 
    As recusas do formulário, o total ao vivo, a colisão (período + dia + hora, conferida
-   contra o arquivo relido), substituir, encerrar, excluir e a grade da semana.
+   contra o arquivo relido), substituir, encerrar, excluir (inclusive o engano do dia,
+   v0.8) e a grade da semana.
 
    Roda com: node testes/rodar.mjs 02
    ========================================================= */
@@ -68,7 +69,7 @@ export default async function (t) {
   confere(await ev(`!!document.querySelector("#listaMinhas .decl.vigente .tag.vigente")`) &&
     await ev(`!document.querySelector(".tag.diverge, .divergente")`), "vigente marcada; nenhum aviso dourado");
   confere(await ev(`document.querySelector("#listaMinhas .obs").innerHTML.includes("&lt;b&gt;")`), "observação escapada");
-  confere(await ev(`!document.querySelector('#listaMinhas [data-excluir]')`), "vigente não oferece excluir");
+  confere(await ev(`!!document.querySelector('#listaMinhas [data-excluir="${A.id}"]')`), "vigente declarada hoje oferece excluir (engano do dia)");
 
   console.log("3. Colisão só quando período, dia e hora se cruzam");
   m = await declarar({ de: HOJE, dias: [2, 4], inicio: "14:00", fim: "16:00" });
@@ -86,9 +87,45 @@ export default async function (t) {
 
   console.log("5. Futura: excluir");
   m = await declarar({ de: iso(10), ate: iso(40), dias: [0], inicio: "08:00", fim: "12:00" });
-  confere(m.includes("gravada") && await ev(`!!document.querySelector('#listaMinhas [data-excluir]')`), "futura oferece excluir");
-  await clica('#listaMinhas [data-excluir]'); await dorme(500);
+  confere(m.includes("gravada") && await ev(`!!document.querySelector('#listaMinhas .futura [data-excluir]')`), "futura oferece excluir");
+  await clica('#listaMinhas .futura [data-excluir]'); await dorme(500);
   confere((await lerArq()).length === 3, "futura excluída");
+
+  console.log("5b. Engano do dia: excluir no dia em que foi declarada (v0.8)");
+  // O caso da prova de uso: começa e termina hoje. Sem a exceção, nenhuma ação servia.
+  const diaHoje = new Date(HOJE + "T00:00:00Z").getUTCDay();
+  m = await declarar({ de: HOJE, ate: HOJE, dias: [diaHoje], inicio: "20:00", fim: "21:00" });
+  let D = (await lerArq()).find(d => d.inicio === "20:00");
+  confere(m.includes("gravada") && D, "declaração só de hoje gravada");
+  confere(await ev(`!document.querySelector('[data-subst="${D.id}"], [data-encerrar="${D.id}"]')`) &&
+    await ev(`!!document.querySelector('[data-excluir="${D.id}"]')`), "só de hoje: sem substituir nem encerrar, com excluir");
+  m = await declarar({ de: HOJE, ate: HOJE, dias: [diaHoje], inicio: "20:00", fim: "22:00" });
+  confere(m.includes("Colide"), "enquanto existir, a nova colide com ela");
+  await clica(`[data-excluir="${D.id}"]`); await dorme(500);
+  confere(!(await lerArq()).some(d => d.id === D.id), "declarada hoje e já começada: excluída");
+  m = await declarar({ de: HOJE, ate: HOJE, dias: [diaHoje], inicio: "20:00", fim: "22:00" });
+  D = (await lerArq()).find(d => d.inicio === "20:00");
+  confere(m.includes("gravada") && D.fim === "22:00", "horário de hoje declarado de novo");
+
+  // A exceção se confere contra o arquivo relido: a tela ainda oferece, o arquivo diz "ontem".
+  const ontem = new Date(iso(-1) + "T12:00:00").toISOString();
+  let dado5 = JSON.parse(await ev(`__ler("declaracoes/roberto-aguiar.json")`));
+  dado5.declaracoes.find(d => d.id === D.id).criadaEm = ontem;
+  await ev(`__gravar("declaracoes/roberto-aguiar.json", ${JSON.stringify(JSON.stringify(dado5))})`);
+  await clica(`[data-excluir="${D.id}"]`); await dorme(500);
+  confere((await ev(aviso("avisoDecl"))).includes("não foi declarada hoje") &&
+    (await lerArq()).some(d => d.id === D.id), "declarada ontem segundo o arquivo: recusa e nada se apaga");
+
+  // Declarada noutro dia, ou em arquivo antigo sem criadaEm: continua sem excluir.
+  dado5.declaracoes.push({ ...D, id: "dec-1-semdata", de: iso(-5), ate: null, inicio: "22:00", fim: "23:00", criadaEm: undefined });
+  await ev(`__gravar("declaracoes/roberto-aguiar.json", ${JSON.stringify(JSON.stringify(dado5))})`);
+  await clica("#btnAtualizar"); await dorme(700);
+  confere(await ev(`!document.querySelector('[data-excluir="${D.id}"], [data-excluir="dec-1-semdata"]')`),
+    "declarada ontem ou sem criadaEm: sem excluir");
+  dado5.declaracoes = dado5.declaracoes.filter(d => d.id !== D.id && d.id !== "dec-1-semdata");
+  await ev(`__gravar("declaracoes/roberto-aguiar.json", ${JSON.stringify(JSON.stringify(dado5))})`);
+  await clica("#btnAtualizar"); await dorme(700);
+  confere((await lerArq()).length === 3, "arquivo de volta às três declarações");
 
   console.log("6. Substituir");
   await clica(`#listaMinhas [data-subst="${A.id}"]`); await dorme(200);
