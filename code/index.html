@@ -917,10 +917,12 @@ dialog h2{font-family:var(--serif); font-weight:400; font-size:21px; margin:0 0 
             <li><b>Substituir</b> — encerra a declaração atual na véspera e começa a nova, numa
               só gravação. É o caminho para trocar de horário.</li>
             <li><b>Encerrar</b> — dá data de fim a uma declaração que está valendo.</li>
-            <li><b>Excluir</b> — só para declaração que ainda não começou.</li>
+            <li><b>Excluir</b> — para declaração que ainda não começou e, no mesmo dia em que
+              foi feita, para qualquer uma: é como corrigir um engano de digitação.</li>
           </ul>
           <p>Uma declaração que já começou não se edita: o painel consulta o passado mês a mês,
-            e editar reescreveria o que ele já mostrou.</p>
+            e editar reescreveria o que ele já mostrou. Errou o horário de hoje? Exclua a
+            declaração ainda hoje e declare de novo.</p>
         </div>
       </div>
 
@@ -1680,6 +1682,13 @@ function limitesEncerrar(d) {
   const max = d.ate ? somaDias(d.ate, -1) : null;
   return (situacao(d) === "vigente" && (!max || min <= max)) ? { min, max } : null;
 }
+/* Excluir vale para a que ainda não começou e, no próprio dia em que foi
+   declarada, para qualquer uma: é a borracha do engano de digitação.
+   Até amanhã ninguém consultou aquele dia no painel como coisa passada.
+   Arquivo antigo sem criadaEm não ganha a exceção — na dúvida, fica. */
+const criadaHoje = (d) => typeof d.criadaEm === "string" &&
+  new Date(d.criadaEm).toLocaleDateString("sv") === hoje();
+const podeExcluir = (d) => situacao(d) === "futura" || criadaHoje(d);
 function limitesSubstituir(d) {
   const depoisDoInicio = somaDias(d.de, 1);
   const min = depoisDoInicio > hoje() ? depoisDoInicio : hoje();
@@ -1750,7 +1759,7 @@ function renderMinhas() {
       acoes.push(`<button type="button" class="acao sec mini" data-subst="${escapar(d.id)}">Substituir</button>`);
     if (limitesEncerrar(d))
       acoes.push(`<button type="button" class="acao sec mini" data-encerrar="${escapar(d.id)}">Encerrar</button>`);
-    if (st === "futura")
+    if (podeExcluir(d))
       acoes.push(`<button type="button" class="excluir" data-excluir="${escapar(d.id)}">Excluir</button>`);
     return `<li class="decl ${st}">
       <div class="faixa">${escapar(d.inicio)}–${escapar(d.fim)} · ${escapar(rotDias(d.dias))}
@@ -1871,7 +1880,7 @@ function atualizarTotal() {
     linhas.push("O total aparece aqui enquanto você preenche.");
   }
   if (f.de && f.de < hoje() && !substituindo)
-    linhas.push("Começa no passado: depois de gravada, esta declaração só poderá ser encerrada, não excluída.");
+    linhas.push("Começa no passado: depois de gravada, esta declaração só poderá ser excluída hoje mesmo; a partir de amanhã, só encerrada.");
   if (substituindo && f.de) {
     const velha = minhas.find(d => d.id === substituindo);
     if (velha)
@@ -2156,14 +2165,19 @@ $("listaMinhas").addEventListener("click", async (e) => {
   if (b.dataset.excluir) {
     const id = b.dataset.excluir;
     const d = minhas.find(x => x.id === id);
-    if (!d || !confirm(`Excluir a declaração de ${descrever(d)}?\n\nEla ainda não começou, então nada do que o painel já mostrou se perde.`)) return;
+    if (!d) return;
+    const porque = situacao(d) === "futura"
+      ? "Ela ainda não começou, então nada do que o painel já mostrou se perde."
+      : "Ela foi declarada hoje, então ainda dá para desfazer. A partir de amanhã, não poderá mais ser excluída.";
+    if (!confirm(`Excluir a declaração de ${descrever(d)}?\n\n${porque}`)) return;
     await gravarMinhas((est) => {
       const atual = est.declaracoes.find(x => x.id === id);
       if (!atual) throw recusa("Esta declaração não está mais no arquivo.");
-      /* Excluir só o que nunca valeu. O que já começou se encerra: apagar
-         reescreveria meses que o painel já mostrou. */
-      if (situacao(atual) !== "futura")
-        throw recusa("Esta declaração já começou: ela pode ser encerrada, não excluída.");
+      /* Excluir só o que nunca valeu, ou o que foi declarado hoje. O que
+         já começou noutro dia se encerra: apagar reescreveria dias que o
+         painel já mostrou. Conferido contra o arquivo relido. */
+      if (!podeExcluir(atual))
+        throw recusa("Esta declaração já começou e não foi declarada hoje: ela pode ser encerrada, não excluída.");
       est.declaracoes = est.declaracoes.filter(x => x.id !== id);
     }, "Declaração excluída.");
   }

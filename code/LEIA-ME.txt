@@ -1,4 +1,4 @@
-DECLARAÇÃO DE DISPONIBILIDADE (versão 0.7, out/26 — PWA em rede)
+DECLARAÇÃO DE DISPONIBILIDADE (versão 0.8, out/26 — PWA em rede)
 ================================================================
 
 Este arquivo é a documentação de verdade do programa. Não é uma lista
@@ -14,6 +14,37 @@ de jeitos diferentes: lá, para consultar; aqui, para entender.
 As seções vêm da mais nova para a mais antiga. Uma seção antiga não é
 apagada quando a decisão muda: a nova diz o que mudou e por quê, e a
 antiga fica como registro do que valia antes.
+
+A borracha do dia: excluir o que foi declarado hoje (novidade da v0.8)
+----------------------------------------------------------------------
+Na prova de uso, no primeiro dia, alguém declarou um horário que
+começava e terminava naquele mesmo dia e quis corrigi-lo. Não havia
+como. Excluir só valia para declaração que ainda não começou; encerrar
+só antecipa um fim, e ela já terminava hoje; substituir começa, no
+mínimo, no dia seguinte ao início da atual. E a declaração nova para
+hoje colidia com a errada. O horário de hoje ficava errado até amanhã.
+
+O mesmo valia, com menos alarde, para qualquer declaração que começa no
+passado: um engano de digitação nas datas não tinha borracha nenhuma —
+uma declaração inteira no passado nasce encerrada, sem botão algum.
+
+A regra "o que já começou não se apaga" existe para proteger o que o
+painel já mostrou. Mas uma declaração feita hoje ainda não foi vista
+por ninguém como coisa passada: quem abrir o painel amanhã olhando para
+hoje é que vai contar com ela. Então, a partir da 0.8, a declaração
+pode ser excluída no mesmo dia em que foi declarada, seja ela futura,
+vigente ou já encerrada. A partir do dia seguinte, valem as regras de
+sempre.
+
+"Declarada hoje" é lido do campo criadaEm, que toda declaração grava
+desde a 0.2 — não foi preciso chave nova, nem mexer em arquivo nenhum.
+Um arquivo antigo sem criadaEm não ganha a exceção: sem saber quando a
+declaração foi feita, o programa fica com a regra mais segura. E, como
+toda gravação, a exclusão é conferida contra o arquivo relido, não
+contra a tela.
+
+As ausências continuam com a regra antiga: o caso não apareceu nelas, e
+cada exceção a uma regra de histórico deve chegar com o seu motivo.
 
 O aviso de privacidade (novidade da v0.7)
 -----------------------------------------

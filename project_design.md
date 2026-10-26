@@ -380,7 +380,7 @@ em silêncio.
 
 **Edição, encerramento, exclusão.** Decidido em 12.4: a pessoa **encerra** uma
 declaração vigente (preenche `ate`) e **exclui** uma declaração que nunca valeu
-(`de` > hoje). **Não edita** uma declaração que já começou, porque isso reescreve o
+(`de` > hoje) ou que foi declarada hoje (v0.8). **Não edita** uma declaração que já começou, porque isso reescreve o
 passado que o administrador consulta por mês. Trocar de horário é **substituir**:
 encerrar a atual na véspera e declarar a nova a partir do dia seguinte, numa única
 gravação.
@@ -779,6 +779,7 @@ nome. Só se marca a *tag* com tudo isto feito:
 | v0.5 | out/2026 | Sem jornada (12.9) e sem o dourado; "Sobre" sem o crédito ao projeto de origem; ausências (férias, licença, recesso, outro) em Meus horários e no painel, descontadas da cobertura na data (#13). |
 | v0.6 | out/2026 | Preparação da 1.0: contrato dos arquivos congelado (5.6) e conferido por `testes/06-contrato.mjs`; recusa de gravar por cima de formato mais novo; testes no navegador no repositório; guia de instalação, permissões, cópia de segurança e publicação na LEIA-ME; lista de publicação da 1.0 (10.3). |
 | v0.7 | out/2026 | Aviso de Privacidade e Proteção de Dados (LGPD) na Ajuda, no lugar do marcador de texto pendente (12.7, #17). |
+| v0.8 | out/2026 | Prova de uso: a declaração pode ser excluída no dia em que foi declarada, mesmo já começada (12.4 revista, #20). |
 
 ---
 
@@ -877,6 +878,14 @@ A situação (vigente, futura, encerrada) é calculada contra hoje, nunca gravad
 Alternativa descartada: edição livre. É mais simples na tela, mas apaga o histórico
 que o painel consulta por mês.
 
+**Revisto na v0.8 (26/10/2026, prova de uso, #20):** excluir vale também para
+**qualquer declaração no dia em que foi declarada** (`criadaEm` na data local de
+hoje), seja futura, vigente ou encerrada. Motivo: uma declaração que começa e
+termina hoje não tinha ação nenhuma, e a nova para hoje colidia com ela; o engano do
+dia não tinha correção. O histórico que a regra protege é o já consultado, e o do dia
+ainda não foi. Arquivo sem `criadaEm` não ganha a exceção. Ausências mantêm a regra
+original.
+
 ### 12.5. Ausências — **Decidido: entram na v0.5** (revisto em 21/10/2026, #13)
 
 A primeira decisão as deixava para depois da 1.0, com a chave reservada. Revista a
@@ -962,7 +971,7 @@ declaração ou ausência.
 | **2. Declarar** | Tela *Meus horários*: formulário, total ao vivo, recusas de 7.2, colisão, encerrar/excluir/substituir, grade semanal. `atualizarArquivoPessoa`. | v0.2 |
 | **3. Painel** | Filtros, indicadores, tabela, CSV, "arquivos sem cadastro"; recorte por `unidadesVisiveis()` para o leitor. | v0.3 |
 | **4. Gráficos** | Mapa de cobertura, horas por semana, linha do tempo, todos em HTML/CSS (12.6). | v0.4 |
-| **5. Prova de uso** | Teste com uma unidade real, numa pasta real, com permissões NTFS aplicadas. Ajustes — o primeiro lote (#13: jornada, crédito, ausências) saiu na v0.5. Roteiro em `prova-de-uso/ROTEIRO.md`; relatos pelo modelo de issue "Prova de uso: relato" (#20). | v0.5… |
+| **5. Prova de uso** | Teste com uma unidade real, numa pasta real, com permissões NTFS aplicadas. Ajustes — o primeiro lote (#13: jornada, crédito, ausências) saiu na v0.5; o engano do dia (12.4 revista), na v0.8. Roteiro em `prova-de-uso/ROTEIRO.md`; relatos pelo modelo de issue "Prova de uso: relato" (#20). | v0.5… |
 | **6. Produção** | Esquema congelado, LEIA-ME completo, Ajuda com o texto de 12.7. Preparada em out/2026 (contrato 5.6, teste 06, guia de instalação na LEIA-ME; aviso LGPD na v0.7); a *tag* espera a prova de uso (10.3, #20). | **v1.0** |
 
 Depois da 1.0, nesta ordem de custo/benefício: relatório impresso (o mecanismo da
@@ -980,7 +989,7 @@ entraram na v0.5.)
 | **Ausência** | Período de férias, licença, recesso ou outro afastamento declarado pela própria pessoa. Tira a pessoa da cobertura na data. |
 | **Jornada / carga** | Horas por dia (8 ou 6) pedidas até a v0.4; removidas na v0.5 (12.9). Ficam nos arquivos antigos, sem uso. |
 | **Encerrar** | Preencher `ate` numa declaração vigente. Única alteração permitida depois que ela começou. |
-| **Excluir** | Apagar uma declaração que ainda não começou (`de` > hoje). |
+| **Excluir** | Apagar uma declaração que ainda não começou (`de` > hoje) ou que foi declarada hoje (v0.8). |
 | **Substituir** | Encerrar a vigente na véspera e declarar a nova, numa só gravação. |
 | **Cobertura** | Quantas pessoas declararam estar em atividade numa hora de um dia da semana. |
 | **Selo** | UUID gravado no `config.json` que identifica a pasta oficial. |

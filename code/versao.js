@@ -21,8 +21,8 @@
    existe justamente para funcionar sem ela (ver LEIA-ME).
    ========================================================= */
 const APP = {
-  versao:      "0.7",                   // acompanha a tag do repositório
-  rotulo:      "versão 0.7 (out/26)",   // etiqueta exibida no rail
-  atualizado:  "21.10.2026",            // data desta publicação
+  versao:      "0.8",                   // acompanha a tag do repositório
+  rotulo:      "versão 0.8 (out/26)",   // etiqueta exibida no rail
+  atualizado:  "26.10.2026",            // data desta publicação
   repositorio: "https://github.com/ErnyBSB/declare-time"
 };
