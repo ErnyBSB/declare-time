@@ -1,0 +1,258 @@
+
+=== 01-entrada.mjs — Entrada, cadastro e papéis (v0.1)
+1. Pasta virgem: oficializar
+  ok    etiqueta da versão vem do versao.js
+  ok    abre na entrada
+  ok    pasta sem config.json oferece oficializar
+  ok    senhas diferentes são recusadas
+  ok    config.json criado com o primeiro adm
+  ok    config.json tem formato, atualizadoEm e selo
+  ok    não há chave 'administrador' fixa
+  ok    entrar não grava arquivo (a jornada não é mais pedida)
+  ok    não há escolha de 8 ou 6 horas na tela
+  ok    entra em Meus horários
+  ok    adm vê Administração no rail
+2. Administração: unidades, pessoas, papéis
+  ok    unidade repetida (sem diferenciar maiúsculas) é recusada
+  ok    nome com o mesmo slug é recusado
+  ok    leitor sem unidade é recusado
+  ok    leitor gravado com a lista de unidades
+  ok    unidade com pessoas não pode ser removida
+  ok    não retira o papel do último adm
+  ok    não remove o último adm
+  ok    tornar adm sem senha abre a janela de senha
+  ok    adm e senha gravados juntos
+  ok    adm não oferece 'Remover senha'
+3. Dois administradores: conferência de atualizadoEm
+  ok    gravação recusada quando outro adm gravou antes
+  ok    a mudança do outro adm não foi apagada
+  ok    depois de atualizar, grava sem perder nada
+4. Entrar como pessoa comum e como leitora
+  ok    pessoa sem senha não vê o campo de senha
+  ok    leitora entra sem Administração
+  ok    rail mostra o papel de leitor
+  ok    unidadesVisiveis() do leitor
+  ok    podeVer barra Administração para quem não é adm
+5. Chaves desconhecidas sobrevivem à gravação
+  ok    declaração gravada; 'realizados' e a jornada antiga preservados intactos
+  ok    declaração nova não leva jornada
+6. Arquivo da pessoa ilegível
+  ok    arquivo ilegível: tela avisa e não deixa gravar por cima
+  ok    arquivo ilegível ficou intacto
+7. Senha exigida e senha errada
+  ok    adm vê o campo de senha
+  ok    senha errada recusada
+8. Identidade lembrada ao reabrir
+  ok    reabre direto com a identidade lembrada
+9. config.json ilegível: ninguém entra
+  ok    volta para a entrada
+  ok    explica que não é pasta nova
+  ok    não oferece oficializar nem entrar
+10. Ajuda e Sobre antes de entrar
+  ok    ajuda abre sem identidade
+  ok    marcador de texto pendente removido
+  ok    aviso LGPD com os cinco itens aprovados
+  ok    itens factuais do aviso batem com o programa
+  ok    Sobre mostra a versão
+11. Service worker e cache dt-
+  ok    cache dt-<versão> criado: ["dt-0.8"]
+
+=== 02-declarar.mjs — Meus horários: declarar (v0.2)
+0. Preparação: pasta nova
+  ok    versão do versao.js no rail
+  ok    entra em Meus horários
+  ok    lista começa vazia
+1. Recusas do formulário (7.2)
+  ok    faixa invertida explica a meia-noite
+  ok    sem dia da semana
+  ok    último dia antes do primeiro
+  ok    dia marcado fora do período
+  ok    nenhuma recusa gravou nada
+2. Declarar e total ao vivo
+  ok    total ao vivo: 6h por dia · 30h por semanaComeça no pas
+  ok    total ao vivo sem comparação com jornada
+  ok    aviso de início no passado
+  ok    declaração gravada
+  ok    esquema 5.1 com retratos de carga e unidade
+  ok    vigente marcada; nenhum aviso dourado
+  ok    observação escapada
+  ok    vigente declarada hoje oferece excluir (engano do dia)
+3. Colisão só quando período, dia e hora se cruzam
+  ok    colisão cita a outra declaração e os dias
+  ok    faixa encostada (15h) não colide — jornada partida
+  ok    mesma hora em outro dia não colide
+  ok    três declarações no arquivo
+4. Grade da semana
+  ok    totais do dia: ["Total","8h","8h","8h","8h","8h","3h"]
+  ok    células cobertas (hora inteira)
+5. Futura: excluir
+  ok    futura oferece excluir
+  ok    futura excluída
+5b. Engano do dia: excluir no dia em que foi declarada (v0.8)
+  ok    declaração só de hoje gravada
+  ok    só de hoje: sem substituir nem encerrar, com excluir
+  ok    enquanto existir, a nova colide com ela
+  ok    declarada hoje e já começada: excluída
+  ok    horário de hoje declarado de novo
+  ok    declarada ontem segundo o arquivo: recusa e nada se apaga
+  ok    declarada ontem ou sem criadaEm: sem excluir
+  ok    arquivo de volta às três declarações
+6. Substituir
+  ok    substituir começa hoje, com o horário atual
+  ok    substituição não começa no passado
+  ok    substituição gravada
+  ok    atual termina na véspera, nova começa amanhã
+  ok    substituir não apaga a antiga
+7. Encerrar
+  ok    encerrar no passado é recusado
+  ok    encerrada com o último dia escolhido
+8. Colisão conferida contra o arquivo, não contra a tela
+  ok    declaração de outra aba é levada em conta
+  ok    dia em comum que não ocorre na sobreposição não colide
+9. Arquivo ilegível bloqueia o formulário
+  ok    mostra o motivo e desliga Declarar
+  ok    volta ao normal depois de corrigido
+
+=== 03-painel.mjs — Painel (v0.3)
+0. Preparação
+  ok    versão do versao.js no rail
+1. Rail e acesso
+  ok    adm vê Painel e Administração
+  ok    painel abre
+2. Administrador, numa data (hoje)
+  ok    indicadores: ["5","3","1","100h","0"]
+  ok    ilegível contado à parte
+  ok    média por pessoa com declaração
+  ok    tabela alfabética, atribuída pelo arquivo: ["Ana Beatriz Nunes","Carlos Eduardo Prado","Roberto Aguiar"]
+  ok    tabela sem coluna de jornada nem dourado
+  ok    lista de quem falta, com o ilegível marcado
+  ok    arquivos que pedem atenção (órfão e ilegível)
+  ok    arquivo sem cadastro fica fora das contas
+3. Filtros
+  ok    SEORE pela unidade carimbada (Carlos declarou quando era de SEORE)
+  ok    cadastrados em SEORE pela unidade atual: Roberto e Helena
+  ok    horas por semana não se somam num mês
+  ok    no mês que vem entram a vigente e a futura da Ana
+  ok    numa data passada, só o que valia nela
+4. CSV
+  ok    BOM UTF-8 nos primeiros bytes
+  ok    cabeçalho na ordem do esquema, sem jornada
+  ok    uma linha por declaração da tabela
+  ok    fórmula neutralizada com apóstrofo
+  ok    dias por extenso
+5. Leitora de SEACE
+  ok    leitora vê Painel e não Administração
+  ok    só declarações carimbadas com SEACE
+  ok    SEACE: 3 cadastrados, 2 com declaração (Carlos conta), 0 sem: ["3","2","0","30h","0"]
+  ok    indicador explica o Carlos fora da tabela
+  ok    leitora não vê os arquivos fora do cadastro
+  ok    filtro de unidade só com as dela
+6. Quem só declara
+  ok    item malformado avisado em Meus horários
+  ok    item malformado continua no arquivo
+  ok    pessoa comum não vê o Painel
+  ok    podeVer barra o Painel
+7. Painel do administrador no celular
+
+=== 04-graficos.mjs — Gráficos do painel (v0.4)
+0. Preparação
+  ok    versão do versao.js no rail
+1. Cobertura (hoje, todas as unidades)
+  ok    colunas de segunda a sexta (fim de semana não usado hoje)
+  ok    horas da primeira à última usada: 09h–18h
+  ok    segunda, hora a hora (pessoas distintas): ["2","2","2","2","3","3","2","2","1","1"]
+  ok    3 pessoas = 3º degrau
+  ok    dica lista quem cobre
+  ok    legenda com o zero
+2. Hora descoberta
+  ok    SEACE hoje só tem a Ana: grade só nas horas dela, sem zeros
+3. Horas por semana
+  ok    ordem alfabética por padrão
+  ok    barras de uma cor só, sem traço de jornada
+  ok    valor na ponta de cada barra
+  ok    ordenar por volume, e volta
+4. Linha do tempo
+  ok    uma faixa por pessoa
+  ok    Ana: vigente e futura
+  ok    sobreposição vai para uma segunda raia
+  ok    vigente em verde, sem fim = continua além da janela
+  ok    linha da data de referência em cada faixa
+  ok    faixa tem texto alternativo
+5. Dica no foco e no ponteiro
+  ok    foco pelo teclado mostra a dica
+6. Num mês
+  ok    barras recusam o mês, com o motivo
+  ok    no mês, o sábado da futura da Ana aparece na cobertura
+  ok    janela da linha do tempo é o mês
+
+=== 05-ausencias.mjs — Sem jornada, ausências (v0.5)
+1. Sem jornada e sem crédito de origem
+  ok    versão do versao.js no rail
+  ok    Sobre sem 'Derivado do Programa de Resultados'
+  ok    oficializar não pede jornada
+  ok    entra direto em Meus horários
+  ok    rail e ficha sem jornada
+2. Registrar ausência: recusas
+  ok    quatro tipos, do catálogo
+  ok    ausência exige último dia
+  ok    último dia antes do primeiro
+3. Futura: registrar, colisão, excluir
+  ok    ausência futura registrada
+  ok    gravada na chave ausencias, com unidade carimbada
+  ok    duas ausências não cobrem o mesmo dia
+  ok    futura oferece excluir
+  ok    futura excluída
+4. Em curso: aviso, encerrar
+  ok    férias em curso registradas, por cima de uma declaração vigente
+  ok    Minha semana avisa a ausência de hoje
+  ok    em curso: encerrar, não excluir
+  ok    encerrar no passado é recusado
+  ok    férias encerradas antes
+  ok    a declaração não foi tocada
+5. Painel
+  ok    indicador Ausentes = 1 (Roberto hoje): ["2","2","0","66h","1"]
+  ok    cobertura tira o Roberto ausente: segunda 10h conta só a Ana
+  ok    nota diz quem saiu da conta
+  ok    horas e dias que só o ausente cobria aparecem como zero (descoberta), em vez de sumir
+  ok    tabela marca a declaração de quem está ausente
+  ok    tabela de ausências: só a da data
+  ok    linha do tempo mostra as duas ausências válidas (a malformada fica fora)
+  ok    barra do ausente avisa na dica
+  ok    CSV de ausências com BOM, tipo por extenso e dias corridos
+  ok    no mês, a cobertura não desconta e diz por quê
+
+=== 06-contrato.mjs — Contrato dos arquivos (v1.0)
+1. Gravar cada tipo de dado pela tela
+2. config.json
+  ok    config.json: só chaves do contrato
+  ok    formato 1, unidades lista, pessoas mapa
+  ok    pessoas["Roberto Aguiar"]: só chaves do contrato
+  ok    pessoas["Ana Beatriz Nunes"]: só chaves do contrato
+  ok    papéis gravados como leitor (lista) e adm (true)
+  ok    instalacao: só chaves do contrato
+  ok    senhas só como hash sha-256
+3. Arquivo da pessoa, declaração, ausência
+  ok    declaracoes/roberto-aguiar.json: só chaves do contrato
+  ok    formato 1, sem cargaHoraria
+  ok    declaração: só chaves do contrato
+  ok    ate null = sem fim; dias como números
+  ok    ausência: só chaves do contrato
+  ok    tipo gravado pela chave, não pelo rótulo
+4. Chave desconhecida atravessa a gravação
+  ok    arquivo da pessoa: chaves desconhecidas preservadas (topo e item)
+  ok    config.json: chaves desconhecidas preservadas (topo e pessoa)
+5. Formato mais novo: não grava por cima
+  ok    arquivo de formato 2: tela avisa e desliga as gravações
+  ok    arquivo de formato 2 ficou intacto
+  ok    config.json de formato 2: Administração não grava por cima
+  ok    a tela continua de pé
+
+=== Resumo
+  ok      01-entrada.mjs: 45 conferência(s), 0 falha(s)
+  ok      02-declarar.mjs: 43 conferência(s), 0 falha(s)
+  ok      03-painel.mjs: 31 conferência(s), 0 falha(s)
+  ok      04-graficos.mjs: 22 conferência(s), 0 falha(s)
+  ok      05-ausencias.mjs: 29 conferência(s), 0 falha(s)
+  ok      06-contrato.mjs: 19 conferência(s), 0 falha(s)
+
+Tudo certo.

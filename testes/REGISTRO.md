@@ -13,7 +13,27 @@ conferência à mão nem a prova de uso (`prova-de-uso/ROTEIRO.md`).
 
 | Data | Versão | Commit | Ambiente | Resultado | Saída |
 |---|---|---|---|---|---|
+| 26/10/2026 | v0.8 | `9bbf780` | Ubuntu 24.04.5 LTS · Node 22.17.1 · Google Chrome 155.0.8059.79 (headless) | **189 conferências, 0 falhas**, nenhum erro no console | [`2026-10-26_v0.8.txt`](resultados/2026-10-26_v0.8.txt) |
 | 22/10/2026 | v0.7 | `37f115f` | Ubuntu 24.04.5 LTS · Node 22.17.1 · Google Chrome 155.0.8059.79 (headless) | **181 conferências, 0 falhas**, nenhum erro no console | [`2026-10-22_v0.7.txt`](resultados/2026-10-22_v0.7.txt) |
+
+## 26/10/2026 — v0.8
+
+Sobre o código da *tag* `v0.8` (`9bbf780`), rodado no próprio `main` da *tag*. A
+única suíte que mudou é a `02-declarar`, com a seção 5b: excluir a declaração no dia
+em que foi declarada (12.4 revista, #29), achado da prova de uso (#20).
+
+| Suíte | O que cobre | Conferências | Falhas |
+|---|---|---|---|
+| `01-entrada` | oficializar, entrar, cadastro e papéis, dois administradores, arquivos ilegíveis, Ajuda (aviso LGPD), Sobre, cache | 45 | 0 |
+| `02-declarar` | recusas do formulário, total ao vivo, colisão, substituir, encerrar, excluir, **engano do dia**, grade da semana | 43 | 0 |
+| `03-painel` | indicadores, atribuição pelo dono do arquivo, filtros, recorte do leitor, CSV | 31 | 0 |
+| `04-graficos` | cobertura, horas por semana, linha do tempo, dica no foco | 22 | 0 |
+| `05-ausencias` | sem jornada, ausências na tela e no painel | 29 | 0 |
+| `06-contrato` | chaves gravadas contra a tabela 5.6, chaves desconhecidas, formato mais novo | 19 | 0 |
+| **Total** | | **189** | **0** |
+
+Código de saída 0. Comando: `node testes/rodar.mjs > testes/resultado-testes.txt 2>&1`,
+depois movido para `testes/resultados/`.
 
 ## 22/10/2026 — v0.7 (primeiro registro)
 
